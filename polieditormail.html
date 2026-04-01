@@ -46,6 +46,7 @@
 
             const HUB_ASSETS = {
                 logo: 'https://i.imgur.com/URPZBPX.png',
+                site: 'https://poligonalhub.com',
                 linkedin: 'https://www.linkedin.com/company/poligonalhub/',
                 youtube: 'https://www.youtube.com/@poligonalhub',
                 instagram: 'https://www.instagram.com/poligonalhub/',
@@ -105,7 +106,6 @@
                 <div className="min-h-screen text-zinc-400 p-4 md:p-8 font-sans overflow-x-hidden">
                     <div className="max-w-[720px] mx-auto bg-[#111] border border-white/5 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col">
                         
-                        {/* Editor */}
                         <div className="p-6 md:p-10 border-b border-white/5">
                             <header className="flex items-center justify-between mb-8">
                                 <h2 className="text-[10px] font-black flex items-center gap-2 text-white uppercase tracking-[0.3em]">
@@ -175,7 +175,6 @@
                             </div>
                         </div>
 
-                        {/* Preview */}
                         <div className="bg-[#0c0c0c] p-6 md:p-10 flex flex-col flex-grow items-center">
                             <div className="w-full flex items-center justify-between mb-8 px-2">
                                 <h2 className="text-xl font-black text-white tracking-tighter uppercase italic">PREVIEW</h2>
@@ -198,21 +197,21 @@
                                                                     <div style={{ fontSize: '12px', color: data.secondaryColor, fontWeight: '800', margin: '0 0 28px 0', textTransform: 'uppercase', letterSpacing: '5px' }}>{data.role}</div>
                                                                     <div style={{ height: '3px', backgroundColor: data.secondaryColor, width: '40px', marginBottom: '32px' }}></div>
                                                                     <div style={{ marginBottom: '38px' }}>
-                                                                        <img src={HUB_ASSETS.logo} alt="Poligonal Hub" width="340" style={{ display: 'block', border: '0' }} />
+                                                                        <a href={HUB_ASSETS.site} target="_blank"><img src={HUB_ASSETS.logo} alt="Poligonal Hub" width="340" style={{ display: 'block', border: '0' }} /></a>
                                                                     </div>
                                                                     <table cellPadding="0" cellSpacing="0">
                                                                         <tbody>
                                                                             <tr>
                                                                                 {data.personalLinks.map((link, idx) => link.url && (
                                                                                     <td key={idx} style={{ paddingRight: '16px' }}>
-                                                                                        <a href={link.url}><img src={getSocialIcon(link.url, 'ffffff')} width="22" height="22" alt="Icon" /></a>
+                                                                                        <a href={link.url} target="_blank"><img src={getSocialIcon(link.url, 'ffffff')} width="22" height="22" alt="Icon" /></a>
                                                                                     </td>
                                                                                 ))}
                                                                                 {data.personalLinks.some(l => l.url) && <td style={{ paddingRight: '20px' }}></td>}
-                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.linkedin}><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/linkedin.png`} width="22" height="22" /></a></td>
-                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.youtube}><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/youtube-play.png`} width="22" height="22" /></a></td>
-                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.instagram}><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/instagram-new.png`} width="22" height="22" /></a></td>
-                                                                                <td><a href={HUB_ASSETS.substack}><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/news.png`} width="22" height="22" /></a></td>
+                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.linkedin} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/linkedin.png`} width="22" height="22" /></a></td>
+                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.youtube} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/youtube-play.png`} width="22" height="22" /></a></td>
+                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.instagram} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/instagram-new.png`} width="22" height="22" /></a></td>
+                                                                                <td><a href={HUB_ASSETS.substack} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/news.png`} width="22" height="22" /></a></td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
