@@ -55,10 +55,11 @@
 
             const ensureAbsoluteUrl = (url) => {
                 if (!url) return '';
-                if (!/^https?:\/\//i.test(url)) {
-                    return `https://${url}`;
+                const trimmedUrl = url.trim();
+                if (!/^https?:\/\//i.test(trimmedUrl)) {
+                    return `https://${trimmedUrl}`;
                 }
-                return url;
+                return trimmedUrl;
             };
 
             const getSocialIcon = (url, colorHex = 'ffffff') => {
@@ -114,6 +115,7 @@
                 <div className="min-h-screen text-zinc-400 p-4 md:p-8 font-sans overflow-x-hidden">
                     <div className="max-w-[720px] mx-auto bg-[#111] border border-white/5 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col">
                         
+                        {/* Seção do Editor */}
                         <div className="p-6 md:p-10 border-b border-white/5">
                             <header className="flex items-center justify-between mb-8">
                                 <h2 className="text-[10px] font-black flex items-center gap-2 text-white uppercase tracking-[0.3em]">
@@ -150,7 +152,7 @@
                                         {data.personalLinks.map((link, idx) => (
                                             <div key={idx} className="flex gap-2 items-center">
                                                 <div className="relative flex-grow">
-                                                    <input type="text" value={link.url} onChange={e => updateLink(idx, e.target.value)} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" placeholder="URL do link (ex: instagram.com/usuario)" />
+                                                    <input type="text" value={link.url} onChange={e => updateLink(idx, e.target.value)} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" placeholder="URL (ex: instagram.com/voce)" />
                                                 </div>
                                                 {data.personalLinks.length > 1 && (
                                                     <button onClick={() => removeLink(idx)} className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all">×</button>
@@ -183,6 +185,7 @@
                             </div>
                         </div>
 
+                        {/* Seção de Preview */}
                         <div className="bg-[#0c0c0c] p-6 md:p-10 flex flex-col flex-grow items-center">
                             <div className="w-full flex items-center justify-between mb-8 px-2">
                                 <h2 className="text-xl font-black text-white tracking-tighter uppercase italic">PREVIEW</h2>
@@ -192,40 +195,40 @@
                             </div>
 
                             <div className="w-full flex items-center justify-center p-2 md:p-6 overflow-x-auto">
-                                <div ref={signatureRef} className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[44px]">
-                                    <table cellPadding="0" cellSpacing="0" style={{ backgroundColor: data.bgColor, color: '#FFFFFF', fontFamily: "'Raleway', Helvetica, Arial, sans-serif", width: '640px', borderRadius: '44px', border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', borderCollapse: 'separate' }}>
+                                <div ref={signatureRef} className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[32px]">
+                                    <table cellPadding="0" cellSpacing="0" style={{ backgroundColor: data.bgColor, color: '#FFFFFF', fontFamily: "'Raleway', Helvetica, Arial, sans-serif", width: '500px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', borderCollapse: 'separate' }}>
                                         <tbody>
                                             <tr>
-                                                <td style={{ padding: '48px' }}>
+                                                <td style={{ padding: '32px' }}>
                                                     <table cellPadding="0" cellSpacing="0" style={{ width: '100%' }}>
                                                         <tbody>
                                                             <tr>
-                                                                <td style={{ verticalAlign: 'top', paddingRight: '40px' }}>
-                                                                    <div style={{ fontSize: '38px', fontWeight: '900', color: '#FFFFFF', margin: '0 0 4px 0', lineHeight: '1', letterSpacing: '-2px' }}>{data.name}</div>
-                                                                    <div style={{ fontSize: '12px', color: data.secondaryColor, fontWeight: '800', margin: '0 0 28px 0', textTransform: 'uppercase', letterSpacing: '5px' }}>{data.role}</div>
-                                                                    <div style={{ height: '3px', backgroundColor: data.secondaryColor, width: '40px', marginBottom: '32px' }}></div>
-                                                                    <div style={{ marginBottom: '38px' }}>
-                                                                        <a href={HUB_ASSETS.site} target="_blank"><img src={HUB_ASSETS.logo} alt="Poligonal Hub" width="340" style={{ display: 'block', border: '0' }} /></a>
+                                                                <td style={{ verticalAlign: 'top', paddingRight: '25px' }}>
+                                                                    <div style={{ fontSize: '26px', fontWeight: '900', color: '#FFFFFF', margin: '0 0 2px 0', lineHeight: '1.1', letterSpacing: '-1.2px' }}>{data.name}</div>
+                                                                    <div style={{ fontSize: '10px', color: data.secondaryColor, fontWeight: '800', margin: '0 0 20px 0', textTransform: 'uppercase', letterSpacing: '4px' }}>{data.role}</div>
+                                                                    <div style={{ height: '2px', backgroundColor: data.secondaryColor, width: '30px', marginBottom: '24px' }}></div>
+                                                                    <div style={{ marginBottom: '28px' }}>
+                                                                        <a href={HUB_ASSETS.site} target="_blank"><img src={HUB_ASSETS.logo} alt="Poligonal Hub" width="240" style={{ display: 'block', border: '0' }} /></a>
                                                                     </div>
                                                                     <table cellPadding="0" cellSpacing="0">
                                                                         <tbody>
                                                                             <tr>
                                                                                 {data.personalLinks.map((link, idx) => link.url && (
-                                                                                    <td key={idx} style={{ paddingRight: '16px' }}>
-                                                                                        <a href={ensureAbsoluteUrl(link.url)} target="_blank"><img src={getSocialIcon(link.url, 'ffffff')} width="22" height="22" alt="Icon" /></a>
+                                                                                    <td key={idx} style={{ paddingRight: '12px' }}>
+                                                                                        <a href={ensureAbsoluteUrl(link.url)} target="_blank"><img src={getSocialIcon(link.url, 'ffffff')} width="18" height="18" alt="Icon" /></a>
                                                                                     </td>
                                                                                 ))}
-                                                                                {data.personalLinks.some(l => l.url) && <td style={{ paddingRight: '20px' }}></td>}
-                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.linkedin} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/linkedin.png`} width="22" height="22" /></a></td>
-                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.youtube} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/youtube-play.png`} width="22" height="22" /></a></td>
-                                                                                <td style={{ paddingRight: '16px' }}><a href={HUB_ASSETS.instagram} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/instagram-new.png`} width="22" height="22" /></a></td>
-                                                                                <td><a href={HUB_ASSETS.substack} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/news.png`} width="22" height="22" /></a></td>
+                                                                                {data.personalLinks.some(l => l.url) && <td style={{ paddingRight: '15px' }}></td>}
+                                                                                <td style={{ paddingRight: '12px' }}><a href={HUB_ASSETS.linkedin} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/linkedin.png`} width="18" height="18" /></a></td>
+                                                                                <td style={{ paddingRight: '12px' }}><a href={HUB_ASSETS.youtube} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/youtube-play.png`} width="18" height="18" /></a></td>
+                                                                                <td style={{ paddingRight: '12px' }}><a href={HUB_ASSETS.instagram} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/instagram-new.png`} width="18" height="18" /></a></td>
+                                                                                <td><a href={HUB_ASSETS.substack} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/news.png`} width="18" height="18" /></a></td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
                                                                 </td>
-                                                                <td style={{ verticalAlign: 'top', width: '230px' }}>
-                                                                    <div style={{ width: '230px', height: '230px', borderRadius: '32px', overflow: 'hidden', border: `3px solid ${data.secondaryColor}`, backgroundColor: '#000' }}>
+                                                                <td style={{ verticalAlign: 'middle', width: '150px' }}>
+                                                                    <div style={{ width: '150px', height: '150px', borderRadius: '24px', overflow: 'hidden', border: `2px solid ${data.secondaryColor}`, backgroundColor: '#000' }}>
                                                                         <img src={data.photoUrl} alt={data.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                                                     </div>
                                                                 </td>
