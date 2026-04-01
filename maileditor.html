@@ -151,7 +151,19 @@
                                         {data.personalLinks.map((link, idx) => (
                                             <div key={idx} className="flex gap-2 items-center">
                                                 <div className="relative flex-grow">
-                                                    <input type="text" value={link.url} onChange={e => updateLink(idx, e.target.value)} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" placeholder="URL (ex: instagram.com/voce)" />
+                                                    <input 
+                                                        type="text" 
+                                                        value={link.url} 
+                                                        onChange={e => updateLink(idx, e.target.value)} 
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                addLink();
+                                                            }
+                                                        }}
+                                                        className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" 
+                                                        placeholder="URL (ex: instagram.com/voce)" 
+                                                    />
                                                 </div>
                                                 {data.personalLinks.length > 1 && (
                                                     <button onClick={() => removeLink(idx)} className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all">×</button>
