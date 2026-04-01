@@ -53,6 +53,14 @@
                 substack: 'https://poligonal.substack.com/'
             };
 
+            const ensureAbsoluteUrl = (url) => {
+                if (!url) return '';
+                if (!/^https?:\/\//i.test(url)) {
+                    return `https://${url}`;
+                }
+                return url;
+            };
+
             const getSocialIcon = (url, colorHex = 'ffffff') => {
                 const cleanColor = colorHex.replace('#', '');
                 if (!url) return `https://img.icons8.com/ios-filled/50/${cleanColor}/internet.png`;
@@ -142,7 +150,7 @@
                                         {data.personalLinks.map((link, idx) => (
                                             <div key={idx} className="flex gap-2 items-center">
                                                 <div className="relative flex-grow">
-                                                    <input type="text" value={link.url} onChange={e => updateLink(idx, e.target.value)} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" placeholder="URL do link..." />
+                                                    <input type="text" value={link.url} onChange={e => updateLink(idx, e.target.value)} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" placeholder="URL do link (ex: instagram.com/usuario)" />
                                                 </div>
                                                 {data.personalLinks.length > 1 && (
                                                     <button onClick={() => removeLink(idx)} className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all">×</button>
@@ -204,7 +212,7 @@
                                                                             <tr>
                                                                                 {data.personalLinks.map((link, idx) => link.url && (
                                                                                     <td key={idx} style={{ paddingRight: '16px' }}>
-                                                                                        <a href={link.url} target="_blank"><img src={getSocialIcon(link.url, 'ffffff')} width="22" height="22" alt="Icon" /></a>
+                                                                                        <a href={ensureAbsoluteUrl(link.url)} target="_blank"><img src={getSocialIcon(link.url, 'ffffff')} width="22" height="22" alt="Icon" /></a>
                                                                                     </td>
                                                                                 ))}
                                                                                 {data.personalLinks.some(l => l.url) && <td style={{ paddingRight: '20px' }}></td>}
