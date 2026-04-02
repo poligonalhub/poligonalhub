@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Editor - Poligonal Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap');
+        body { background-color: #050505; margin: 0; }
+        select { background-image: none !important; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        const THEMES = {
+            poligonal: { name: 'Poligonal Original', bgColor: '#000000', secondaryColor: '#C7009C' },
+            roxo: { name: 'Roxo', bgColor: '#1A0A20', secondaryColor: '#9D00FF' },
+            verde: { name: 'Verde', bgColor: '#04BF9D', secondaryColor: '#DEFFF9' },
+            laranja: { name: 'Laranja', bgColor: '#FF4D00', secondaryColor: '#EDB70C' },
+            amarelo: { name: 'Amarelo', bgColor: '#EDB70C', secondaryColor: '#FF4D00' },
+            vermelho: { name: 'Vermelho', bgColor: '#C61008', secondaryColor: '#DEFFF9' },
+            rosa: { name: 'Rosa', bgColor: '#EB00DC', secondaryColor: '#1A0A20' }
+        };
+
+        const App = () => {
+            const [data, setData] = useState({
+                name: 'Nome do Integrante',
+                role: 'Cargo / Função',
+                bgColor: THEMES.poligonal.bgColor,
+                secondaryColor: THEMES.poligonal.secondaryColor,
+                textColor: '#FFFFFF',
+                photoUrl: 'https://i.imgur.com/LjAazyW.png',
+                personalLinks: [{ url: '' }]
+            });
+
+            const [copied, setCopied] = useState(false);
+            const signatureRef = useRef(null);
+
+            const HUB_ASSETS = {
+                logo: 'https://i.imgur.com/URPZBPX.png',
+                site: 'https://poligonalhub.com',
+                linkedin: 'https://www.linkedin.com/company/poligonalhub/',
+                youtube: 'https://www.youtube.com/@poligonalhub',
+                instagram: 'https://www.instagram.com/poligonalhub/',
+                substack: 'https://poligonal.substack.com/'
+            };
+
+            const ensureAbsoluteUrl = (url) => {
+                if (!url) return '';
+                const trimmedUrl = url.trim();
+                if (!/^https?:\/\//i.test(trimmedUrl)) {
+                    return `https://${trimmedUrl}`;
+                }
+                return trimmedUrl;
+            };
+
+            const getSocialIcon = (url, colorHex = 'ffffff') => {
+                const cleanColor = colorHex.replace('#', '');
+                if (!url) return `https://img.icons8.com/ios-filled/50/${cleanColor}/internet.png`;
+                const lowerUrl = url.toLowerCase();
+                if (lowerUrl.includes('instagram.com')) return `https://img.icons8.com/ios-filled/50/${cleanColor}/instagram-new.png`;
+                if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return `https://img.icons8.com/ios-filled/50/${cleanColor}/youtube-play.png`;
+                if (lowerUrl.includes('bsky.app')) return `https://img.icons8.com/ios-filled/50/${cleanColor}/butterfly.png`;
+                if (lowerUrl.includes('linkedin.com')) return `https://img.icons8.com/ios-filled/50/${cleanColor}/linkedin.png`;
+                if (lowerUrl.includes('substack.com')) return `https://img.icons8.com/ios-filled/50/${cleanColor}/news.png`;
+                if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return `https://img.icons8.com/ios-filled/50/${cleanColor}/x-logo.png`;
+                return `https://img.icons8.com/ios-filled/50/${cleanColor}/internet.png`;
+            };
+
+            const handleThemeChange = (e) => {
+                const theme = THEMES[e.target.value];
+                if (theme) {
+                    setData(prev => ({ ...prev, bgColor: theme.bgColor, secondaryColor: theme.secondaryColor }));
+                }
+            };
+
+            const addLink = () => setData(prev => ({ ...prev, personalLinks: [...prev.personalLinks, { url: '' }] }));
+            
+            const removeLink = (index) => {
+                const newList = [...data.personalLinks];
+                newList.splice(index, 1);
+                setData(prev => ({ ...prev, personalLinks: newList }));
+            };
+
+            const updateLink = (index, value) => {
+                const newList = [...data.personalLinks];
+                newList[index].url = value;
+                setData(prev => ({ ...prev, personalLinks: newList }));
+            };
+
+            const copyToClipboard = () => {
+                if (signatureRef.current) {
+                    const range = document.createRange();
+                    range.selectNode(signatureRef.current);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                }
+            };
+
+            const cleanHex = (hex) => hex.replace('#', '');
+
+            return (
+                <div className="min-h-screen text-zinc-400 p-4 md:p-8 font-sans overflow-x-hidden">
+                    <div className="max-w-[720px] mx-auto bg-[#111] border border-white/5 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col">
+                        
+                        <div className="p-6 md:p-10 border-b border-white/5">
+                            <header className="flex items-center justify-between mb-8">
+                                <h2 className="text-[10px] font-black flex items-center gap-2 text-white uppercase tracking-[0.3em]">
+                                    EDITOR DE ASSINATURA
+                                </h2>
+                                <div className="hidden md:flex items-center gap-2 text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+                                    Poligonal Hub © 2026
+                                </div>
+                            </header>
+
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Nome</label>
+                                        <input type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-sm outline-none focus:border-pink-600 text-white transition-all" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Cargo</label>
+                                        <input type="text" value={data.role} onChange={e => setData({...data, role: e.target.value})} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-sm outline-none focus:border-pink-600 text-white transition-all" />
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">URL da Foto 1:1</label>
+                                    <input type="text" value={data.photoUrl} onChange={e => setData({...data, photoUrl: e.target.value})} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-sm outline-none focus:border-pink-600 text-white transition-all" />
+                                </div>
+
+                                <div className="space-y-3 pt-6 border-t border-white/5">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="text-pink-600 font-black text-[10px] uppercase tracking-widest block">Links Pessoais</h3>
+                                        <button onClick={addLink} className="p-1.5 bg-pink-600/10 hover:bg-pink-600 text-pink-500 hover:text-white rounded-lg transition-all">+</button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {data.personalLinks.map((link, idx) => (
+                                            <div key={idx} className="flex gap-2 items-center">
+                                                <div className="relative flex-grow">
+                                                    <input 
+                                                        type="text" 
+                                                        value={link.url} 
+                                                        onChange={e => updateLink(idx, e.target.value)} 
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                addLink();
+                                                            }
+                                                        }}
+                                                        className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2.5 text-xs outline-none focus:border-pink-600 text-white" 
+                                                        placeholder="URL (ex: instagram.com/voce)" 
+                                                    />
+                                                </div>
+                                                {data.personalLinks.length > 1 && (
+                                                    <button onClick={() => removeLink(idx)} className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all">×</button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-white/5 space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Temas Rápidos</label>
+                                        <select onChange={handleThemeChange} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-sm outline-none text-white cursor-pointer appearance-none">
+                                            {Object.entries(THEMES).map(([key, theme]) => (
+                                                <option key={key} value={key}>{theme.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest">Hex Fundo</label>
+                                            <input type="text" value={cleanHex(data.bgColor)} onChange={e => setData({...data, bgColor: `#${cleanHex(e.target.value)}`})} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2 text-xs text-white font-mono uppercase" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest">Hex Destaque</label>
+                                            <input type="text" value={cleanHex(data.secondaryColor)} onChange={e => setData({...data, secondaryColor: `#${cleanHex(e.target.value)}`})} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-2 text-xs text-white font-mono uppercase" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-[#0c0c0c] p-6 md:p-10 flex flex-col flex-grow items-center">
+                            <div className="w-full flex items-center justify-between mb-8 px-2">
+                                <h2 className="text-xl font-black text-white tracking-tighter uppercase italic">PREVIEW</h2>
+                                <button onClick={copyToClipboard} className={`px-6 py-3 rounded-2xl text-xs font-black transition-all ${copied ? 'bg-green-600 text-white' : 'bg-white text-black hover:bg-zinc-200'}`}>
+                                    {copied ? 'CONCLUÍDO' : 'COPIAR ASSINATURA'}
+                                </button>
+                            </div>
+
+                            <div className="w-full flex items-center justify-center p-2 md:p-6 overflow-x-auto">
+                                <div ref={signatureRef} className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[32px]">
+                                    <table border="0" cellPadding="0" cellSpacing="0" style={{ backgroundColor: data.bgColor, color: '#FFFFFF', fontFamily: "'Raleway', Helvetica, Arial, sans-serif", width: '500px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', borderCollapse: 'separate' }}>
+                                        <tbody>
+                                            <tr>
+                                                <td style={{ padding: '32px' }}>
+                                                    <table border="0" cellPadding="0" cellSpacing="0" style={{ width: '100%' }}>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style={{ verticalAlign: 'top', paddingRight: '20px' }}>
+                                                                    <div style={{ fontSize: '26px', fontWeight: '900', color: '#FFFFFF', margin: '0 0 2px 0', lineHeight: '1.1', letterSpacing: '-1.2px', whiteSpace: 'nowrap' }}>
+                                                                        {data.name}
+                                                                    </div>
+                                                                    <div style={{ fontSize: '10px', color: data.secondaryColor, fontWeight: '800', margin: '0 0 20px 0', textTransform: 'uppercase', letterSpacing: '4px', whiteSpace: 'nowrap' }}>
+                                                                        {data.role}
+                                                                    </div>
+                                                                    <div style={{ height: '2px', backgroundColor: data.secondaryColor, width: '30px', marginBottom: '24px' }}></div>
+                                                                    <div style={{ marginBottom: '28px' }}>
+                                                                        <a href={HUB_ASSETS.site} target="_blank"><img src={HUB_ASSETS.logo} alt="Poligonal Hub" width="220" style={{ display: 'block', border: '0' }} /></a>
+                                                                    </div>
+                                                                    <table border="0" cellPadding="0" cellSpacing="0">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                {data.personalLinks.map((link, idx) => link.url && (
+                                                                                    <td key={idx} style={{ paddingRight: '12px' }}>
+                                                                                        <a href={ensureAbsoluteUrl(link.url)} target="_blank"><img src={getSocialIcon(link.url, 'ffffff')} width="18" height="18" style={{ display: 'block', border: '0' }} /></a>
+                                                                                    </td>
+                                                                                ))}
+                                                                                {data.personalLinks.some(l => l.url) && <td style={{ paddingRight: '15px' }}></td>}
+                                                                                <td style={{ paddingRight: '12px' }}><a href={HUB_ASSETS.linkedin} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/linkedin.png`} width="18" height="18" style={{ display: 'block', border: '0' }} /></a></td>
+                                                                                <td style={{ paddingRight: '12px' }}><a href={HUB_ASSETS.youtube} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/youtube-play.png`} width="18" height="18" style={{ display: 'block', border: '0' }} /></a></td>
+                                                                                <td style={{ paddingRight: '12px' }}><a href={HUB_ASSETS.instagram} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/instagram-new.png`} width="18" height="18" style={{ display: 'block', border: '0' }} /></a></td>
+                                                                                <td><a href={HUB_ASSETS.substack} target="_blank"><img src={`https://img.icons8.com/ios-filled/50/${cleanHex(data.secondaryColor)}/news.png`} width="18" height="18" style={{ display: 'block', border: '0' }} /></a></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                                <td style={{ verticalAlign: 'middle', width: '150px' }}>
+                                                                    <table border="0" cellPadding="0" cellSpacing="0" style={{ width: '150px' }}>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <div style={{ width: '150px', height: '150px', borderRadius: '24px', overflow: 'hidden', border: `2px solid ${data.secondaryColor}`, backgroundColor: '#000' }}>
+                                                                                        <img 
+                                                                                            src={data.photoUrl} 
+                                                                                            alt={data.name} 
+                                                                                            width="150" 
+                                                                                            height="150" 
+                                                                                            style={{ width: '150px', height: '150px', objectFit: 'cover', display: 'block' }} 
+                                                                                        />
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
