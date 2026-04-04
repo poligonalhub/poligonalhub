@@ -23,7 +23,12 @@
             --brown: #281D1A;
             --beige: #BDB1A5;
             --red: #EE3137;
-            --drag-x: 0px;
+        }
+
+        /* TRAVA DE SCROLL HORIZONTAL (Correção Mobile - Agora usando CLIP para não quebrar o Sticky) */
+        html {
+            max-width: 100vw;
+            overflow-x: clip; 
         }
 
         body {
@@ -35,7 +40,10 @@
             background-position: center;
             color: var(--beige);
             margin: 0;
-            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            overflow-x: clip;
+            overscroll-behavior-x: none; /* Impede aquele "pulo" lateral no iOS/Android */
         }
 
         /* --- PADRÕES DE SEÇÃO & TRANSIÇÕES FLUIDAS --- */
@@ -78,7 +86,7 @@
 
         /* --- HERO ANIMATION CSS --- */
         .hero-track {
-            height: 250vh;
+            height: 180vh; /* Reduzido levemente para um scroll mais ágil antes de chegar na próxima seção */
             position: relative;
             width: 100%;
         }
@@ -114,13 +122,11 @@
             perspective: 2000px;
             cursor: grab;
             user-select: none;
-            transform: translate3d(var(--drag-x), 0, 0);
-            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             margin: 0 auto;
+            touch-action: pan-y; 
         }
 
         .deck-wrapper:active { cursor: grabbing; }
-        .deck-wrapper.is-dragging { transition: none; }
 
         .card {
             position: absolute;
@@ -271,7 +277,7 @@
 </head>
 <body>
 
-    <!-- --- HERO SECTION CINEMATOGRÁFICA --- -->
+    <!-- --- HERO SECTION --- -->
     <div id="heroTrack" class="hero-track">
         <header class="hero-sticky">
             <div id="heroBlock" class="flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4">
@@ -295,13 +301,13 @@
     </div>
 
     <!-- SEÇÃO: DIFERENCIAIS -->
-    <section class="section-container scroll-fade">
+    <section class="section-container scroll-fade pt-8">
         <h2 class="section-title">Diferenciais</h2>
         <div id="deck-diferenciais" class="deck-wrapper"></div>
         <div id="dots-diferenciais" class="deck-dots"></div>
     </section>
 
-    <!-- SEÇÃO DIVISORA ANGULADA: GAME LOOP -->
+    <!-- SEÇÃO: GAME LOOP -->
     <div class="w-full relative py-12 my-12">
         <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-y border-[var(--orange)]/30 shadow-2xl backdrop-blur-md"></div>
         <div class="relative z-10">
@@ -320,7 +326,7 @@
         <div id="dots-modos" class="deck-dots"></div>
     </section>
 
-    <!-- SEÇÃO DIVISORA ANGULADA: NARRATIVA E PERSONAGENS -->
+    <!-- SEÇÃO: NARRATIVA E PERSONAGENS -->
     <div class="w-full relative py-16 my-12">
         <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-y border-[var(--orange)]/30 shadow-2xl backdrop-blur-md"></div>
         <div class="relative z-10">
@@ -342,7 +348,7 @@
         <div id="dots-modulos" class="deck-dots"></div>
     </section>
 
-    <!-- SEÇÃO DIVISORA ANGULADA: INIMIGOS DO POVO -->
+    <!-- SEÇÃO: INIMIGOS DO POVO -->
     <div class="w-full relative py-12 my-12">
         <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-y border-[var(--red)]/30 shadow-2xl backdrop-blur-md"></div>
         <div class="relative z-10">
@@ -357,14 +363,14 @@
         </div>
     </div>
 
-    <!-- SEÇÃO: OPORTUNIDADES (Movida para antes do Posicionamento) -->
+    <!-- SEÇÃO: OPORTUNIDADES -->
     <section class="section-container scroll-fade">
         <h2 class="section-title">Oportunidades</h2>
         <div id="deck-oportunidades" class="deck-wrapper"></div>
         <div id="dots-oportunidades" class="deck-dots"></div>
     </section>
 
-    <!-- SEÇÃO DIVISORA ANGULADA: POSICIONAMENTO (GRÁFICO) -->
+    <!-- SEÇÃO: POSICIONAMENTO (GRÁFICO) -->
     <div class="w-full relative py-16 mt-12 mb-0">
         <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-t border-[var(--orange)]/30 shadow-2xl backdrop-blur-md"></div>
         <div class="relative z-10">
@@ -453,7 +459,9 @@
                 
                 this.startX = 0;
                 this.isDragging = false;
-                this.threshold = 50; 
+                
+                // Exige menos arrasto para ativar a passagem da carta no celular
+                this.threshold = window.innerWidth < 768 ? 20 : 50; 
                 this.currentDist = 0;
 
                 this.init();
@@ -492,11 +500,9 @@
                             </div>
                         `;
                     } 
-                    // Novo Design Elegante do Cartão Mistério com a Interrogação
                     else if (item.type === 'mystery') {
                         usePadding = false;
                         innerContent = `
-                            <!-- Estado Inativo: Interrogação Elegante no Anel -->
                             <div class="char-bust absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#1a1311]">
                                 <div class="w-24 h-24 rounded-full border-2 border-[var(--beige)] border-opacity-20 flex items-center justify-center mb-16 bg-black/40 shadow-inner">
                                     <span class="text-5xl font-black text-[var(--beige)] opacity-30">?</span>
@@ -506,7 +512,6 @@
                                 <h4 class="text-2xl font-black uppercase text-gray-500 tracking-widest drop-shadow-md">${item.title}</h4>
                             </div>
 
-                            <!-- Estado Revelado: Interrogação Laranja Brilhante -->
                             <div class="char-full absolute inset-0 flex flex-col items-center justify-center z-0 bg-[#1a1311]">
                                 <div class="w-32 h-32 rounded-full border-4 border-[var(--orange)] border-opacity-60 flex items-center justify-center mb-24 bg-black/60 shadow-[0_0_40px_rgba(255,97,39,0.15)]">
                                     <span class="text-[5rem] font-black text-[var(--orange)] opacity-80 drop-shadow-lg">?</span>
@@ -570,6 +575,7 @@
                 this.container.addEventListener('mousedown', (e) => this.dragStart(e.pageX));
                 window.addEventListener('mousemove', (e) => this.dragMove(e.pageX));
                 window.addEventListener('mouseup', () => this.dragEnd());
+                
                 this.container.addEventListener('touchstart', (e) => this.dragStart(e.touches[0].pageX), {passive: true});
                 window.addEventListener('touchmove', (e) => this.dragMove(e.touches[0].pageX), {passive: true});
                 window.addEventListener('touchend', () => this.dragEnd());
@@ -577,29 +583,30 @@
                 this.update();
             }
 
-            dragStart(x) { this.isDragging = true; this.startX = x; this.container.classList.add('is-dragging'); }
+            dragStart(x) { 
+                this.isDragging = true; 
+                this.startX = x; 
+            }
             
             dragMove(x) {
                 if (!this.isDragging) return;
                 this.currentDist = (x - this.startX);
-                this.container.style.setProperty('--drag-x', `${this.currentDist * 0.5}px`);
-            }
-
-            dragEnd() {
-                if (!this.isDragging) return;
-                this.isDragging = false;
-                this.container.classList.remove('is-dragging');
-                this.container.style.setProperty('--drag-x', `0px`);
                 
                 if (Math.abs(this.currentDist) > this.threshold) {
                     if (this.currentDist > 0 && this.currentIndex > 0) {
                         this.currentIndex--;
                         this.update();
+                        this.startX = x; 
                     } else if (this.currentDist < 0 && this.currentIndex < this.data.length - 1) {
                         this.currentIndex++;
                         this.update();
+                        this.startX = x; 
                     }
                 }
+            }
+
+            dragEnd() {
+                this.isDragging = false;
                 this.currentDist = 0;
             }
 
@@ -641,7 +648,7 @@
 
         const diferenciaisData = [
             { shortTitle: "Temática", title: "Temática Revolucionária", description: "Uma abordagem única que mistura estratégia clássica com a dura e real luta por moradia e reforma agrária no Brasil." },
-            { shortTitle: "Gêneros", title: "Híbrido de Gêneros", description: "A fusão de mecicas de colheita de dia e defesa de torres pela noite cria um loop de gameplay viciante que atrai tanto jogadores casuais quanto de estratégia." },
+            { shortTitle: "Gêneros", title: "Híbrido de Gêneros", description: "A fusão de mecânicas de colheita de dia e defesa de torres pela noite cria um loop de gameplay viciante que atrai tanto jogadores casuais quanto de estratégia." },
             { shortTitle: "Estética", title: "Estética Carismática", description: "A direção de arte inspirada nas obras de Regis Soares e Paulo Moreira tem um forte apelo visual e destaque no competitivo mercado indie." }
         ];
 
