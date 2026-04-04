@@ -3,539 +3,717 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocupar e Resistir - Pitch Deck</title>
+    <title>Ocupar e Resistir</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js para o Gráfico Radar -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
     <style>
-        /* * =============================================
-         * TEMA E ESTILOS GERAIS
-         * =============================================
-        */
         :root {
-            --bg-main: #3a1202;
-            --bg-card: rgba(1, 1, 1, 0.7);
-            --text-light: #fae0cb;
-            --text-muted: #b4725c;
-            --highlight-primary: #a20d06;
-            --highlight-secondary: #fae0cb;
-            --border-color: rgba(162, 13, 6, 0.5);
-            --header-filter: brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(8);
-            --bg-image: linear-gradient(rgba(10, 0, 0, 0.8), rgba(10, 0, 0, 0.8)), url('https://i.imgur.com/QZefyhA.png');
+            --orange: #FF6127;
+            --green: #006D28;
+            --brown: #281D1A;
+            --beige: #BDB1A5;
+            --red: #EE3137;
+            --drag-x: 0px;
         }
 
-        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Roboto Condensed', sans-serif;
-            background-color: var(--bg-main);
-            background-image: var(--bg-image);
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--brown);
+            background-image: linear-gradient(rgba(40, 29, 26, 0.85), rgba(40, 29, 26, 0.95)), url('https://github.com/poligonalhub/poligonalhub/blob/main/assets/images/aratu/BG1.png?raw=true');
             background-size: cover;
-            background-position: center center;
             background-attachment: fixed;
-            color: var(--text-light);
-        }
-        .font-display { font-family: 'Archivo Black', sans-serif; letter-spacing: 0.05em; }
-        
-        .section-title { color: var(--text-light); }
-        .section-title::after {
-            content: ''; display: block; width: 80px; height: 4px;
-            background-color: var(--highlight-primary); margin-top: 0.75rem;
-        }
-        .section-title.center::after { margin-left: auto; margin-right: auto; }
-        .icon-pictogram { filter: brightness(0) invert(1); opacity: 0.9; }
-        .header-img-red-filter { filter: var(--header-filter); }
-        .text-justify { text-align: justify; hyphens: auto; }
-
-        /* * =============================================
-         * ESTILO DOS CARDS
-         * =============================================
-        */
-        .single-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: all 0.3s ease-in-out;
-        }
-        .single-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--highlight-primary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-position: center;
+            color: var(--beige);
+            margin: 0;
+            overflow-x: hidden;
         }
 
-        .card-industrial {
-            background-color: #222;
-            border: 4px solid #444;
-            border-radius: 4px;
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-            transition: all 0.3s ease-in-out;
-            color: #999;
+        /* --- PADRÕES DE SEÇÃO & TRANSIÇÕES FLUIDAS --- */
+        .section-container {
+            padding: 5rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-        }
-        .card-industrial:hover {
-            transform: translateY(-8px);
-            border-color: var(--highlight-primary);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .card-industrial::before, .card-industrial::after {
-            content: '●';
-            position: absolute;
-            color: #555;
-            font-size: 10px;
-        }
-        .card-industrial::before { top: 5px; left: 5px; }
-        .card-industrial::after { bottom: 5px; right: 5px; }
-        .card-industrial .font-display { text-transform: uppercase; color: #ccc; }
-        .card-industrial .key-hint {
-            background-color: var(--highlight-primary);
-            color: var(--text-light);
-            font-family: 'Archivo Black', sans-serif;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-top: auto;
-            border: 1px solid rgba(255,255,255,0.2);
+            align-items: center;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* * =============================================
-         * COMPONENTES ESPECÍFICOS
-         * =============================================
-        */
-        .carousel-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 1rem;
+        .section-container.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .carousel-container { 
-            position: relative; 
-            width: 100%; 
-            max-width: 400px; 
-            height: 450px; 
-            perspective: 1000px;
-            cursor: grab;
-        }
-        .carousel-container:active { cursor: grabbing; }
-        .enemy-card-wrapper { 
-            position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            transform-style: preserve-3d; 
-            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
-        }
-        .enemy-card {
-            position: absolute; width: 360px; height: 450px; left: 20px; top: 0;
-            border-radius: 0.75rem; background-color: rgba(20, 20, 20, 0.95);
-            border: 2px solid var(--border-color); display: flex; flex-direction: column;
-            align-items: center; padding: 2rem; text-align: center;
-            backface-visibility: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            user-select: none;
-        }
-        .enemy-card img { pointer-events: none; }
-        .carousel-nav { 
-            display: flex; 
-            gap: 2rem;
-            margin-top: 1rem;
+
+        .section-title {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
             position: relative;
+            color: var(--beige);
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: var(--orange);
+            margin: 1rem auto 0;
+        }
+
+        /* --- HERO ANIMATION CSS --- */
+        .hero-track {
+            height: 250vh;
+            position: relative;
+            width: 100%;
+        }
+
+        .hero-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             z-index: 10;
         }
-        .carousel-nav button {
-            background-color: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+
+        .hero-anim-logo { will-change: max-width, width; }
+        .hero-anim-content { 
+            will-change: max-height, margin-top, opacity, transform; 
+            overflow: hidden; 
+        }
+
+        /* --- WIDGET BARALHO --- */
+        .deck-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 480px;
             display: flex;
             align-items: center;
             justify-content: center;
+            perspective: 2000px;
+            cursor: grab;
+            user-select: none;
+            transform: translate3d(var(--drag-x), 0, 0);
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin: 0 auto;
+        }
+
+        .deck-wrapper:active { cursor: grabbing; }
+        .deck-wrapper.is-dragging { transition: none; }
+
+        .card {
+            position: absolute;
+            width: 320px;
+            height: 460px;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backface-visibility: hidden;
+            top: 50%;
+            left: 50%;
+            margin-top: -230px;
+            margin-left: -160px;
+            z-index: 10;
+        }
+
+        .card-visuals {
+            position: absolute;
+            inset: 0;
+            background-color: #1a1311;
+            border: 2px solid var(--beige);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
+            overflow: hidden; 
+            transition: border-color 0.7s;
+        }
+
+        .card[data-pos="0"] .card-visuals { border-color: var(--orange); }
+
+        .card-label {
+            position: absolute;
+            top: 50%;
+            writing-mode: vertical-rl;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: var(--beige);
+            opacity: 0;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+            pointer-events: none;
+            height: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .label-left { left: 10px; transform: translateY(-50%) rotate(180deg); }
+        .label-right { right: 10px; transform: translateY(-50%); }
+
+        .card[data-side="right"]:not(.active) .label-right { opacity: 0.5; }
+        .card[data-side="left"]:not(.active) .label-left { opacity: 0.5; }
+        
+        .card:hover:not(.active)[data-side="right"] .label-right,
+        .card:hover:not(.active)[data-side="left"] .label-left { opacity: 1; color: var(--orange); }
+
+        .card.active .card-label { opacity: 0 !important; }
+
+        .card-content {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+
+        .card.active .card-content {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+            transition-delay: 0.1s; 
+        }
+
+        /* --- CONTROLE DE VISIBILIDADE DO CONTEÚDO POR TIPO --- */
+        .card[data-type="character"] .card-content,
+        .card[data-type="mystery"] .card-content {
+            opacity: 1; 
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .card[data-type="character"] .card-label,
+        .card[data-type="mystery"] .card-label {
+            display: none !important;
+        }
+
+        .icon-filter-beige {
+            filter: invert(86%) sepia(5%) saturate(417%) hue-rotate(334deg) brightness(85%) contrast(85%);
+        }
+
+        /* Transformações 3D */
+        .card[data-pos="0"] { z-index: 40; transform: translate3d(0, 0, 160px); }
+        .card[data-pos="1"] { z-index: 30; transform: translate3d(110px, 0, 60px) rotateY(-20deg); cursor: pointer; }
+        .card[data-pos="2"] { z-index: 20; transform: translate3d(180px, 0, -40px) rotateY(-35deg); opacity: 0.5; cursor: pointer; }
+        .card[data-pos="-1"] { z-index: 30; transform: translate3d(-110px, 0, 60px) rotateY(20deg); cursor: pointer; }
+        .card[data-pos="-2"] { z-index: 20; transform: translate3d(-180px, 0, -40px) rotateY(35deg); opacity: 0.5; cursor: pointer; }
+
+        .deck-dots {
+            display: flex;
+            gap: 10px;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 30px;
+            height: 6px;
+            background-color: var(--beige);
+            opacity: 0.2;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .carousel-nav button:hover {
-            background-color: var(--highlight-primary);
-            border-color: var(--highlight-secondary);
+
+        .dot.active { opacity: 1; background-color: var(--orange); width: 50px; }
+
+        /* --- ESTILOS EXCLUSIVOS: NARRATIVA E PERSONAGENS --- */
+        .char-bust, .char-full, .char-speech, .char-info, .char-nameplate {
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .carousel-nav svg { width: 30px; height: 30px; stroke: var(--text-light); }
-        
-        .character-image-container { transition: all 0.3s ease-in-out; }
-        .frame-tape {
-            border: 6px solid #222; padding: 8px; background-color: #111;
-            transform: rotate(-2deg); box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            display: inline-block;
+
+        .char-full, .char-speech, .char-info { 
+            opacity: 0; pointer-events: none; transform: translateY(15px); 
         }
-        .frame-tape:hover { transform: rotate(1deg) scale(1.02); }
-        
-        /* Estilos para o Modal do Mapa */
-        .map-modal {
-            transition: opacity 0.3s ease;
-        }
-        .map-modal-content {
-            transition: transform 0.3s ease;
-        }
-        
-        em.highlight {
-            font-style: normal;
-            font-weight: 600;
-            color: var(--highlight-secondary);
+
+        .card:not(.revealed) .char-bust { opacity: 1; transform: scale(1); }
+        .card:not(.revealed) .char-nameplate { opacity: 1; transform: translateY(0); }
+
+        .card.revealed .char-bust { opacity: 0; transform: scale(0.9); pointer-events: none; }
+        .card.revealed .char-nameplate { opacity: 0; transform: translateY(10px); pointer-events: none; }
+        .card.revealed .char-full { opacity: 1; transform: translateY(0); }
+        .card.revealed .char-info { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+        .card.revealed .char-speech { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+
+        .card.active { cursor: pointer; }
+
+        /* --- CHART CONTAINER --- */
+        .chart-container {
+            position: relative;
+            height: 500px;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: rgba(26, 19, 17, 0.8);
+            border-radius: 24px;
+            padding: 1rem;
+            border: 1px solid var(--beige);
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <main class="container mx-auto p-4 md:p-8">
-        <section class="text-center my-12 md:my-20">
-            <div class="inline-block">
-                <img src="https://i.imgur.com/pUvl5JA.png" alt="Letreiro de Ocupar e Resistir" class="h-20 sm:h-24 md:h-32 mx-auto drop-shadow-lg header-img-red-filter">
-            </div>
-            <p class="text-lg sm:text-xl md:text-2xl mt-8 text-gray-200 max-w-3xl mx-auto">Um jogo de colheita, gerenciamento e defesa de torres sobre a luta pela reforma agrária e urbana no Nordeste Brasileiro.</p>
-            <p class="text-base sm:text-lg mt-4 text-gray-300 max-w-3xl mx-auto">🌿 Selecionado na Trilha Crie Games 2025 | SEBRAE & Playbor 🌿 </br> 🌿 Selecionado no Grupo de Desenvolvimento 2026 | Centro Cultural Marieta 🌿</p>
+    <!-- --- HERO SECTION CINEMATOGRÁFICA --- -->
+    <div id="heroTrack" class="hero-track">
+        <header class="hero-sticky">
+            <div id="heroBlock" class="flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4">
+                <img src="https://github.com/poligonalhub/poligonalhub/blob/main/assets/images/aratu/Aratuletreirocolorido.png?raw=true" 
+                     id="heroLogo" 
+                     class="w-full object-contain drop-shadow-2xl hero-anim-logo" 
+                     style="max-width: 1000px; width: 95%;">
 
-        </section>
-                
-        <section class="mb-16">
-            <div class="single-card p-6 md:p-8 rounded-lg text-center">
-                 <h3 class="font-display text-3xl md:text-4xl mb-6 section-title center">A Proposta</h3>
-                 <blockquote class="text-xl md:text-2xl italic max-w-4xl mx-auto" style="color: var(--text-light);">
-                     "Ocupar e Resistir é um jogo de defesa de torres com mecânicas de cultivo e gerenciamento, trazendo uma narrativa socialmente relevante para gêneros consolidados<br>mas nunca unidos em sinergia."
-                 </blockquote>
-            </div>
-        </section>
+                <div id="heroText" class="text-center w-full hero-anim-content" style="max-height: 0px; margin-top: 0px; opacity: 0;">
+                    <h3 class="text-xl md:text-2xl font-bold leading-relaxed max-w-3xl mx-auto" style="color: var(--beige);">
+                        Um jogo de colheita, gerenciamento e defesa de torres sobre a luta pela reforma agrária e urbana no Nordeste Brasileiro.
+                    </h3>
+                </div>
 
-        <section class="mb-16">
-            <h3 class="font-display text-3xl md:text-4xl mb-8 text-center section-title center">Pre-Alpha Demo</h3>
-            <div class="single-card p-4 rounded-lg">
-                <div class="aspect-video bg-black rounded-md overflow-hidden">
-                    <iframe src="https://www.youtube.com/embed/Ni0xzqSbMn0?si=VpY5U9EmvBpK-HhE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full"></iframe>
-                </div>
-                 <p class="text-center text-sm text-gray-500 mt-2">Vídeo do protótipo atual (prova de conceito).</p>
-            </div>
-        </section>
-        
-        <section class="mb-16">
-            <h3 class="font-display text-3xl md:text-4xl mb-8 text-center section-title center">Diferenciais</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card-industrial p-6 text-center">
-                    <h4 class="font-display text-xl mb-2">Temática Revolucionária</h4>
-                    <p>Uma abordagem única sobre movimentos sociais brasileiros com ênfase no nordeste, preenchendo o espaço vago no mercado por narrativas glocais e impactantes.</p>
-                </div>
-                <div class="card-industrial p-6 text-center">
-                    <h4 class="font-display text-xl mb-2">Híbrido de Gêneros</h4>
-                    <p>A fusão de mecânicas de colheita de dia e defesa de torres pela noite cria um loop de gameplay viciante que atrai tanto jogadores casuais quanto de estratégia.</p>
-                </div>
-                <div class="card-industrial p-6 text-center">
-                    <h4 class="font-display text-xl mb-2">Estética Carismática</h4>
-                    <p>A direção de arte inspirada nas obras de Regis Soares e Paulo Moreira tem um forte apelo visual e destaque no competitivo mercado indie.</p>
+                <div id="heroTags" class="flex flex-col gap-3 justify-center items-center w-full text-xs md:text-sm font-bold tracking-wider text-green-400 hero-anim-content" style="max-height: 0px; margin-top: 0px; opacity: 0;">
+                    <span class="bg-green-900/50 px-4 py-2 rounded border border-green-700 shadow-lg text-center">🌿 Selecionado na Trilha Crie Games 2025 | SEBRAE & Playbor 🌿</span>
+                    <span class="bg-green-900/50 px-4 py-2 rounded border border-green-700 shadow-lg text-center">🌿 Selecionado no Grupo de Desenvolvimento 2026 | Centro Cultural Marieta 🌿</span>
                 </div>
             </div>
-        </section>
+        </header>
+    </div>
 
-        <section class="mb-16">
-            <div class="single-card p-6 md:p-8 rounded-lg">
-                <h3 class="font-display text-3xl md:text-4xl mb-6 section-title">Oportunidades</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 text-lg">
-                    <div>
-                        <h4 class="font-display text-xl text-highlight-secondary mb-2">Público-Alvo e Potencial de Mercado</h4>
-                        <p style="color: var(--text-muted);" class="text-justify">Miramos em um nicho crescente e engajado: jogadores dos mercados de simulação (avaliado em US$ 19.7 bilhões em 2024) e estratégia, que buscam experiências com profundidade narrativa. Este público, que consagrou títulos como <em class="highlight">This War of Mine</em> (9 milhões de cópias vendidas), <em class="highlight">Tonight We Riot</em> e o adorável <em class="highlight">Punhos de Repúdio</em> que teve um exitoso Kickstarter.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-display text-xl text-highlight-secondary mb-2">Estratégia de Marketing</h4>
-                        <p style="color: var(--text-muted);" class="text-justify">Nossa abordagem é orgânica e de alto impacto. Ativaremos uma campanha transmídia com forte presença em redes sociais e streaming, amplificada por parcerias estratégicas com artistas e influenciadores paraibanos que participarão do jogo, como Totonho e Yasmin Formiga, garantindo autenticidade e alcance direto com a comunidade que queremos representar e engajar.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-display text-xl text-highlight-secondary mb-2">Monetização e Distribuição</h4>
-                        <p style="color: var(--text-muted);" class="text-justify">O jogo será distribuído globalmente nas principais plataformas de PC (Steam, GOG, Itch.io) com preço projetado entre R$40 e R$60. Em caso de financiamento via editais públicos, <em class="highlight">a demo será disponibilizada gratuitamente</em>, servindo como uma poderosa ferramenta de marketing e construção de comunidade para o lançamento completo.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-display text-xl text-highlight-secondary mb-2">O Investimento</h4>
-                        <p style="color: var(--text-muted);" class="text-justify">Buscamos um investimento inicial de R$200.000 para financiar um ano de produção focada no desenvolvimento de uma demo robusta e polida (vertical slice). Este montante cobrirá os custos da equipe e estrutura, permitindo-nos criar um material de alta qualidade, essencial para atrair o investimento subsequente necessário para a produção completa do jogo.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- SEÇÃO: DIFERENCIAIS -->
+    <section class="section-container scroll-fade">
+        <h2 class="section-title">Diferenciais</h2>
+        <div id="deck-diferenciais" class="deck-wrapper"></div>
+        <div id="dots-diferenciais" class="deck-dots"></div>
+    </section>
 
-        <section class="mb-16">
-            <h3 class="font-display text-3xl md:text-4xl mb-8 text-center section-title center">Game Loop</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="card-industrial p-6 text-center">
-                    <img src="https://i.imgur.com/oyjkFA0.png" alt="Ícone Ocupar" class="h-24 mx-auto mb-4 icon-pictogram">
-                    <h4 class="font-display text-2xl mb-2">OCUPAR</h4>
-                    <p>Plante, colha e gerencie um assentamento de plantações solidárias.</p>
-                </div>
-                <div class="card-industrial p-6 text-center">
-                    <img src="https://i.imgur.com/09dfJx3.png" alt="Ícone Cuidar" class="h-24 mx-auto mb-4 icon-pictogram">
-                    <h4 class="font-display text-2xl mb-2">CUIDAR</h4>
-                    <p>Una mais trabalhadores à causa, administre recursos e expanda a ocupação.</p>
-                </div>
-                <div class="card-industrial p-6 text-center">
-                    <img src="https://i.imgur.com/YCamRf7.png" alt="Ícone Resistir" class="h-24 mx-auto mb-4 icon-pictogram">
-                    <h4 class="font-display text-2xl mb-2">RESISTIR</h4>
-                    <p>Use defesas orgânicas para proteger o assentamento das hordas inimigas.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="card-industrial p-6 flex-grow">
-                    <div class="text-center">
-                        <img src="https://i.imgur.com/xqfMcPm.png" alt="Ícone Modo Cultivo" class="h-24 mx-auto mb-4 icon-pictogram">
-                        <h4 class="font-display text-2xl mb-4">Modo Cultivo (Dia)</h4>
-                    </div>
-                    <ul class="space-y-3 text-left list-disc list-inside text-base">
-                        <li><span class="font-bold text-gray-400">Cultivo e Gestão:</span> Plante diversas colheitas com benefícios específicos.</li>
-                        <li><span class="font-bold text-gray-400">Recrutamento:</span> Aumente a Força de Trabalho recrutando mais pessoas.</li>
-                        <li><span class="font-bold text-gray-400">Desenvolvimento:</span> Desbloqueie melhorias, novas construções e sementes.</li>
-                    </ul>
-                </div>
-                <div class="card-industrial p-6 flex-grow">
-                    <div class="text-center">
-                        <img src="https://i.imgur.com/xclXune.png" alt="Ícone Modo Defesa" class="h-24 mx-auto mb-4 icon-pictogram">
-                        <h4 class="font-display text-2xl mb-4">Modo Defesa (Noite)</h4>
-                    </div>
-                    <ul class="space-y-3 text-left list-disc list-inside text-base">
-                        <li><span class="font-bold text-gray-400">Defesa de Torre:</span> Hordas de inimigos atacam a fábrica.</li>
-                        <li><span class="font-bold text-gray-400">Defesas Orgânicas:</span> Use as colheitas para criar torres, barreiras e armadilhas.</li>
-                        <li><span class="font-bold text-gray-400">Controle Estratégico:</span> Posicione defesas para proteger o núcleo da ocupação.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+    <!-- SEÇÃO DIVISORA ANGULADA: GAME LOOP -->
+    <div class="w-full relative py-12 my-12">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-y border-[var(--orange)]/30 shadow-2xl backdrop-blur-md"></div>
+        <div class="relative z-10">
+            <section class="section-container scroll-fade !py-0">
+                <h2 class="section-title">Game Loop</h2>
+                <div id="deck-gameloop" class="deck-wrapper"></div>
+                <div id="dots-gameloop" class="deck-dots"></div>
+            </section>
+        </div>
+    </div>
 
-        <section class="mb-16">
-            <div class="single-card p-6 md:p-8 rounded-lg">
-                <h3 class="font-display text-3xl md:text-4xl mb-6 section-title">Narrativa e Personagens</h3>
-                <div class="narrative-content">
-                    <p class="mb-12 text-lg text-justify" style="color: var(--text-muted);">Em um dos inúmeros imóveis abandonados na área urbana de João Pessoa, movimentos populares transformaram as ruínas de uma fábrica em uma comunidade pulsante com escola, cozinha solidária e ateliê. Por um tempo a vida floresceu sem problemas. Agora, sob a ameaça de corporações e forças corruptas, a ocupação precisa lutar para manter seu lar, usando a força orgânica que brota da terra e o poder soberano da sociedade civil organizada.</p>
-                    <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
-                        <div class="flex-shrink-0 character-image-container frame-tape">
-                            <img src="https://i.imgur.com/01mC08E.png" alt="Retrato de Luzia" class="w-48 h-auto">
-                        </div>
-                        <div class="flex-grow">
-                            <blockquote class="border-l-4 pl-4 italic text-lg" style="border-color: var(--highlight-secondary); color: var(--text-light);">
-                                “Era tudo entulho aqui, po. A gente meteu a mão na massa e transformou a antiga Guaraná Sanhauá na Ocupação Aratu, um ponto de cultura e educação. Agora os bicho tão tudo com uma lapa de olho grande, querendo esmagar o que construimos com nossas próprias mãos. Mas aqui ninguém arreda o pé. Essa ocupação é nossa.” — Luzia
-                            </blockquote>
-                        </div>
-                    </div>
-                    <div class="flex flex-col md:flex-row-reverse items-center gap-8">
-                        <div class="flex-shrink-0 character-image-container frame-tape">
-                            <img src="https://i.imgur.com/1L04EFF.png" alt="Retrato de Antônio" class="w-48 h-auto">
-                        </div>
-                        <div class="flex-grow">
-                            <blockquote class="border-r-4 md:border-r-0 md:border-l-4 pr-4 md:pr-0 md:pl-4 italic text-lg text-left md:text-right" style="border-color: var(--highlight-secondary); color: var(--text-light);">
-                                “Quando eu cheguei aqui era tudo máquina. Mas aí os pelego sabotaram nossa coperativa e a fábrica foi sucateada de propósito. Eu vi o que os jovens fizeram aqui. Revitalizaram tudo. Meus netos tão tudo aprendendo aqui de graça. Eu vou usar cada parafuso e sucata que conseguir pra proteger esse lugar. Não vou perder esse chão de fábrica de novo.” — Seu Antônio
-                            </blockquote>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- SEÇÃO: MODOS DE JOGO -->
+    <section class="section-container scroll-fade">
+        <h2 class="section-title">Modos de Jogo</h2>
+        <div id="deck-modos" class="deck-wrapper"></div>
+        <div id="dots-modos" class="deck-dots"></div>
+    </section>
 
-        <section class="mb-16">
-            <h3 class="font-display text-3xl md:text-4xl mb-8 text-center section-title center">Módulos da Ocupação</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card-industrial p-6 text-center">
-                    <img src="https://i.imgur.com/J3m2f5E.png" alt="Ícone Paiol" class="h-24 mx-auto mb-4 icon-pictogram">
-                    <h4 class="font-display text-xl mb-2">Paiol</h4>
-                    <p class="mb-4 flex-grow">Central para gerenciar recursos, estoque de colheitas e a Força de Trabalho disponível no assentamento.</p>
-                    <span class="key-hint">TAB</span>
-                </div>
-                <div class="card-industrial p-6 text-center">
-                    <img src="https://i.imgur.com/yG8g5g1.png" alt="Ícone Escola" class="h-24 mx-auto mb-4 icon-pictogram">
-                    <h4 class="font-display text-xl mb-2">Escola</h4>
-                    <p class="mb-4 flex-grow">Enciclopédia do jogo, com informações sobre mecânicas, inimigos, aliados e aprofundamento nos temas políticos.</p>
-                    <span class="key-hint">V</span>
-                </div>
-                <div class="card-industrial p-6 text-center">
-                    <img src="https://i.imgur.com/R2gYq2v.png" alt="Ícone Ateliê" class="h-24 mx-auto mb-4 icon-pictogram">
-                    <h4 class="font-display text-xl mb-2">Ateliê Metalúrgico</h4>
-                    <p class="mb-4 flex-grow">Oficina para criar e aprimorar equipamentos e defesas utilizados no modo noturno contra os inimigos.</p>
-                    <span class="key-hint">G</span>
-                </div>
-            </div>
-        </section>
-        
-        <section class="mb-16">
-             <h3 class="font-display text-3xl md:text-4xl mb-8 text-center section-title center">Inimigos da Ocupação</h3>
-             <div class="carousel-wrapper">
-                 <div class="carousel-container" id="carousel-touch-area">
-                     <div class="enemy-card-wrapper">
-                         <div class="enemy-card">
-                             <img src="https://i.imgur.com/gfMHbXJ.png" alt="Ícone de Gadistas" class="h-48 mx-auto mb-4 icon-pictogram">
-                             <h4 class="font-display text-2xl">Early Game: Gadistas</h4>
-                             <p class="mt-4 text-lg" style="color: var(--text-muted);">Frágeis, mas numerosos. A base das hordas inimigas são monstros antropomorfos semelhantes a bois, hienas e robôs.</p>
-                         </div>
-                         <div class="enemy-card">
-                             <img src="https://i.imgur.com/Oi6GiZY.png" alt="Ícone de MalACABados" class="h-48 mx-auto mb-4 icon-pictogram">
-                             <h4 class="font-display text-2xl">Mid Game: MalACABados</h4>
-                             <p class="mt-4 text-lg" style="color: var(--text-muted);">Nível intermediário que serve a interesses opressivos. Monstros antropomorfos com fardas, semelhantes a porcos, cães e cavalos.</p>
-                         </div>
-                         <div class="enemy-card">
-                             <img src="https://i.imgur.com/zdppIGd.png" alt="Ícone de O 1%" class="h-48 mx-auto mb-4 icon-pictogram">
-                             <h4 class="font-display text-2xl">Late Game: O 1%</h4>
-                             <p class="mt-4 text-lg" style="color: var(--text-muted);">O predador alfa. Raros e poderosos, são monstros antropomorfos com características de águias, chacais e répteis.</p>
-                         </div>
-                     </div>
-                 </div>
-                 <div class="carousel-nav">
-                     <button id="prevBtn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg></button>
-                     <button id="nextBtn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></button>
-                 </div>
-             </div>
-        </section>
+    <!-- SEÇÃO DIVISORA ANGULADA: NARRATIVA E PERSONAGENS -->
+    <div class="w-full relative py-16 my-12">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-y border-[var(--orange)]/30 shadow-2xl backdrop-blur-md"></div>
+        <div class="relative z-10">
+            <section class="section-container scroll-fade !py-0">
+                <h2 class="section-title">Narrativa</h2>
+                <p class="text-center max-w-4xl mx-auto leading-relaxed mb-8 opacity-90 text-lg">
+                    Dentre os inúmeros imóveis abandonados na área urbana de João Pessoa, movimentos populares escolheram as ruínas de uma fábrica como ponto de transformação, cultura e educação. O sucesso e progresso da Ocupação Aratu se tornou em um perigo pra si, chamando a atenção de diversas ameaças que querem esmagar o poder emancipatório que irradia do povo. Pressão corporativa, forças de opressão e até perigos internos devem serem levados em consideração pela coletividade que delibera, prospera e constrói a alternativa por uma vida digna. Plante, colha, organize, converse, resolva, descubra, construa, defenda, combata e ESMAGUE a quimera imperialista!
+                </p>
+                <div id="deck-narrativa" class="deck-wrapper mt-16" style="height: 520px;"></div>
+                <div id="dots-narrativa" class="deck-dots"></div>
+            </section>
+        </div>
+    </div>
 
-        <section class="mb-16">
-            <div class="single-card p-6 md:p-8 rounded-lg">
-                <h3 class="font-display text-3xl md:text-4xl mb-6 section-title">Level Design</h3>
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="md:w-1/2">
-                        <p class="text-lg text-justify" style="color: var(--text-muted);">
-                            O mapa é um corredor de atividades. Quem joga começa na Área de Colheita, passa pela Fábrica Ocupada (a base de operações) e defende a entrada principal na Área de Construção de Defesas, onde os inimigos surgem em ondas progressivas. O design incentiva o posicionamento estratégico de defesas para criar funis e otimizar o dano contra as hordas.
-                        </p>
-                    </div>
-                    <div class="md:w-1/2">
-                         <div id="map-trigger" class="bg-gray-900 p-2 md:p-4 rounded-lg overflow-hidden hover:cursor-pointer transition-transform duration-300 hover:scale-105">
-                            <img src="https://i.imgur.com/O3eiVGl.png" alt="Mapa conceitual do level design de Ocupar e Resistir" class="w-full h-auto rounded-md pointer-events-none">
-                            <p class="text-center text-sm text-gray-500 mt-2">Clique para ampliar o mapa conceitual.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- SEÇÃO: MÓDULOS -->
+    <section class="section-container scroll-fade">
+        <h2 class="section-title">Módulos da Ocupação</h2>
+        <div id="deck-modulos" class="deck-wrapper"></div>
+        <div id="dots-modulos" class="deck-dots"></div>
+    </section>
 
-        <section class="mb-16">
-            <div class="single-card p-6 md:p-8 rounded-lg">
-                <h3 class="font-display text-3xl md:text-4xl mb-8 text-center section-title center">Posicionamento</h3>
-                 <p class="text-center text-lg max-w-3xl mx-auto mb-8" style="color: var(--text-muted);">“Ocupar e Resistir” se posiciona na interseção de gêneros de sucesso, combinando a estratégia de Defesa de Torres como <em class="highlight">Orcs Must Die</em> e uma versão simplificada da Simulação de Colheita de <em class="highlight">Stardew Valley</em>, mas se destaca por sua forte <em class="highlight">Narrativa Político-Social</em> e uma <em class="highlight">Estética Original</em> única.</p>
-                <div class="relative w-full max-w-3xl mx-auto h-[450px] md:h-[500px]">
+    <!-- SEÇÃO DIVISORA ANGULADA: INIMIGOS DO POVO -->
+    <div class="w-full relative py-12 my-12">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-y border-[var(--red)]/30 shadow-2xl backdrop-blur-md"></div>
+        <div class="relative z-10">
+            <section class="section-container scroll-fade !py-0">
+                <h2 class="section-title text-[var(--red)]">Inimigos da Ocupação</h2>
+                <p class="text-center max-w-3xl mx-auto leading-relaxed mb-10 opacity-90">
+                    Criaturas bizarras forjadas em poços de urânio enriquecido da sociedade, os Gadistas são monstros antropomorfos com muito orçamento e vários artifícios, porém um único objetivo: destruir a Cozinha Solidária que é o coração da Ocupação.
+                </p>
+                <div id="deck-inimigos" class="deck-wrapper" style="height: 560px;"></div>
+                <div id="dots-inimigos" class="deck-dots"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- SEÇÃO: OPORTUNIDADES (Movida para antes do Posicionamento) -->
+    <section class="section-container scroll-fade">
+        <h2 class="section-title">Oportunidades</h2>
+        <div id="deck-oportunidades" class="deck-wrapper"></div>
+        <div id="dots-oportunidades" class="deck-dots"></div>
+    </section>
+
+    <!-- SEÇÃO DIVISORA ANGULADA: POSICIONAMENTO (GRÁFICO) -->
+    <div class="w-full relative py-16 mt-12 mb-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-[#1a1311] to-black/90 transform -skew-y-2 z-0 border-t border-[var(--orange)]/30 shadow-2xl backdrop-blur-md"></div>
+        <div class="relative z-10">
+            <section class="section-container scroll-fade !py-0">
+                <h2 class="section-title">Posicionamento</h2>
+                <p class="text-center max-w-3xl mx-auto leading-relaxed mb-8 opacity-90">
+                    Ocupar e Resistir se posiciona na interseção de gêneros de sucesso, combinando a estratégia de Defesa de Torres como Orcs Must Die e uma versão simplificada da Simulação de Colheita de Stardew Valley, mas se destaca por sua forte Narrativa Político-Social e uma Estética Original única.
+                </p>
+                <div class="chart-container">
                     <canvas id="correlatosChart"></canvas>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
+    </div>
 
-    </main>
-
-    <footer class="mt-16 py-8 border-t" style="border-color: var(--border-color);">
-        <div class="container mx-auto px-6 text-center" style="color: var(--text-muted);">
-            <p class="mb-2">Quer saber mais? Vamos conversar!</p>
-            <a href="mailto:poligonalhub@gmail.com" class="font-display text-xl text-highlight-secondary hover:text-white transition-colors">poligonalhub@gmail.com</a>
-            <a href="http://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="block mt-4 text-lg hover:text-highlight-secondary transition-colors">
+    <!-- FOOTER -->
+    <footer class="py-8 border-t bg-[#140e0c] relative z-20" style="border-color: rgba(189, 177, 165, 0.2);">
+        <div class="container mx-auto px-6 text-center" style="color: var(--beige);">
+            <p class="mb-2 opacity-80">Quer saber mais? Vamos conversar!</p>
+            <a href="mailto:poligonalhub@gmail.com" class="font-bold text-xl text-orange-500 hover:text-white transition-colors">poligonalhub@gmail.com</a>
+            <a href="http://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="block mt-4 text-lg hover:text-orange-500 transition-colors opacity-80">
                 © <script>document.write(/\d{4}/.exec(Date())[0])</script> Centro Comunitário-Criativo Poligonal.
             </a>
         </div>
     </footer>
-    
-    <div id="map-modal" class="map-modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden opacity-0">
-        <div class="map-modal-content relative bg-gray-900 p-4 rounded-lg max-w-4xl w-full scale-95">
-            <button id="close-modal" class="absolute -top-4 -right-4 bg-red-700 text-white rounded-full h-10 w-10 flex items-center justify-center text-2xl font-bold">&times;</button>
-            <img src="https://i.imgur.com/O3eiVGl.png" alt="Mapa conceitual ampliado" class="w-full h-auto rounded-md">
-        </div>
-    </div>
 
-
+    <!-- SCRIPTS -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // --- LÓGICA DO MODAL DO MAPA ---
-            const mapModal = document.getElementById('map-modal');
-            const mapTrigger = document.getElementById('map-trigger');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalContent = mapModal.querySelector('.map-modal-content');
+        // --- LÓGICA DE SCROLL PARALLAX DA HERO ---
+        const handleHeroScroll = () => {
+            const track = document.getElementById('heroTrack');
+            if (!track) return;
 
-            if (mapModal && mapTrigger && closeModalBtn) {
-                const openModal = () => {
-                    mapModal.classList.remove('hidden');
-                    setTimeout(() => {
-                        mapModal.classList.remove('opacity-0');
-                        modalContent.classList.remove('scale-95');
-                    }, 10);
-                };
+            const rect = track.getBoundingClientRect();
+            const maxScroll = rect.height - window.innerHeight;
+            
+            let progress = -rect.top / maxScroll;
+            progress = Math.max(0, Math.min(progress, 1)); 
 
-                const closeModal = () => {
-                    modalContent.classList.add('scale-95');
-                    mapModal.classList.add('opacity-0');
-                    setTimeout(() => {
-                        mapModal.classList.add('hidden');
-                    }, 300);
-                };
+            const logo = document.getElementById('heroLogo');
+            const text = document.getElementById('heroText');
+            const tags = document.getElementById('heroTags');
 
-                mapTrigger.addEventListener('click', openModal);
-                closeModalBtn.addEventListener('click', closeModal);
-                mapModal.addEventListener('click', (e) => {
-                    if (e.target === mapModal) {
-                        closeModal();
+            const logoProgress = Math.min(progress / 0.5, 1);
+            logo.style.maxWidth = `${1000 - (550 * logoProgress)}px`;
+            logo.style.width = `${95 - (30 * logoProgress)}%`;
+
+            const textProgress = Math.max(0, Math.min((progress - 0.3) / 0.4, 1));
+            text.style.maxHeight = `${textProgress * 180}px`; 
+            text.style.marginTop = `${textProgress * 1.5}rem`;
+            text.style.opacity = textProgress;
+            text.style.transform = `translateY(${(1 - textProgress) * 20}px)`;
+
+            const tagsProgress = Math.max(0, Math.min((progress - 0.6) / 0.4, 1));
+            tags.style.maxHeight = `${tagsProgress * 150}px`;
+            tags.style.marginTop = `${tagsProgress * 1.5}rem`;
+            tags.style.opacity = tagsProgress;
+            tags.style.transform = `translateY(${(1 - tagsProgress) * 20}px)`;
+        };
+
+        window.addEventListener('scroll', handleHeroScroll);
+        window.addEventListener('resize', handleHeroScroll);
+        handleHeroScroll();
+
+        // --- LÓGICA DE FADE-IN SUAVE NAS SEÇÕES AO ROLAR ---
+        const initScrollAnimations = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
                     }
                 });
+            }, { threshold: 0.15 });
+
+            document.querySelectorAll('.scroll-fade').forEach(sec => observer.observe(sec));
+        };
+
+        // --- CLASSE UNIVERSAL DO BARALHO OTIMIZADA ---
+        class OcuparDeck {
+            constructor(containerId, dotsId, data) {
+                this.container = document.getElementById(containerId);
+                this.dotsContainer = document.getElementById(dotsId);
+                this.data = data;
+                this.currentIndex = 0;
+                
+                this.startX = 0;
+                this.isDragging = false;
+                this.threshold = 50; 
+                this.currentDist = 0;
+
+                this.init();
             }
 
-            // --- LÓGICA DO CARROSSEL CIRCULAR ---
-            const carouselContainer = document.getElementById('carousel-touch-area');
-            if (carouselContainer) {
-                const carousel = carouselContainer.querySelector('.enemy-card-wrapper');
-                const cards = carouselContainer.querySelectorAll('.enemy-card');
-                const prevBtn = document.getElementById('prevBtn');
-                const nextBtn = document.getElementById('nextBtn');
-                
-                if (carousel && cards.length > 0 && prevBtn && nextBtn) {
-                    const cardCount = cards.length;
-                    const theta = 360 / cardCount;
-                    let currentIndex = 0;
-                    let isDragging = false;
-                    let startX;
-
-                    function rotateCarousel() {
-                        const angle = currentIndex * -theta;
-                        carousel.style.transform = `rotateY(${angle}deg)`;
-                    }
-
-                    function setupCarousel() {
-                        const radius = (carousel.offsetWidth / 2) / Math.tan(Math.PI / cardCount);
-                        cards.forEach((card, index) => {
-                            const angle = index * theta;
-                            card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-                        });
-                        rotateCarousel();
-                    }
-
-                    function handleNext() { currentIndex++; rotateCarousel(); }
-                    function handlePrev() { currentIndex--; rotateCarousel(); }
-
-                    nextBtn.addEventListener('click', handleNext);
-                    prevBtn.addEventListener('click', handlePrev);
+            init() {
+                this.data.forEach((item, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-type', item.type || 'default');
                     
-                    function dragStart(e) {
-                        isDragging = true;
-                        startX = e.pageX || e.touches[0].pageX;
-                        carousel.style.transition = 'none';
-                    }
+                    let innerContent = '';
+                    let speechBubble = '';
+                    let usePadding = true;
+                    
+                    if (item.type === 'character') {
+                        usePadding = false;
+                        speechBubble = `
+                            <div class="char-speech absolute bg-[var(--beige)] text-[var(--brown)] p-4 rounded-xl text-[0.8rem] font-bold leading-tight z-50 shadow-2xl border-2 border-orange-900/20" 
+                                 style="bottom: calc(100% + 15px); left: -1rem; right: -1rem;">
+                                "${item.speech}"
+                                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-[var(--beige)] rotate-45 border-r-2 border-b-2 border-orange-900/20"></div>
+                            </div>
+                        `;
+                        innerContent = `
+                            <img src="${item.bust}" class="char-bust absolute bottom-0 left-0 w-full h-[85%] object-contain z-10 drop-shadow-2xl">
+                            <div class="char-nameplate absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black/80 to-transparent text-center z-30 pt-16 rounded-b-[24px]">
+                                <h4 class="text-3xl font-black uppercase text-[var(--orange)] leading-none tracking-tighter drop-shadow-md">${item.title}</h4>
+                            </div>
 
-                    function dragEnd(e) {
-                        if (!isDragging) return;
-                        isDragging = false;
-                        carousel.style.transition = 'transform 0.6s cubic-bezier(0.77, 0, 0.175, 1)';
-                        const endX = e.pageX || e.changedTouches[0].pageX;
-                        const diffX = endX - startX;
-                        
-                        if (Math.abs(diffX) > 50) {
-                            if (diffX < 0) handleNext();
-                            else handlePrev();
-                        } else {
-                            rotateCarousel();
+                            <img src="${item.full}" class="char-full absolute bottom-0 left-0 w-full h-[95%] object-contain z-0 drop-shadow-md">
+                            <div class="char-info absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black via-[var(--brown)] to-transparent text-center z-20 pt-16 rounded-b-[24px]">
+                                <h4 class="text-2xl font-black uppercase text-[var(--orange)] mb-1 leading-none tracking-tighter">${item.title}</h4>
+                                <p class="text-[0.65rem] text-orange-300 uppercase tracking-widest font-bold mb-2">${item.role}</p>
+                                <p class="text-[0.65rem] opacity-90 leading-snug">${item.origin}</p>
+                            </div>
+                        `;
+                    } 
+                    // Novo Design Elegante do Cartão Mistério com a Interrogação
+                    else if (item.type === 'mystery') {
+                        usePadding = false;
+                        innerContent = `
+                            <!-- Estado Inativo: Interrogação Elegante no Anel -->
+                            <div class="char-bust absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#1a1311]">
+                                <div class="w-24 h-24 rounded-full border-2 border-[var(--beige)] border-opacity-20 flex items-center justify-center mb-16 bg-black/40 shadow-inner">
+                                    <span class="text-5xl font-black text-[var(--beige)] opacity-30">?</span>
+                                </div>
+                            </div>
+                            <div class="char-nameplate absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black/80 to-transparent text-center z-30 pt-16 rounded-b-[24px]">
+                                <h4 class="text-2xl font-black uppercase text-gray-500 tracking-widest drop-shadow-md">${item.title}</h4>
+                            </div>
+
+                            <!-- Estado Revelado: Interrogação Laranja Brilhante -->
+                            <div class="char-full absolute inset-0 flex flex-col items-center justify-center z-0 bg-[#1a1311]">
+                                <div class="w-32 h-32 rounded-full border-4 border-[var(--orange)] border-opacity-60 flex items-center justify-center mb-24 bg-black/60 shadow-[0_0_40px_rgba(255,97,39,0.15)]">
+                                    <span class="text-[5rem] font-black text-[var(--orange)] opacity-80 drop-shadow-lg">?</span>
+                                </div>
+                            </div>
+                            <div class="char-info absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black via-black/90 to-transparent text-center z-20 pt-16 rounded-b-[24px]">
+                                <h4 class="text-xl font-black uppercase text-[var(--orange)] mb-1 tracking-widest">${item.title}</h4>
+                                <p class="text-[0.65rem] text-[var(--orange)] uppercase tracking-widest font-bold mb-2 opacity-80">${item.role}</p>
+                                <p class="text-[0.65rem] text-gray-400 leading-snug">${item.origin}</p>
+                            </div>
+                        `;
+                    }
+                    else if (item.type === 'enemy') {
+                        innerContent = `
+                            <img src="${item.image}" class="w-full h-auto object-contain max-h-60 mb-2 rounded drop-shadow-2xl">
+                            <span class="text-[0.65rem] font-black px-3 py-1 rounded mb-4 mt-2 inline-block uppercase tracking-[0.2em]" style="background-color: ${item.tagColor || 'var(--orange)'}; color: var(--brown)">${item.tag}</span>
+                            <h4 class="text-3xl font-black uppercase mb-3 tracking-tighter leading-none" style="color: var(--orange)">${item.title}</h4>
+                            <p class="text-sm leading-relaxed opacity-80 px-2">${item.description}</p>
+                        `;
+                    }
+                    else {
+                        if (item.tag) {
+                            innerContent += `<span class="text-xs font-bold px-3 py-1 rounded mb-4 inline-block uppercase tracking-widest" style="background-color: ${item.tagColor || 'var(--orange)'}; color: var(--brown)">${item.tag}</span>`;
                         }
+                        
+                        if (item.image) {
+                            innerContent += `<img src="${item.image}" class="w-full h-auto object-contain max-h-40 mb-4 rounded drop-shadow-2xl">`;
+                        } else if (item.icon) {
+                            const iconClass = item.invertIcon ? 'icon-filter-beige max-w-[80px]' : 'max-w-[120px]';
+                            innerContent += `<img src="${item.icon}" class="${iconClass} mx-auto mb-6">`;
+                        }
+                        
+                        innerContent += `<h4 class="text-2xl font-black uppercase mb-3 tracking-tighter" style="color: var(--orange)">${item.title}</h4>`;
+                        innerContent += `<p class="text-sm leading-relaxed opacity-80 px-2">${item.description}</p>`;
                     }
-                    
-                    carouselContainer.addEventListener('mousedown', dragStart);
-                    carouselContainer.addEventListener('touchstart', dragStart, { passive: true });
-                    carouselContainer.addEventListener('mouseup', dragEnd);
-                    carouselContainer.addEventListener('touchend', dragEnd);
-                    carouselContainer.addEventListener('mouseleave', (e) => { if (isDragging) dragEnd(e); });
 
-                    setupCarousel();
-                    window.addEventListener('resize', setupCarousel);
+                    const paddingClass = usePadding ? 'p-8 pt-10 flex flex-col items-center justify-center text-center' : '';
+                    card.innerHTML = `
+                        ${speechBubble}
+                        <div class="card-visuals">
+                            <span class="card-label label-left">${item.shortTitle || item.title}</span>
+                            <span class="card-label label-right">${item.shortTitle || item.title}</span>
+                            <div class="card-content w-full h-full relative ${paddingClass}">
+                                ${innerContent}
+                            </div>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => {
+                        this.setIndex(i);
+                    });
+                    
+                    this.container.appendChild(card);
+
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.addEventListener('click', () => this.setIndex(i));
+                    this.dotsContainer.appendChild(dot);
+                });
+
+                this.container.addEventListener('mousedown', (e) => this.dragStart(e.pageX));
+                window.addEventListener('mousemove', (e) => this.dragMove(e.pageX));
+                window.addEventListener('mouseup', () => this.dragEnd());
+                this.container.addEventListener('touchstart', (e) => this.dragStart(e.touches[0].pageX), {passive: true});
+                window.addEventListener('touchmove', (e) => this.dragMove(e.touches[0].pageX), {passive: true});
+                window.addEventListener('touchend', () => this.dragEnd());
+
+                this.update();
+            }
+
+            dragStart(x) { this.isDragging = true; this.startX = x; this.container.classList.add('is-dragging'); }
+            
+            dragMove(x) {
+                if (!this.isDragging) return;
+                this.currentDist = (x - this.startX);
+                this.container.style.setProperty('--drag-x', `${this.currentDist * 0.5}px`);
+            }
+
+            dragEnd() {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+                this.container.classList.remove('is-dragging');
+                this.container.style.setProperty('--drag-x', `0px`);
+                
+                if (Math.abs(this.currentDist) > this.threshold) {
+                    if (this.currentDist > 0 && this.currentIndex > 0) {
+                        this.currentIndex--;
+                        this.update();
+                    } else if (this.currentDist < 0 && this.currentIndex < this.data.length - 1) {
+                        this.currentIndex++;
+                        this.update();
+                    }
+                }
+                this.currentDist = 0;
+            }
+
+            setIndex(index) {
+                if (this.currentIndex === index) {
+                    const activeCard = this.container.children[index];
+                    if (activeCard.getAttribute('data-type') === 'character' || activeCard.getAttribute('data-type') === 'mystery') {
+                        activeCard.classList.toggle('revealed');
+                    }
+                } else {
+                    this.currentIndex = index;
+                    this.update();
                 }
             }
 
-            // --- LÓGICA DO GRÁFICO ---
+            update() {
+                const cards = this.container.querySelectorAll('.card');
+                const dots = this.dotsContainer.querySelectorAll('.dot');
+                cards.forEach((card, i) => {
+                    const diff = i - this.currentIndex;
+                    card.setAttribute('data-pos', diff);
+                    
+                    if (i === this.currentIndex) {
+                        card.classList.add('active');
+                    } else {
+                        card.classList.remove('active');
+                        card.classList.remove('revealed');
+                    }
+
+                    if (diff > 0) card.setAttribute('data-side', 'right');
+                    else if (diff < 0) card.setAttribute('data-side', 'left');
+                    else card.setAttribute('data-side', 'center');
+                });
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === this.currentIndex));
+            }
+        }
+
+        // --- BANCOS DE DADOS DAS SEÇÕES ---
+
+        const diferenciaisData = [
+            { shortTitle: "Temática", title: "Temática Revolucionária", description: "Uma abordagem única que mistura estratégia clássica com a dura e real luta por moradia e reforma agrária no Brasil." },
+            { shortTitle: "Gêneros", title: "Híbrido de Gêneros", description: "A fusão de mecicas de colheita de dia e defesa de torres pela noite cria um loop de gameplay viciante que atrai tanto jogadores casuais quanto de estratégia." },
+            { shortTitle: "Estética", title: "Estética Carismática", description: "A direção de arte inspirada nas obras de Regis Soares e Paulo Moreira tem um forte apelo visual e destaque no competitivo mercado indie." }
+        ];
+
+        const gameLoopData = [
+            { shortTitle: "Ocupar", title: "OCUPAR", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/OCUPARICONE.png", description: "Plante, colha e gerencie um assentamento de agroecologia solidária numa Fábrica abandonada tornada em ponto de cultura e educação." },
+            { shortTitle: "Cuidar", title: "CUIDAR", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/CUIDARICONE.png", description: "Quanto mais resiste, mais trabalhadores se unem e disponibilizam Força de Trabalho. Use-a para levantar defesas e administrar operações." },
+            { shortTitle: "Resistir", title: "RESISTIR", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/RESISTIRICONE.png", description: "Utilize diversos dispositivos e equipamentos vindos da terra para defender a Ocupação contra as ameaças iminentes." }
+        ];
+
+        const modosData = [
+            { shortTitle: "Matutino", title: "Colheita e Cuidado (Matutino)", description: "Plante, cultive e colha diversas plantações, cada uma com benefícios específicos. Aproveite para conhecer com quem divide o front e descobrir segredos acerca da Fábrica." },
+            { shortTitle: "Contínuo", title: "Gerenciamento (Contínuo)", description: "Após terminar suas tarefas pela manhã, tome o tempo necessário para organizar mantimentos, equipamentos e defesas. Gerencie tudo a qualquer momento pelo painel." },
+            { shortTitle: "Noturno", title: "Defender e resistir (Noturno)", description: "Lute contra criaturas bizarras que querem a destruição da classe trabalhadora organizada. Não só esmague reacionários, ria da cara deles também!" }
+        ];
+
+        const narrativaData = [
+            {
+                shortTitle: "Luzia",
+                title: "Luzia",
+                type: "character",
+                role: "Líder comunitária. Personagem Jogável.",
+                origin: "Mora perto e já faz parte da comunidade urbana do Centro.",
+                bust: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/LUZIAB.png?raw=true",
+                full: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/LUZIAA.png?raw=true",
+                speech: "Era tudo entulho aqui, po. A gente meteu a mão na massa e transformou a antiga Fábrica Sanhauá na Ocupação Aratu. Agora os bicho tão tudo com uma lapa de olho grande... Daqui ninguém arreda o pé. Essa ocupação é do povo."
+            },
+            {
+                shortTitle: "Zé Antônio",
+                title: "Seu Zé Antônio",
+                type: "character",
+                role: "Líder metalúrgico. Personagem Jogável.",
+                origin: "Ex-operário da fábrica antes dela ser abandonada (origem é um mistério no começo).",
+                bust: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/ZEANTOINB.png?raw=true",
+                full: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/ZEANTOINA.png?raw=true",
+                speech: "Quando cheguei aqui era tudo máquina. Mas aí os pelego sabotaram nossa cooperativa e a fábrica foi sucateada de propósito. Vi o que os jovens fizeram aqui... Vou usar cada pedaço de sucata que conseguir pra proteger esse lugar."
+            },
+            { shortTitle: "???", title: "Desconhecido", type: "mystery", role: "Personagem Bloqueado", origin: "Continue resistindo para descobrir a identidade deste aliado." },
+            { shortTitle: "???", title: "Desconhecido", type: "mystery", role: "Personagem Bloqueado", origin: "Continue resistindo para descobrir a identidade deste aliado." },
+            { shortTitle: "???", title: "Desconhecido", type: "mystery", role: "Personagem Bloqueado", origin: "Continue resistindo para descobrir a identidade deste aliado." }
+        ];
+
+        const modulosData = [
+            { shortTitle: "Paiol", title: "PAIOL", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/paiol.png", invertIcon: true, description: "Painel de Controle para gerenciamento de recursos, missões e Força de Trabalho." },
+            { shortTitle: "Escola", title: "ESCOLA", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/ENFF.png", invertIcon: true, description: "Enciclopédia sobre Agroecologia, Táticas, Inimigos, Movimentos Sociais e seus personagens jogáveis, a História da Ocupação Aratu, O Universo e Tudo Mais." },
+            { shortTitle: "Ateliê", title: "ATELIÊ METALÚRGICO", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/atelie.png", invertIcon: true, description: "Oficina para criar e aprimorar ferramentas, equipamentos e defesas utilizadas por toda Ocupação." }
+        ];
+
+        const inimigosData = [
+            { shortTitle: "Gadistas", title: "GADISTAS", type: "enemy", tag: "Early Game", tagColor: "var(--green)", image: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/gadistas.png?raw=true", description: "Frágeis, mas numerosos. A base de apoio contrarevolucionária é composta por hordas de bovinos, hienas e robôs de internet." },
+            { shortTitle: "MalACABados", title: "MalACABados", type: "enemy", tag: "Mid Game", tagColor: "var(--orange)", image: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/malACABados.png?raw=true", description: "Quebramato do Poder, Forças Fardadas de Opressão que se manifestam como Cães de Guarda, Cavalos e Porcos." },
+            { shortTitle: "O 1%", title: "O 1%", type: "enemy", tag: "Late Game", tagColor: "var(--red)", image: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/1PORCENTO.png?raw=true", description: "Os Predadores Alfa do suor trabalhador. Esses monstros elite carregam características de Chacais, Répteis e Águias Americanas." }
+        ];
+
+        const oportunidadesData = [
+            { shortTitle: "Público-Alvo", title: "Potencial de Mercado", description: "Miramos em um nicho crescente e engajado: jogadores de simulação (avaliado em US$ 19.7 bilhões em 2024) e estratégia, buscando experiências com profundidade narrativa e combate intenso." },
+            { shortTitle: "Marketing", title: "Estratégia Multimídia", description: "Campanha transmídia: Livro de Direção de Arte, Trilha Sonora Original, Videodevlogs e tutoriais. Forte presença com parcerias estratégicas para alcance direto com a comunidade." },
+            { shortTitle: "Distribuição", title: "Monetização", description: "Distribuição digital (Steam, Epic) com preço alvo entre R$60-R$80 para 70H de conteúdo base. Demo gratuita e estrutura modular para expansão com DLCs (novos movimentos, construções e ameaças!)." }
+        ];
+
+        window.onload = () => {
+            initScrollAnimations();
+            
+            // Instanciações ordenadas conforme a leitura da página
+            new OcuparDeck('deck-diferenciais', 'dots-diferenciais', diferenciaisData);
+            new OcuparDeck('deck-gameloop', 'dots-gameloop', gameLoopData);
+            new OcuparDeck('deck-modos', 'dots-modos', modosData);
+            new OcuparDeck('deck-narrativa', 'dots-narrativa', narrativaData);
+            new OcuparDeck('deck-modulos', 'dots-modulos', modulosData);
+            new OcuparDeck('deck-inimigos', 'dots-inimigos', inimigosData);
+            new OcuparDeck('deck-oportunidades', 'dots-oportunidades', oportunidadesData);
+
+            // --- LÓGICA DO GRÁFICO (POSICIONAMENTO) ---
             const ctx = document.getElementById('correlatosChart');
             if (ctx) {
                 const isMobile = window.innerWidth < 768;
@@ -544,10 +722,7 @@
                 const legendLabelSize = isMobile ? 12 : 14;
                 
                 let chartLabels = ['Defesa de Torre', 'Narrativa Social', 'Cultivo', 'Estética Original', 'Gameplay Ágil'];
-                
-                if (isMobile) {
-                    chartLabels = ['Defesa', 'Narrativa', 'Cultivo', 'Estética', 'Gameplay'];
-                }
+                if (isMobile) { chartLabels = ['Defesa', 'Narrativa', 'Cultivo', 'Estética', 'Gameplay']; }
 
                 new Chart(ctx, {
                     type: 'radar',
@@ -555,52 +730,40 @@
                         labels: chartLabels,
                         datasets: [
                             {
-                                label: 'Ocupar e Resistir',
-                                data: [7, 9, 7, 10, 8],
+                                label: 'Ocupar e Resistir', data: [7, 9, 7, 10, 8],
                                 borderWidth: 4, pointRadius: 6, pointHoverRadius: 8,
-                                backgroundColor: 'rgba(220, 50, 47, 0.4)', borderColor: '#dc322f',
-                                pointBackgroundColor: '#dc322f', pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#dc322f'
+                                backgroundColor: 'rgba(255, 97, 39, 0.4)', borderColor: '#FF6127',
+                                pointBackgroundColor: '#FF6127', pointBorderColor: '#fff'
                             },
                             {
-                                label: 'Orcs Must Die',
-                                data: [10, 3, 2, 5, 7],
+                                label: 'Orcs Must Die', data: [10, 3, 2, 5, 7],
                                 borderWidth: 2, pointRadius: 4,
                                 backgroundColor: 'rgba(133, 153, 0, 0.4)', borderColor: '#859900',
-                                pointBackgroundColor: '#859900', pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#859900'
+                                pointBackgroundColor: '#859900', pointBorderColor: '#fff'
                             },
                             {
-                                label: 'Stardew Valley',
-                                data: [2, 6, 10, 7, 6],
+                                label: 'Stardew Valley', data: [2, 6, 10, 7, 6],
                                 borderWidth: 2, pointRadius: 4,
                                 backgroundColor: 'rgba(38, 139, 210, 0.4)', borderColor: '#268bd2',
-                                pointBackgroundColor: '#268bd2', pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#268bd2'
+                                pointBackgroundColor: '#268bd2', pointBorderColor: '#fff'
                             },
                             {
-                                label: 'Atomicrops',
-                                data: [6, 2, 8, 9, 10],
+                                label: 'Atomicrops', data: [6, 2, 8, 9, 10],
                                 borderWidth: 2, pointRadius: 4,
                                 backgroundColor: 'rgba(108, 113, 196, 0.4)', borderColor: '#6c71c4',
-                                pointBackgroundColor: '#6c71c4', pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#6c71c4'
+                                pointBackgroundColor: '#6c71c4', pointBorderColor: '#fff'
                             },
                             {
-                                label: 'Tonight We Riot',
-                                data: [6, 8, 1, 8, 8],
+                                label: 'Tonight We Riot', data: [6, 8, 1, 8, 8],
                                 borderWidth: 2, pointRadius: 4,
                                 backgroundColor: 'rgba(211, 54, 130, 0.4)', borderColor: '#d33682',
-                                pointBackgroundColor: '#d33682', pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#d33682'
+                                pointBackgroundColor: '#d33682', pointBorderColor: '#fff'
                             },
                             {
-                                label: 'Punhos de Repúdio',
-                                data: [1, 10, 1, 9, 9],
+                                label: 'Punhos de Repúdio', data: [1, 10, 1, 9, 9],
                                 borderWidth: 2, pointRadius: 4,
                                 backgroundColor: 'rgba(181, 137, 0, 0.4)', borderColor: '#b58900',
-                                pointBackgroundColor: '#b58900', pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#b58900'
+                                pointBackgroundColor: '#b58900', pointBorderColor: '#fff'
                             }
                         ]
                     },
@@ -610,18 +773,16 @@
                         animation: { duration: 1500, easing: 'easeInOutQuart' },
                         scales: {
                             r: {
-                                angleLines: { color: 'rgba(42, 54, 59, 0.5)' },
-                                grid: { color: 'rgba(42, 54, 59, 0.5)' },
+                                angleLines: { color: 'rgba(189, 177, 165, 0.2)' },
+                                grid: { color: 'rgba(189, 177, 165, 0.2)' },
                                 pointLabels: {
-                                    color: '#93a1a1',
-                                    font: { family: "'Roboto Condensed', sans-serif", size: pointLabelSize }
+                                    color: '#BDB1A5',
+                                    font: { family: "'Raleway', sans-serif", size: pointLabelSize, weight: 'bold' }
                                 },
                                 ticks: {
-                                    color: '#839496',
-                                    backdropColor: 'rgba(0, 43, 54, 0.8)',
-                                    stepSize: 2,
-                                    min: 0,
-                                    max: 10
+                                    color: '#BDB1A5',
+                                    backdropColor: 'transparent',
+                                    stepSize: 2, min: 0, max: 10
                                 }
                             }
                         },
@@ -629,25 +790,17 @@
                             legend: {
                                 display: true,
                                 position: legendPosition,
-                                align: 'center',
                                 labels: {
-                                    color: '#F5F5F5',
-                                    font: { family: "'Archivo Black', sans-serif", size: legendLabelSize },
-                                    padding: 20,
-                                    usePointStyle: true,
-                                    boxWidth: 15
+                                    color: '#BDB1A5',
+                                    font: { family: "'Raleway', sans-serif", size: legendLabelSize, weight: 'bold' },
+                                    padding: 20, usePointStyle: true, boxWidth: 15
                                 }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                titleFont: { family: "'Archivo Black', sans-serif", size: 16 },
-                                bodyFont: { family: "'Roboto Condensed', sans-serif", size: 14 }
                             }
                         }
                     }
                 });
             }
-        });
+        };
     </script>
 </body>
 </html>
