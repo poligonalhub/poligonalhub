@@ -25,7 +25,7 @@
             --red: #EE3137;
         }
 
-        /* TRAVA DE SCROLL HORIZONTAL (Correção Mobile - Agora usando CLIP para não quebrar o Sticky) */
+        /* TRAVA DE SCROLL HORIZONTAL */
         html {
             max-width: 100vw;
             overflow-x: clip; 
@@ -43,7 +43,7 @@
             width: 100%;
             position: relative;
             overflow-x: clip;
-            overscroll-behavior-x: none; /* Impede aquele "pulo" lateral no iOS/Android */
+            overscroll-behavior-x: none; 
         }
 
         /* --- PADRÕES DE SEÇÃO & TRANSIÇÕES FLUIDAS --- */
@@ -86,7 +86,7 @@
 
         /* --- HERO ANIMATION CSS --- */
         .hero-track {
-            height: 180vh; /* Reduzido levemente para um scroll mais ágil antes de chegar na próxima seção */
+            height: 180vh;
             position: relative;
             width: 100%;
         }
@@ -333,7 +333,7 @@
             <section class="section-container scroll-fade !py-0">
                 <h2 class="section-title">Narrativa</h2>
                 <p class="text-center max-w-4xl mx-auto leading-relaxed mb-8 opacity-90 text-lg">
-                    Dentre os inúmeros imóveis abandonados na área urbana de João Pessoa, movimentos populares escolheram as ruínas de uma fábrica como ponto de transformação, cultura e educação. O sucesso e progresso da Ocupação Aratu se tornou em um perigo pra si, chamando a atenção de diversas ameaças que querem esmagar o poder emancipatório que irradia do povo. Pressão corporativa, forças de opressão e até perigos internos devem serem levados em consideração pela coletividade que delibera, prospera e constrói a alternativa por uma vida digna. Plante, colha, organize, converse, resolva, descubra, construa, defenda, combata e ESMAGUE a quimera imperialista!
+                    Dentre os inúmeros imóveis abandonados na área urbana de João Pessoa, movimentos populares escolheram as ruínas de uma fábrica como ponto de transformação, cultura e educação. O sucesso e progresso da Ocupação Aratu se tornou em um perigo pra si, chamando a atenção de diversas ameaças que querem esmagar o poder emancipatório que irradia do povo. Lobby corporativo, forças de opressão e até perigos internos devem serem levados em consideração pela coletividade. Plante, colha, organize, converse, resolva, descubra, construa, defenda, combata e ESMAGUE a quimera imperialista!
                 </p>
                 <div id="deck-narrativa" class="deck-wrapper mt-16" style="height: 520px;"></div>
                 <div id="dots-narrativa" class="deck-dots"></div>
@@ -651,7 +651,6 @@
             { shortTitle: "Gêneros", title: "Híbrido de Gêneros", description: "A fusão de mecânicas de colheita de dia e defesa de torres pela noite cria um loop de gameplay viciante que atrai tanto jogadores casuais quanto de estratégia." },
             { shortTitle: "Estética", title: "Estética Carismática", description: "A direção de arte inspirada nas obras de Regis Soares e Paulo Moreira tem um forte apelo visual e destaque no competitivo mercado indie." }
         ];
-
         const gameLoopData = [
             { shortTitle: "Ocupar", title: "OCUPAR", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/OCUPARICONE.png", description: "Plante, colha e gerencie um assentamento de agroecologia solidária numa Fábrica abandonada tornada em ponto de cultura e educação." },
             { shortTitle: "Cuidar", title: "CUIDAR", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/CUIDARICONE.png", description: "Quanto mais resiste, mais trabalhadores se unem e disponibilizam Força de Trabalho. Use-a para levantar defesas e administrar operações." },
