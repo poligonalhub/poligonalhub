@@ -18,13 +18,12 @@
     <!-- Importação dos Ícones (Iconify) -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </head>
-<body class="bg-[#0a0a0b] text-gray-200 antialiased selection:bg-blue-600 selection:text-white">
+<body class="bg-[#0a0a0b] text-gray-200 antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
     
-    <!-- Ponto de ancoragem do React -->
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
         
         // Componente Universal de Ícone
         const Icon = ({ name, className }) => (
@@ -32,24 +31,256 @@
         );
 
         // ============================================================================
-        // DADOS
+        // DADOS (Trilhas e Lições Específicas)
         // ============================================================================
         const TRACKS = [
-          { id: 'engine-structure', title: "Engine Structure", description: "Compreenda a hierarquia básica, os painéis do editor, Actors e a organização de arquivos.", icon: <Icon name="layers" className="w-5 h-5 text-gray-300" />, progress: 80, lessons: 10, color: "border-gray-500", tags: ["Editor", "Actors", "Assets"] },
-          { id: 'blueprints', title: "Blueprint Visual Scripting", description: "Introdução à programação visual, variáveis, eventos e fluxo de controle lógico.", icon: <Icon name="git-merge" className="w-5 h-5 text-cyan-400" />, progress: 45, lessons: 32, color: "border-cyan-500", tags: ["Eventos", "Lógica", "Nós"] },
-          { id: 'gameplay-framework', title: "Gameplay Framework", description: "Estruturação das regras do jogo com GameMode, PlayerController, Pawns e GameState.", icon: <Icon name="gamepad-2" className="w-5 h-5 text-purple-400" />, progress: 30, lessons: 18, color: "border-purple-500", tags: ["GameMode", "Classes", "Regras"] },
-          { id: 'world-building', title: "World Building & Level Design", description: "Construção de terrenos, blocagem (blockout), uso de meshes e navegação do cenário.", icon: <Icon name="map" className="w-5 h-5 text-emerald-400" />, progress: 20, lessons: 22, color: "border-emerald-500", tags: ["Landscape", "Blockout", "Espaço"] },
-          { id: 'rendering', title: "Rendering & Lighting", description: "Estudo sobre como a engine desenha os gráficos, princípios de iluminação e materiais.", icon: <Icon name="camera" className="w-5 h-5 text-yellow-400" />, progress: 5, lessons: 25, color: "border-yellow-500", tags: ["Luzes", "Lumen", "Materiais"] },
-          { id: 'animation', title: "Animation", description: "Importação de esqueletos, Blend Spaces, Animation Blueprints e State Machines.", icon: <Icon name="activity" className="w-5 h-5 text-orange-400" />, progress: 10, lessons: 15, color: "border-orange-500", tags: ["Skeletons", "Montages", "AnimBP"] },
-          { id: 'umg', title: "UMG UI Designer", description: "Criação de menus, HUDs, barras de vida e elementos interativos para a interface.", icon: <Icon name="monitor" className="w-5 h-5 text-blue-400" />, progress: 15, lessons: 12, color: "border-blue-500", tags: ["Widgets", "Canvas", "Bindings"] },
-          { id: 'niagara', title: "Niagara VFX", description: "Fundamentos de sistemas de partículas e emissores para criação de efeitos visuais.", icon: <Icon name="sparkles" className="w-5 h-5 text-pink-400" />, progress: 0, lessons: 14, color: "border-pink-500", tags: ["Partículas", "Emissores", "VFX"] },
-          { id: 'audio', title: "Audio Engine", description: "Implementação de efeitos sonoros, atenuação espacial e controle de trilhas musicais.", icon: <Icon name="volume-2" className="w-5 h-5 text-teal-400" />, progress: 5, lessons: 8, color: "border-teal-500", tags: ["Sound Cues", "Espacial", "Mixagem"] },
-          { id: 'narrative-design', title: "Narrative Design", description: "Técnicas de escrita, construção de universo (worldbuilding) e estrutura de diálogos.", icon: <Icon name="book-open" className="w-5 h-5 text-rose-400" />, progress: 25, lessons: 10, color: "border-rose-500", tags: ["Roteiro", "Diálogos", "Lore"] },
-          { id: 'game-design', title: "Game Design", description: "Estudo de mecânicas, balanceamento, loops de jogo e experiência do jogador.", icon: <Icon name="code-2" className="w-5 h-5 text-indigo-400" />, progress: 40, lessons: 16, color: "border-indigo-500", tags: ["Mecânicas", "Sistemas", "UX"] },
-          { id: 'multiplayer', title: "Multiplayer & Networking", description: "Conceitos de replicação de variáveis e arquitetura Cliente-Servidor.", icon: <Icon name="users" className="w-5 h-5 text-green-400" />, progress: 0, lessons: 12, color: "border-green-500", tags: ["Replicação", "RPCs", "Sessões"] },
-          { id: 'computer-science', title: "Ciência da Computação", description: "Lógica binária, matemática vetorial e o funcionamento do processamento da engine.", icon: <Icon name="cpu" className="w-5 h-5 text-slate-400" />, progress: 15, lessons: 20, color: "border-slate-500", tags: ["Binário", "Vetores", "Lógica"] },
-          { id: 'documentation', title: "Documentação Técnica", description: "Padronização de GDDs, TDDs e manutenção de conhecimento da equipe.", icon: <Icon name="file-text" className="w-5 h-5 text-emerald-600" />, progress: 50, lessons: 8, color: "border-emerald-600", tags: ["GDD", "TDD", "Padrões"] },
-          { id: 'project-management', title: "Gestão de Projetos", description: "Organização de tarefas, sprints e pipelines de produção no desenvolvimento.", icon: <Icon name="briefcase" className="w-5 h-5 text-amber-600" />, progress: 10, lessons: 10, color: "border-amber-600", tags: ["Agile", "Scrum", "Pipeline"] }
+          { 
+            id: 'engine-structure', 
+            title: "Engine Structure", 
+            description: "Compreenda a hierarquia básica, os painéis do editor, Actors e a organização de arquivos.", 
+            icon: <Icon name="layers" className="w-5 h-5 text-gray-300" />, 
+            progress: 80, 
+            lessons: 6, 
+            color: "border-gray-500", 
+            tags: ["Editor", "Actors", "Assets"],
+            lessonsData: [
+                { id: 1, title: "A Interface e Viewports", type: "theory", status: "completed" },
+                { id: 2, title: "Content Browser", type: "practice", status: "completed" },
+                { id: 3, title: "O que é um Actor?", type: "theory", status: "active" },
+                { id: 4, title: "Details Panel & Transform", type: "practice", status: "locked" },
+                { id: 5, title: "World Outliner", type: "theory", status: "locked" },
+                { id: 6, title: "Migração de Assets", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'blueprints', 
+            title: "Blueprint Visual Scripting", 
+            description: "Introdução à programação visual, variáveis, eventos e fluxo de controle lógico.", 
+            icon: <Icon name="git-merge" className="w-5 h-5 text-cyan-400" />, 
+            progress: 45, 
+            lessons: 7, 
+            color: "border-cyan-500", 
+            tags: ["Eventos", "Lógica", "Nós"],
+            lessonsData: [
+                { id: 1, title: "Event Graph vs Construction", type: "theory", status: "completed" },
+                { id: 2, title: "Variáveis e Tipos de Dados", type: "theory", status: "completed" },
+                { id: 3, title: "Nós Get e Set", type: "practice", status: "completed" },
+                { id: 4, title: "O Nó Branch", type: "practice", status: "active" },
+                { id: 5, title: "Loops (ForLoop, While)", type: "practice", status: "locked" },
+                { id: 6, title: "Macros vs Funções", type: "theory", status: "locked" },
+                { id: 7, title: "Comunicação: Casting", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'gameplay-framework', 
+            title: "Gameplay Framework", 
+            description: "Estruturação das regras do jogo com GameMode, PlayerController, Pawns e GameState.", 
+            icon: <Icon name="gamepad-2" className="w-5 h-5 text-purple-400" />, 
+            progress: 30, 
+            lessons: 5, 
+            color: "border-purple-500", 
+            tags: ["GameMode", "Classes", "Regras"],
+            lessonsData: [
+                { id: 1, title: "GameMode e GameState", type: "theory", status: "completed" },
+                { id: 2, title: "Pawn vs Character", type: "theory", status: "active" },
+                { id: 3, title: "Player Controller", type: "practice", status: "locked" },
+                { id: 4, title: "Player State", type: "theory", status: "locked" },
+                { id: 5, title: "Possuindo Pawns", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'level-design', 
+            title: "Level Design & World Building", 
+            description: "Construção de terrenos, blocagem (blockout), uso de meshes e navegação do cenário.", 
+            icon: <Icon name="map" className="w-5 h-5 text-emerald-400" />, 
+            progress: 20, 
+            lessons: 5, 
+            color: "border-emerald-500", 
+            tags: ["Landscape", "Blockout", "Espaço"],
+            lessonsData: [
+                { id: 1, title: "Blockout com Geometry (BSP)", type: "practice", status: "completed" },
+                { id: 2, title: "Static Meshes e Colisões", type: "theory", status: "active" },
+                { id: 3, title: "Criando um Landscape", type: "practice", status: "locked" },
+                { id: 4, title: "Pintura de Folhagens (Foliage)", type: "practice", status: "locked" },
+                { id: 5, title: "NavMesh Bounds Volume", type: "theory", status: "locked" }
+            ]
+          },
+          { 
+            id: 'animation', 
+            title: "Animation", 
+            description: "Importação de esqueletos, Blend Spaces, Animation Blueprints e State Machines.", 
+            icon: <Icon name="activity" className="w-5 h-5 text-orange-400" />, 
+            progress: 10, 
+            lessons: 4, 
+            color: "border-orange-500", 
+            tags: ["Skeletons", "Montages", "AnimBP"],
+            lessonsData: [
+                { id: 1, title: "Skeletal Meshes", type: "theory", status: "completed" },
+                { id: 2, title: "Animation Blueprints", type: "practice", status: "active" },
+                { id: 3, title: "State Machines", type: "practice", status: "locked" },
+                { id: 4, title: "Blend Spaces", type: "theory", status: "locked" }
+            ]
+          },
+          { 
+            id: 'umg', 
+            title: "UMG UI Designer", 
+            description: "Criação de menus, HUDs, barras de vida e elementos interativos para a interface.", 
+            icon: <Icon name="monitor" className="w-5 h-5 text-blue-400" />, 
+            progress: 15, 
+            lessons: 4, 
+            color: "border-blue-500", 
+            tags: ["Widgets", "Canvas", "Bindings"],
+            lessonsData: [
+                { id: 1, title: "O Canvas Panel", type: "theory", status: "completed" },
+                { id: 2, title: "Anchors e Responsividade", type: "practice", status: "active" },
+                { id: 3, title: "Property Binding", type: "theory", status: "locked" },
+                { id: 4, title: "Eventos de Botão", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'narrative-design', 
+            title: "Narrative Design", 
+            description: "Técnicas de escrita, construção de universo (worldbuilding) e estrutura de diálogos.", 
+            icon: <Icon name="book-open" className="w-5 h-5 text-rose-400" />, 
+            progress: 25, 
+            lessons: 4, 
+            color: "border-rose-500", 
+            tags: ["Roteiro", "Diálogos", "Lore"],
+            lessonsData: [
+                { id: 1, title: "Estruturas de Diálogo", type: "theory", status: "completed" },
+                { id: 2, title: "Worldbuilding", type: "theory", status: "active" },
+                { id: 3, title: "A Jornada do Herói", type: "theory", status: "locked" },
+                { id: 4, title: "Escrevendo para NPCs", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'game-design', 
+            title: "Game Design", 
+            description: "Estudo de mecânicas, balanceamento, loops de jogo e experiência do jogador.", 
+            icon: <Icon name="puzzle" className="w-5 h-5 text-indigo-400" />, 
+            progress: 40, 
+            lessons: 5, 
+            color: "border-indigo-500", 
+            tags: ["Mecânicas", "Sistemas", "UX"],
+            lessonsData: [
+                { id: 1, title: "O Core Loop", type: "theory", status: "completed" },
+                { id: 2, title: "Os 3 Cs (Character, Camera, Controls)", type: "theory", status: "completed" },
+                { id: 3, title: "Balanceamento", type: "practice", status: "active" },
+                { id: 4, title: "Risco e Recompensa", type: "theory", status: "locked" },
+                { id: 5, title: "Onboarding (Tutoriais)", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'niagara', 
+            title: "Niagara VFX", 
+            description: "Fundamentos de sistemas de partículas e emissores para criação de efeitos visuais.", 
+            icon: <Icon name="sparkles" className="w-5 h-5 text-pink-400" />, 
+            progress: 0, 
+            lessons: 4, 
+            color: "border-pink-500", 
+            tags: ["Partículas", "Emissores", "VFX"],
+            lessonsData: [
+                { id: 1, title: "Emissores vs Sistemas", type: "theory", status: "active" },
+                { id: 2, title: "Módulos de Partículas", type: "practice", status: "locked" },
+                { id: 3, title: "Curvas e Cores", type: "practice", status: "locked" },
+                { id: 4, title: "Spawning Rate", type: "theory", status: "locked" }
+            ]
+          },
+          { 
+            id: 'rendering', 
+            title: "Rendering & Lighting", 
+            description: "Estudo sobre como a engine desenha os gráficos, princípios de iluminação e materiais.", 
+            icon: <Icon name="camera" className="w-5 h-5 text-yellow-400" />, 
+            progress: 5, 
+            lessons: 4, 
+            color: "border-yellow-500", 
+            tags: ["Luzes", "Lumen", "Materiais"],
+            lessonsData: [
+                { id: 1, title: "Tipos de Luzes", type: "theory", status: "active" },
+                { id: 2, title: "Lumen Global Illumination", type: "theory", status: "locked" },
+                { id: 3, title: "Post Process Volume", type: "practice", status: "locked" },
+                { id: 4, title: "Material Editor", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'audio', 
+            title: "Audio Engine", 
+            description: "MetaSounds, efeitos sonoros, atenuação espacial e trilhas musicais controladas por gameplay tags.", 
+            icon: <Icon name="volume-2" className="w-5 h-5 text-teal-400" />, 
+            progress: 5, 
+            lessons: 4, 
+            color: "border-teal-500", 
+            tags: ["MetaSounds", "Espacial", "Mixagem"],
+            lessonsData: [
+                { id: 1, title: "Sound Cues Básicos", type: "theory", status: "active" },
+                { id: 2, title: "Introdução aos MetaSounds", type: "theory", status: "locked" },
+                { id: 3, title: "Atenuação de Áudio", type: "practice", status: "locked" },
+                { id: 4, title: "Trilhas Dinâmicas", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'multiplayer', 
+            title: "Multiplayer & Networking", 
+            description: "Conceitos de replicação de variáveis e arquitetura Cliente-Servidor.", 
+            icon: <Icon name="users" className="w-5 h-5 text-green-400" />, 
+            progress: 0, 
+            lessons: 4, 
+            color: "border-green-500", 
+            tags: ["Replicação", "RPCs", "Sessões"],
+            lessonsData: [
+                { id: 1, title: "Modelo Cliente-Servidor", type: "theory", status: "active" },
+                { id: 2, title: "Replicação de Variáveis", type: "practice", status: "locked" },
+                { id: 3, title: "RPCs (Remote Procedure Calls)", type: "theory", status: "locked" },
+                { id: 4, title: "Hosteando Sessões", type: "practice", status: "locked" }
+            ]
+          },
+          { 
+            id: 'computer-science', 
+            title: "Ciência da Computação", 
+            description: "Lógica binária, matemática vetorial e o funcionamento do processamento da engine.", 
+            icon: <Icon name="cpu" className="w-5 h-5 text-slate-400" />, 
+            progress: 15, 
+            lessons: 5, 
+            color: "border-slate-500", 
+            tags: ["Binário", "Vetores", "Lógica"],
+            lessonsData: [
+                { id: 1, title: "Lógica Booleana", type: "theory", status: "completed" },
+                { id: 2, title: "Matemática Vetorial 3D", type: "practice", status: "active" },
+                { id: 3, title: "Ciclos de Clock", type: "theory", status: "locked" },
+                { id: 4, title: "Gerenciamento de Memória", type: "theory", status: "locked" },
+                { id: 5, title: "Garbage Collection", type: "theory", status: "locked" }
+            ]
+          },
+          { 
+            id: 'documentation', 
+            title: "Documentação Técnica", 
+            description: "Padronização de GDDs, TDDs e manutenção de conhecimento da equipe.", 
+            icon: <Icon name="file-text" className="w-5 h-5 text-emerald-600" />, 
+            progress: 50, 
+            lessons: 3, 
+            color: "border-emerald-600", 
+            tags: ["GDD", "TDD", "Padrões"],
+            lessonsData: [
+                { id: 1, title: "O GDD de 10 Páginas", type: "theory", status: "completed" },
+                { id: 2, title: "Technical Design Docs (TDD)", type: "theory", status: "active" },
+                { id: 3, title: "Convenções de Nomenclatura", type: "theory", status: "locked" }
+            ]
+          },
+          { 
+            id: 'project-management', 
+            title: "Gestão de Projetos", 
+            description: "Organização de tarefas, sprints e pipelines de produção no desenvolvimento.", 
+            icon: <Icon name="briefcase" className="w-5 h-5 text-amber-600" />, 
+            progress: 10, 
+            lessons: 3, 
+            color: "border-amber-600", 
+            tags: ["Agile", "Scrum", "Pipeline"],
+            lessonsData: [
+                { id: 1, title: "Metodologias Ágeis", type: "theory", status: "active" },
+                { id: 2, title: "Gestão de Backlog", type: "theory", status: "locked" },
+                { id: 3, title: "Sprints de Produção", type: "practice", status: "locked" }
+            ]
+          }
         ];
 
         const DAILY_NODE = {
@@ -58,15 +289,6 @@
           description: "O nó fundamental de tomada de decisão. Ele verifica se uma condição booleana é verdadeira ou falsa e direciona o fluxo de execução para o caminho correspondente.",
           usage: "Use para criar portas lógicas (ex: o jogador tem a chave?), checar vida do jogador ou validar interações condicionais."
         };
-
-        const MOCK_LESSONS = [
-          { id: 1, title: "O que são Variáveis?", type: "theory", status: "completed" },
-          { id: 2, title: "Tipos de Dados Básicos", type: "theory", status: "completed" },
-          { id: 3, title: "O Nó Set e Get", type: "practice", status: "active" },
-          { id: 4, title: "Event BeginPlay", type: "theory", status: "locked" },
-          { id: 5, title: "Event Tick (e porque evitá-lo)", type: "theory", status: "locked" },
-          { id: 6, title: "Custom Events", type: "practice", status: "locked" }
-        ];
 
         // ============================================================================
         // COMPONENTES REUTILIZÁVEIS
@@ -81,7 +303,7 @@
             };
 
             const PIN_COLORS = {
-                exec: 'white', // Usado para o stroke/fill do SVG
+                exec: 'white',
                 bool: 'bg-red-700 border-red-700',
                 float: 'bg-green-400 border-green-400',
                 int: 'bg-teal-400 border-teal-400',
@@ -97,16 +319,18 @@
                 let PinShape;
                 
                 if (isExec) {
-                    // Refinamento do SVG do pino Executável para parecer uma seta de Unreal
+                    // Refinamento MATEMÁTICO do SVG do pino Executável. 
+                    // Agora é um polígono perfeitamente desenhado para parecer a seta da Unreal Engine.
+                    // Quando isConnected=false, ele fica transparente com bordas afiadas.
                     PinShape = (
-                        <div className="w-[13px] h-[13px] flex-shrink-0 relative overflow-visible mt-0.5">
+                        <div className="w-[12px] h-[14px] flex-shrink-0 relative overflow-visible mt-0.5">
                             <svg viewBox="0 0 14 14" className="w-full h-full block">
-                                <path 
-                                    d="M 1 2 L 7 2 L 12 7 L 7 12 L 1 12 Z" 
+                                <polygon 
+                                    points="1,1 8,1 13,7 8,13 1,13" 
                                     fill={isConnected ? "white" : "transparent"} 
                                     stroke="white" 
-                                    strokeWidth="1.5"
-                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    strokeLinejoin="miter"
                                 />
                             </svg>
                         </div>
@@ -201,6 +425,9 @@
         );
 
         const TrackDetailView = ({ track, onBack }) => {
+          // Usa os dados específicos da trilha se existirem, senão exibe um array vazio
+          const lessonsToRender = track.lessonsData || [];
+
           return (
             <div className="max-w-[800px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500 pb-16">
               <button onClick={onBack} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 group transition-colors">
@@ -225,35 +452,41 @@
               <div className="relative py-8 flex flex-col items-center">
                 <div className="absolute top-0 bottom-0 w-1.5 bg-gray-800 rounded-full left-1/2 -translate-x-1/2 z-0"></div>
 
-                {MOCK_LESSONS.map((lesson, index) => {
-                  const isCompleted = lesson.status === 'completed';
-                  const isActive = lesson.status === 'active';
-                  const isLocked = lesson.status === 'locked';
-
-                  return (
-                    <div key={lesson.id} className={`relative z-10 flex items-center justify-center w-full my-6 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                      <div className="w-1/2 hidden md:block"></div>
-                      <div className="flex flex-col items-center relative group cursor-pointer">
-                        <div className={`absolute -top-10 whitespace-nowrap bg-[#1a1a1c] border border-white/10 px-3 py-1.5 rounded-lg shadow-xl transition-all ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'} pointer-events-none z-20`}>
-                          <p className="text-[11px] font-black text-white">{lesson.title}</p>
-                        </div>
-
-                        <button 
-                          disabled={isLocked}
-                          className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative z-10
-                            ${isCompleted ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : ''}
-                            ${isActive ? 'bg-[#121212] border-blue-500 text-blue-400 scale-110 shadow-[0_0_30px_rgba(37,99,235,0.6)]' : ''}
-                            ${isLocked ? 'bg-[#1a1a1c] border-gray-800 text-gray-600 grayscale cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
-                          `}
-                        >
-                          {isActive && <div className="absolute inset-[-8px] border-2 border-blue-500/30 rounded-full animate-ping pointer-events-none"></div>}
-                          {isCompleted ? <Icon name="check-circle" className="w-6 h-6" /> : (isLocked ? <Icon name="lock" className="w-5 h-5" /> : <Icon name="play-circle" className="w-6 h-6" />)}
-                        </button>
-                      </div>
-                      <div className="w-1/2 hidden md:block"></div>
+                {lessonsToRender.length === 0 ? (
+                    <div className="relative z-10 text-center py-10">
+                        <p className="text-gray-500 font-medium">As lições desta trilha estão sendo forjadas na Engine...</p>
                     </div>
-                  );
-                })}
+                ) : (
+                    lessonsToRender.map((lesson, index) => {
+                    const isCompleted = lesson.status === 'completed';
+                    const isActive = lesson.status === 'active';
+                    const isLocked = lesson.status === 'locked';
+
+                    return (
+                        <div key={lesson.id} className={`relative z-10 flex items-center justify-center w-full my-6 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+                        <div className="w-1/2 hidden md:block"></div>
+                        <div className="flex flex-col items-center relative group cursor-pointer">
+                            <div className={`absolute -top-10 whitespace-nowrap bg-[#1a1a1c] border border-white/10 px-3 py-1.5 rounded-lg shadow-xl transition-all ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'} pointer-events-none z-20`}>
+                            <p className="text-[11px] font-black text-white">{lesson.title}</p>
+                            </div>
+
+                            <button 
+                            disabled={isLocked}
+                            className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative z-10
+                                ${isCompleted ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : ''}
+                                ${isActive ? 'bg-[#121212] border-blue-500 text-blue-400 scale-110 shadow-[0_0_30px_rgba(37,99,235,0.6)]' : ''}
+                                ${isLocked ? 'bg-[#1a1a1c] border-gray-800 text-gray-600 grayscale cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
+                            `}
+                            >
+                            {isActive && <div className="absolute inset-[-8px] border-2 border-blue-500/30 rounded-full animate-ping pointer-events-none"></div>}
+                            {isCompleted ? <Icon name="check-circle" className="w-6 h-6" /> : (isLocked ? <Icon name="lock" className="w-5 h-5" /> : <Icon name="play-circle" className="w-6 h-6" />)}
+                            </button>
+                        </div>
+                        <div className="w-1/2 hidden md:block"></div>
+                        </div>
+                    );
+                    })
+                )}
               </div>
             </div>
           );
@@ -296,7 +529,7 @@
                     <span className="font-black tracking-[-0.05em] text-lg text-white uppercase hidden sm:block">Unrealingo</span>
                   </div>
                   
-                  {/* Menu Desktop */}
+                  {/* Menu Desktop ORDENADO E LINKADO */}
                   <div className="hidden xl:flex items-center gap-2 ml-6 h-full">
                     <NavItem label="Aprenda" active={activeNav === 'aprenda'} onClick={() => { setActiveNav('aprenda'); handleBackToDashboard(); }} />
                     <NavItem label="Construa" href="https://github.com/poligonalhub/poligonalhub/tree/main/unrealingo" />
@@ -342,22 +575,25 @@
                   </div>
 
                   <div className="space-y-1 mb-8">
-                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4 ml-2">Navegação</p>
-                    {[
-                      { icon: <Icon name="layout-grid" className="w-4 h-4" />, label: "Início", active: true, onClick: handleBackToDashboard },
-                      { icon: <Icon name="play-circle" className="w-4 h-4" />, label: "Minhas Trilhas" },
-                      { icon: <Icon name="library" className="w-4 h-4" />, label: "Recursos" },
-                      { icon: <Icon name="file-text" className="w-4 h-4" />, label: "Manuais Técnicos" }
-                    ].map((item, idx) => (
-                      <button 
-                        key={idx}
-                        onClick={() => { if(item.onClick) item.onClick(); setIsMobileMenuOpen(false); }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${item.active ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
-                      >
-                        {item.icon}
-                        <span className="text-xs tracking-tight">{item.label}</span>
-                      </button>
-                    ))}
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4 ml-2">Navegação Principal</p>
+                    
+                    {/* Botões adaptados para o Mobile também */}
+                    <button onClick={() => { setActiveNav('aprenda'); handleBackToDashboard(); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${activeNav === 'aprenda' ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}>
+                      <Icon name="layout-grid" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Aprenda</span>
+                    </button>
+                    <a href="https://github.com/poligonalhub/poligonalhub/tree/main/unrealingo" target="_blank" className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-500 hover:bg-white/5 hover:text-gray-300">
+                      <Icon name="hammer" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Construa</span>
+                    </a>
+                    <a href="https://apoia.se/poligonal" target="_blank" className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-500 hover:bg-white/5 hover:text-gray-300">
+                      <Icon name="heart" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Apoie</span>
+                    </a>
+                    <a href="https://discord.gg/VtY3zgVCR6" target="_blank" className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-500 hover:bg-white/5 hover:text-gray-300">
+                      <Icon name="message-square" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Fórum</span>
+                    </a>
+                    <a href="https://dev.epicgames.com/documentation/unreal-engine/" target="_blank" className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-500 hover:bg-white/5 hover:text-gray-300">
+                      <Icon name="file-text" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Documentação</span>
+                    </a>
+
                   </div>
 
                   <div className="mt-auto">
