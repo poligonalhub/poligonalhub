@@ -5,33 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unrealingo | BeginPlay</title>
     
-    <!-- Importação do Tailwind CSS para Estilos -->
+    <!-- Folha de Estilos Externa -->
+    <link rel="stylesheet" href="./styles.css">
+
+    <!-- Importação do Tailwind CSS via CDN (Apenas para classes utilitárias) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Configuração do Tailwind para casar com nossas cores base -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
     <!-- Importação do React e ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Importação do Babel (Traduz o código JSX para o navegador entender) -->
+    <!-- Importação do Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- Importação dos Ícones (Iconify) -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </head>
-<body class="bg-[#0a0a0b] text-gray-200 antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
+<body>
     
+    <!-- Ponto de ancoragem do React -->
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState } = React;
         
-        // Componente Universal de Ícone
+        // Componente de Ícone
         const Icon = ({ name, className }) => (
             <iconify-icon icon={`lucide:${name}`} class={className} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}></iconify-icon>
         );
 
         // ============================================================================
-        // DADOS (Trilhas e Lições Específicas)
+        // DADOS DO APLICATIVO
         // ============================================================================
         const TRACKS = [
           { 
@@ -89,7 +104,7 @@
             ]
           },
           { 
-            id: 'level-design', 
+            id: 'world-building', 
             title: "Level Design & World Building", 
             description: "Construção de terrenos, blocagem (blockout), uso de meshes e navegação do cenário.", 
             icon: <Icon name="map" className="w-5 h-5 text-emerald-400" />, 
@@ -157,7 +172,7 @@
             id: 'game-design', 
             title: "Game Design", 
             description: "Estudo de mecânicas, balanceamento, loops de jogo e experiência do jogador.", 
-            icon: <Icon name="puzzle" className="w-5 h-5 text-indigo-400" />, 
+            icon: <Icon name="code-2" className="w-5 h-5 text-indigo-400" />, 
             progress: 40, 
             lessons: 5, 
             color: "border-indigo-500", 
@@ -192,20 +207,21 @@
             description: "Estudo sobre como a engine desenha os gráficos, princípios de iluminação e materiais.", 
             icon: <Icon name="camera" className="w-5 h-5 text-yellow-400" />, 
             progress: 5, 
-            lessons: 4, 
+            lessons: 5, 
             color: "border-yellow-500", 
             tags: ["Luzes", "Lumen", "Materiais"],
             lessonsData: [
-                { id: 1, title: "Tipos de Luzes", type: "theory", status: "active" },
-                { id: 2, title: "Lumen Global Illumination", type: "theory", status: "locked" },
-                { id: 3, title: "Post Process Volume", type: "practice", status: "locked" },
-                { id: 4, title: "Material Editor", type: "practice", status: "locked" }
+                { id: 1, title: "Diretional vs Point Lights", type: "theory", status: "active" },
+                { id: 2, title: "SkyLight e SkyAtmosphere", type: "practice", status: "locked" },
+                { id: 3, title: "Iluminação Global (Lumen)", type: "theory", status: "locked" },
+                { id: 4, title: "Post Process Volume", type: "practice", status: "locked" },
+                { id: 5, title: "Material Editor Básico", type: "theory", status: "locked" }
             ]
           },
           { 
             id: 'audio', 
             title: "Audio Engine", 
-            description: "MetaSounds, efeitos sonoros, atenuação espacial e trilhas musicais controladas por gameplay tags.", 
+            description: "MetaSounds, efeitos sonoros, atenuação espacial e trilhas musicais.", 
             icon: <Icon name="volume-2" className="w-5 h-5 text-teal-400" />, 
             progress: 5, 
             lessons: 4, 
@@ -319,9 +335,6 @@
                 let PinShape;
                 
                 if (isExec) {
-                    // Refinamento MATEMÁTICO do SVG do pino Executável. 
-                    // Agora é um polígono perfeitamente desenhado para parecer a seta da Unreal Engine.
-                    // Quando isConnected=false, ele fica transparente com bordas afiadas.
                     PinShape = (
                         <div className="w-[12px] h-[14px] flex-shrink-0 relative overflow-visible mt-0.5">
                             <svg viewBox="0 0 14 14" className="w-full h-full block">
@@ -363,7 +376,7 @@
                         </div>
                     </div>
                     <div className="p-3 bg-gradient-to-b from-[#242429] to-[#1a1a1e] flex justify-between gap-6 relative rounded-b-xl">
-                        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '12px 12px' }}></div>
+                        <div className="absolute inset-0 blueprint-grid"></div>
                         <div className="flex flex-col items-start relative z-10 w-1/2">
                             {inputs.map((pin, i) => <RenderPin key={`in-${i}`} {...pin} isInput={true} />)}
                         </div>
@@ -425,7 +438,6 @@
         );
 
         const TrackDetailView = ({ track, onBack }) => {
-          // Usa os dados específicos da trilha se existirem, senão exibe um array vazio
           const lessonsToRender = track.lessonsData || [];
 
           return (
@@ -529,7 +541,7 @@
                     <span className="font-black tracking-[-0.05em] text-lg text-white uppercase hidden sm:block">Unrealingo</span>
                   </div>
                   
-                  {/* Menu Desktop ORDENADO E LINKADO */}
+                  {/* Menu Desktop */}
                   <div className="hidden xl:flex items-center gap-2 ml-6 h-full">
                     <NavItem label="Aprenda" active={activeNav === 'aprenda'} onClick={() => { setActiveNav('aprenda'); handleBackToDashboard(); }} />
                     <NavItem label="Construa" href="https://github.com/poligonalhub/poligonalhub/tree/main/unrealingo" />
@@ -575,9 +587,8 @@
                   </div>
 
                   <div className="space-y-1 mb-8">
-                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4 ml-2">Navegação Principal</p>
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4 ml-2">Menu Principal</p>
                     
-                    {/* Botões adaptados para o Mobile também */}
                     <button onClick={() => { setActiveNav('aprenda'); handleBackToDashboard(); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${activeNav === 'aprenda' ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}>
                       <Icon name="layout-grid" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Aprenda</span>
                     </button>
@@ -593,7 +604,6 @@
                     <a href="https://dev.epicgames.com/documentation/unreal-engine/" target="_blank" className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-500 hover:bg-white/5 hover:text-gray-300">
                       <Icon name="file-text" className="w-4 h-4" /> <span className="text-xs tracking-tight uppercase font-black">Documentação</span>
                     </a>
-
                   </div>
 
                   <div className="mt-auto">
@@ -651,7 +661,7 @@
                             </div>
                             
                             <div className="hidden lg:flex flex-1 justify-center relative p-4">
-                              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+                              <div className="absolute inset-0 blueprint-grid"></div>
                               <BlueprintNode 
                                 title="Event BeginPlay" 
                                 type="event" 
@@ -775,7 +785,7 @@
                         </div>
                       </section>
 
-                      {/* RODAPÉ ATUALIZADO E EM LINHA ÚNICA */}
+                      {/* RODAPÉ */}
                       <footer className="mt-8 mb-4 pt-6 border-t border-white/5">
                         <div className="flex items-center justify-center gap-3 px-2">
                           <div className="w-6 h-6 bg-white/10 rounded flex items-center justify-center shrink-0">
@@ -800,7 +810,6 @@
           );
         }
 
-        // Renderiza o aplicativo
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>

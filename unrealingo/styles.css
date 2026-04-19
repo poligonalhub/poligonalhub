@@ -1,0 +1,50 @@
+/* Importação da fonte Inter para um visual limpo e moderno */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+/* Estilos base da página */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0a0a0b;
+    color: #e5e7eb;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Customização para seleção de texto */
+::selection {
+    background-color: #2563eb; /* blue-600 */
+    color: #ffffff;
+}
+
+/* Ocultar barra de rolagem (Scrollbar Hide) para elementos específicos */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Grid Background para o Blueprint Editor (Reutilizável) */
+.blueprint-grid {
+    background-image: radial-gradient(#ffffff 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+/* Efeito de pulso para nós ativos */
+.node-active-pulse {
+    animation: nodePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes nodePulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: .8;
+        transform: scale(1.05);
+    }
+}
