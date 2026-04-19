@@ -1,479 +1,484 @@
-import React, { useState } from 'react';
-import { 
-  Flame, 
-  Zap, 
-  Bell, 
-  Cpu,
-  Gamepad2,
-  Code2,
-  Palette,
-  Users,
-  FileText,
-  Briefcase,
-  CirclePlay,
-  LayoutGrid,
-  Settings,
-  MoreHorizontal,
-  Library,
-  Terminal,
-  Info,
-  ExternalLink,
-  Layers,
-  Map,
-  Camera,
-  Activity,
-  Monitor,
-  Sparkles,
-  Volume2,
-  BookOpen,
-  GitMerge,
-  ArrowLeft,
-  Lock,
-  CheckCircle2
-} from 'lucide-react';
-
-// ============================================================================
-// DADOS (No futuro, você vai extrair isso para um arquivo como 'data.json')
-// ============================================================================
-const TRACKS = [
-  { id: 'engine-structure', title: "Engine Structure", description: "Compreenda a hierarquia básica, os painéis do editor, Actors e a organização de arquivos.", icon: <Layers className="w-5 h-5 text-gray-300" />, progress: 80, lessons: 10, color: "border-gray-500", tags: ["Editor", "Actors", "Assets"] },
-  { id: 'blueprints', title: "Blueprint Visual Scripting", description: "Introdução à programação visual, variáveis, eventos e fluxo de controle lógico.", icon: <GitMerge className="w-5 h-5 text-cyan-400" />, progress: 45, lessons: 32, color: "border-cyan-500", tags: ["Eventos", "Lógica", "Nós"] },
-  { id: 'gameplay-framework', title: "Gameplay Framework", description: "Estruturação das regras do jogo com GameMode, PlayerController, Pawns e GameState.", icon: <Gamepad2 className="w-5 h-5 text-purple-400" />, progress: 30, lessons: 18, color: "border-purple-500", tags: ["GameMode", "Classes", "Regras"] },
-  { id: 'world-building', title: "World Building & Level Design", description: "Construção de terrenos, blocagem (blockout), uso de meshes e navegação do cenário.", icon: <Map className="w-5 h-5 text-emerald-400" />, progress: 20, lessons: 22, color: "border-emerald-500", tags: ["Landscape", "Blockout", "Espaço"] },
-  { id: 'rendering', title: "Rendering & Lighting", description: "Estudo sobre como a engine desenha os gráficos, princípios de iluminação e materiais.", icon: <Camera className="w-5 h-5 text-yellow-400" />, progress: 5, lessons: 25, color: "border-yellow-500", tags: ["Luzes", "Lumen", "Materiais"] },
-  { id: 'animation', title: "Animation", description: "Importação de esqueletos, Blend Spaces, Animation Blueprints e State Machines.", icon: <Activity className="w-5 h-5 text-orange-400" />, progress: 10, lessons: 15, color: "border-orange-500", tags: ["Skeletons", "Montages", "AnimBP"] },
-  { id: 'umg', title: "UMG UI Designer", description: "Criação de menus, HUDs, barras de vida e elementos interativos para a interface.", icon: <Monitor className="w-5 h-5 text-blue-400" />, progress: 15, lessons: 12, color: "border-blue-500", tags: ["Widgets", "Canvas", "Bindings"] },
-  { id: 'niagara', title: "Niagara VFX", description: "Fundamentos de sistemas de partículas e emissores para criação de efeitos visuais.", icon: <Sparkles className="w-5 h-5 text-pink-400" />, progress: 0, lessons: 14, color: "border-pink-500", tags: ["Partículas", "Emissores", "VFX"] },
-  { id: 'audio', title: "Audio Engine", description: "Implementação de efeitos sonoros, atenuação espacial e controle de trilhas musicais.", icon: <Volume2 className="w-5 h-5 text-teal-400" />, progress: 5, lessons: 8, color: "border-teal-500", tags: ["Sound Cues", "Espacial", "Mixagem"] },
-  { id: 'narrative-design', title: "Narrative Design", description: "Técnicas de escrita, construção de universo (worldbuilding) e estrutura de diálogos.", icon: <BookOpen className="w-5 h-5 text-rose-400" />, progress: 25, lessons: 10, color: "border-rose-500", tags: ["Roteiro", "Diálogos", "Lore"] },
-  { id: 'game-design', title: "Game Design", description: "Estudo de mecânicas, balanceamento, loops de jogo e experiência do jogador.", icon: <Code2 className="w-5 h-5 text-indigo-400" />, progress: 40, lessons: 16, color: "border-indigo-500", tags: ["Mecânicas", "Sistemas", "UX"] },
-  { id: 'multiplayer', title: "Multiplayer & Networking", description: "Conceitos de replicação de variáveis e arquitetura Cliente-Servidor.", icon: <Users className="w-5 h-5 text-green-400" />, progress: 0, lessons: 12, color: "border-green-500", tags: ["Replicação", "RPCs", "Sessões"] },
-  { id: 'computer-science', title: "Ciência da Computação", description: "Lógica binária, matemática vetorial e o funcionamento do processamento da engine.", icon: <Cpu className="w-5 h-5 text-slate-400" />, progress: 15, lessons: 20, color: "border-slate-500", tags: ["Binário", "Vetores", "Lógica"] },
-  { id: 'documentation', title: "Documentação Técnica", description: "Padronização de GDDs, TDDs e manutenção de conhecimento da equipe.", icon: <FileText className="w-5 h-5 text-emerald-600" />, progress: 50, lessons: 8, color: "border-emerald-600", tags: ["GDD", "TDD", "Padrões"] },
-  { id: 'project-management', title: "Gestão de Projetos", description: "Organização de tarefas, sprints e pipelines de produção no desenvolvimento.", icon: <Briefcase className="w-5 h-5 text-amber-600" />, progress: 10, lessons: 10, color: "border-amber-600", tags: ["Agile", "Scrum", "Pipeline"] }
-];
-
-const DAILY_NODE = {
-  name: "Branch",
-  category: "Flow Control",
-  description: "O nó fundamental de tomada de decisão. Ele verifica se uma condição booleana é verdadeira ou falsa e direciona o fluxo de execução para o caminho correspondente.",
-  usage: "Use para criar portas lógicas, checar vida do jogador ou validar interações."
-};
-
-const MOCK_LESSONS = [
-  { id: 1, title: "O que são Variáveis?", type: "theory", status: "completed" },
-  { id: 2, title: "Tipos de Dados Básicos", type: "theory", status: "completed" },
-  { id: 3, title: "O Nó Set e Get", type: "practice", status: "active" },
-  { id: 4, title: "Event BeginPlay", type: "theory", status: "locked" },
-  { id: 5, title: "Event Tick (e porque evitá-lo)", type: "theory", status: "locked" },
-  { id: 6, title: "Custom Events", type: "practice", status: "locked" }
-];
-
-// ============================================================================
-// COMPONENTES (Isto equivale aos seus "Includes" no React)
-// No futuro, cada um desses 'const' pode ir para um arquivo como 'TrackCard.jsx'
-// ============================================================================
-
-const NavItem = ({ label, active = false, onClick }) => (
-  <button 
-    onClick={onClick}
-    className={`px-4 py-5 text-[12px] font-black uppercase tracking-[0.15em] transition-all border-b-[3px] h-full flex items-center ${active ? 'text-white border-blue-500' : 'text-gray-400 border-transparent hover:text-white hover:border-white/20'}`}
-  >
-    {label}
-  </button>
-);
-
-const TrackCard = ({ track }) => (
-  <div className={`bg-[#1a1a1c] border-t-2 ${track.color} rounded-xl p-6 hover:bg-[#232326] transition-all cursor-pointer group flex flex-col h-full shadow-2xl hover:-translate-y-1`}>
-    <div className="flex justify-between items-start mb-6">
-      <div className="p-3 bg-black/40 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
-        {track.icon}
-      </div>
-      <div className="flex flex-wrap gap-1.5 justify-end max-w-[150px]">
-        {track.tags.map(tag => (
-          <span key={tag} className="text-[9px] bg-white/5 px-2 py-0.5 rounded text-gray-500 uppercase tracking-tighter font-black border border-white/5">
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrealingo | BeginPlay</title>
     
-    <h3 className="text-lg font-black text-white mb-2 group-hover:text-blue-400 transition-colors uppercase tracking-tight">
-      {track.title}
-    </h3>
-    <p className="text-gray-400 text-sm mb-8 leading-relaxed flex-1 font-medium">
-      {track.description}
-    </p>
+    <!-- Importação do Tailwind CSS para Estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <div className="mt-auto pt-5 border-t border-white/5 space-y-4">
-      <div className="flex justify-between items-center text-[10px]">
-        <span className="text-gray-500 font-black uppercase tracking-widest">{track.lessons} Lições</span>
-        <span className="text-white font-black">{track.progress}%</span>
-      </div>
-      <div className="w-full bg-black/60 h-1.5 rounded-full overflow-hidden p-[1px]">
-        <div 
-          className="bg-gradient-to-r from-blue-600 to-indigo-400 h-full rounded-full transition-all duration-1000" 
-          style={{ width: `${track.progress}%` }}
-        />
-      </div>
-    </div>
-  </div>
-);
+    <!-- Importação do React e ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-const TrackDetailView = ({ track, onBack }) => {
-  return (
-    <div className="max-w-[800px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-      <button 
-        onClick={onBack}
-        className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 group transition-colors"
-      >
-        <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-        </div>
-        <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
-      </button>
+    <!-- Importação do Babel (Traduz o código JSX para o navegador entender) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-      <div className={`bg-[#1a1a1c] border-t-4 ${track.color} rounded-[32px] p-10 shadow-2xl mb-12 relative overflow-hidden`}>
-        <div className="absolute top-0 right-0 p-10 opacity-5 scale-150 pointer-events-none">
-          {track.icon}
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-black/40 rounded-xl border border-white/5">
-              {track.icon}
-            </div>
-            <span className="text-[10px] bg-white/5 px-3 py-1 rounded-full text-gray-400 uppercase tracking-widest font-black border border-white/5">
-              Módulo de Estudo
-            </span>
-          </div>
-          <h1 className="text-5xl font-black text-white mb-4 tracking-[-0.04em]">{track.title}</h1>
-          <p className="text-gray-400 text-lg font-medium max-w-xl leading-relaxed">{track.description}</p>
-        </div>
-      </div>
+    <!-- Importação dos Ícones (Iconify - Carrega o Lucide de forma nativa e sem bugs no React) -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+<body class="bg-[#0a0a0b] text-gray-200 antialiased selection:bg-blue-600 selection:text-white">
+    
+    <!-- Ponto de ancoragem do React -->
+    <div id="root"></div>
 
-      <div className="relative py-10 flex flex-col items-center">
-        <div className="absolute top-0 bottom-0 w-1.5 bg-gray-800 rounded-full left-1/2 -translate-x-1/2 z-0"></div>
-
-        {MOCK_LESSONS.map((lesson, index) => {
-          const isCompleted = lesson.status === 'completed';
-          const isActive = lesson.status === 'active';
-          const isLocked = lesson.status === 'locked';
-
-          return (
-            <div key={lesson.id} className={`relative z-10 flex items-center justify-center w-full my-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-              <div className="w-1/2 hidden md:block"></div>
-
-              <div className="flex flex-col items-center relative group cursor-pointer">
-                <div className={`absolute -top-12 whitespace-nowrap bg-[#1a1a1c] border border-white/10 px-4 py-2 rounded-xl shadow-xl transition-all ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'} pointer-events-none`}>
-                  <p className="text-xs font-black text-white">{lesson.title}</p>
-                  <p className="text-[9px] text-gray-500 uppercase tracking-widest text-center mt-1">
-                    {lesson.type === 'theory' ? 'Teoria' : 'Prática'}
-                  </p>
-                </div>
-
-                <button 
-                  disabled={isLocked}
-                  className={`w-20 h-20 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative
-                    ${isCompleted ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : ''}
-                    ${isActive ? 'bg-[#121212] border-blue-500 text-blue-400 scale-110 shadow-[0_0_30px_rgba(37,99,235,0.6)]' : ''}
-                    ${isLocked ? 'bg-[#1a1a1c] border-gray-800 text-gray-600 grayscale cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
-                  `}
-                >
-                  {isActive && (
-                    <div className="absolute inset-[-8px] border-2 border-blue-500/30 rounded-full animate-ping pointer-events-none"></div>
-                  )}
-                  {isCompleted ? <CheckCircle2 className="w-8 h-8" /> : (isLocked ? <Lock className="w-6 h-6" /> : <CirclePlay className="w-8 h-8 fill-current" />)}
-                </button>
-              </div>
-
-              <div className="w-1/2 hidden md:block"></div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-// ============================================================================
-// COMPONENTE PRINCIPAL (Sua página inteira)
-// ============================================================================
-export default function App() {
-  const [activeNav, setActiveNav] = useState('aprender');
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [selectedTrack, setSelectedTrack] = useState(null);
-
-  const handleTrackClick = (track) => {
-    setSelectedTrack(track);
-    setCurrentView('track-detail');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleBackToDashboard = () => {
-    setCurrentView('dashboard');
-    setSelectedTrack(null);
-  };
-
-  return (
-    <div className="min-h-screen bg-[#0a0a0b] text-gray-200 font-sans selection:bg-blue-600 selection:text-white antialiased">
-      
-      {/* NAVEGAÇÃO SUPERIOR */}
-      <nav className="h-[72px] bg-[#121212] border-b border-white/5 sticky top-0 z-50 px-10 flex items-center justify-between shadow-2xl">
-        <div className="flex items-center gap-12 h-full">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={handleBackToDashboard}>
-            <div className="w-9 h-9 bg-white rounded flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-              <span className="text-black font-black text-xl">U</span>
-            </div>
-            <span className="font-black tracking-[-0.05em] text-2xl text-white uppercase">Unrealingo</span>
-          </div>
-          
-          <div className="hidden xl:flex items-center gap-2 h-full">
-            <NavItem label="Aprender" active={activeNav === 'aprender'} onClick={() => { setActiveNav('aprender'); handleBackToDashboard(); }} />
-            <NavItem label="Documentação" active={activeNav === 'doc'} onClick={() => setActiveNav('doc')} />
-            <NavItem label="Fórum" />
-            <NavItem label="Roteiro" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <div className="hidden lg:flex items-center gap-5 px-5 h-10 bg-black/40 rounded-lg border border-white/10">
-            <div className="flex items-center gap-2 text-orange-500">
-              <Flame className="w-4 h-4 fill-current" />
-              <span className="text-[13px] font-black uppercase">12 Dias</span>
-            </div>
-            <div className="w-px h-5 bg-white/10" />
-            <div className="flex items-center gap-2 text-cyan-400">
-              <Zap className="w-4 h-4 fill-current" />
-              <span className="text-[13px] font-black uppercase">4,250 XP</span>
-            </div>
-          </div>
-          <button className="p-2.5 hover:bg-white/5 rounded-lg transition-colors relative">
-            <Bell className="w-5 h-5 text-gray-400" />
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-[#121212]"></span>
-          </button>
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 border border-white/10 shadow-lg cursor-pointer hover:scale-105 transition-transform"></div>
-        </div>
-      </nav>
-
-      <div className="flex">
+    <script type="text/babel">
+        const { useState } = React;
         
-        {/* BARRA LATERAL (SIDEBAR) */}
-        <aside className="w-[280px] border-r border-white/5 bg-[#0e0e0f] h-[calc(100vh-72px)] sticky top-[72px] hidden lg:flex flex-col p-8">
-          <div className="space-y-2 mb-12">
-            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em] mb-6 ml-2">Navegação</p>
-            {[
-              { icon: <LayoutGrid className="w-5 h-5" />, label: "Início", active: true, onClick: handleBackToDashboard },
-              { icon: <CirclePlay className="w-5 h-5" />, label: "Minhas Trilhas" },
-              { icon: <Library className="w-5 h-5" />, label: "Recursos" },
-              { icon: <FileText className="w-5 h-5" />, label: "Manuais Técnicos" },
-              { icon: <Settings className="w-5 h-5" />, label: "Configurações" }
-            ].map((item, idx) => (
-              <button 
-                key={idx}
-                onClick={item.onClick}
-                className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-200 ${item.active ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
-              >
-                {item.icon}
-                <span className="text-sm tracking-tight">{item.label}</span>
-              </button>
-            ))}
-          </div>
+        // Componente Universal de Ícone usando o Iconify (Bypass nos bugs do lucide-react UMD)
+        const Icon = ({ name, className }) => (
+            <iconify-icon icon={`lucide:${name}`} class={className} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}></iconify-icon>
+        );
 
-          <div className="mt-auto">
-            <div className="bg-[#161618] p-6 rounded-2xl border border-white/5 shadow-inner">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
-                  <Terminal className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Rank Atual</h4>
-                  <p className="text-white font-black text-sm">Iniciante</p>
-                </div>
+        // ============================================================================
+        // DADOS
+        // ============================================================================
+        const TRACKS = [
+          { id: 'engine-structure', title: "Engine Structure", description: "Compreenda a hierarquia básica, os painéis do editor, Actors e a organização de arquivos.", icon: <Icon name="layers" className="w-5 h-5 text-gray-300" />, progress: 80, lessons: 10, color: "border-gray-500", tags: ["Editor", "Actors", "Assets"] },
+          { id: 'blueprints', title: "Blueprint Visual Scripting", description: "Introdução à programação visual, variáveis, eventos e fluxo de controle lógico.", icon: <Icon name="git-merge" className="w-5 h-5 text-cyan-400" />, progress: 45, lessons: 32, color: "border-cyan-500", tags: ["Eventos", "Lógica", "Nós"] },
+          { id: 'gameplay-framework', title: "Gameplay Framework", description: "Estruturação das regras do jogo com GameMode, PlayerController, Pawns e GameState.", icon: <Icon name="gamepad-2" className="w-5 h-5 text-purple-400" />, progress: 30, lessons: 18, color: "border-purple-500", tags: ["GameMode", "Classes", "Regras"] },
+          { id: 'world-building', title: "World Building & Level Design", description: "Construção de terrenos, blocagem (blockout), uso de meshes e navegação do cenário.", icon: <Icon name="map" className="w-5 h-5 text-emerald-400" />, progress: 20, lessons: 22, color: "border-emerald-500", tags: ["Landscape", "Blockout", "Espaço"] },
+          { id: 'rendering', title: "Rendering & Lighting", description: "Estudo sobre como a engine desenha os gráficos, princípios de iluminação e materiais.", icon: <Icon name="camera" className="w-5 h-5 text-yellow-400" />, progress: 5, lessons: 25, color: "border-yellow-500", tags: ["Luzes", "Lumen", "Materiais"] },
+          { id: 'animation', title: "Animation", description: "Importação de esqueletos, Blend Spaces, Animation Blueprints e State Machines.", icon: <Icon name="activity" className="w-5 h-5 text-orange-400" />, progress: 10, lessons: 15, color: "border-orange-500", tags: ["Skeletons", "Montages", "AnimBP"] },
+          { id: 'umg', title: "UMG UI Designer", description: "Criação de menus, HUDs, barras de vida e elementos interativos para a interface.", icon: <Icon name="monitor" className="w-5 h-5 text-blue-400" />, progress: 15, lessons: 12, color: "border-blue-500", tags: ["Widgets", "Canvas", "Bindings"] },
+          { id: 'niagara', title: "Niagara VFX", description: "Fundamentos de sistemas de partículas e emissores para criação de efeitos visuais.", icon: <Icon name="sparkles" className="w-5 h-5 text-pink-400" />, progress: 0, lessons: 14, color: "border-pink-500", tags: ["Partículas", "Emissores", "VFX"] },
+          { id: 'audio', title: "Audio Engine", description: "Implementação de efeitos sonoros, atenuação espacial e controle de trilhas musicais.", icon: <Icon name="volume-2" className="w-5 h-5 text-teal-400" />, progress: 5, lessons: 8, color: "border-teal-500", tags: ["Sound Cues", "Espacial", "Mixagem"] },
+          { id: 'narrative-design', title: "Narrative Design", description: "Técnicas de escrita, construção de universo (worldbuilding) e estrutura de diálogos.", icon: <Icon name="book-open" className="w-5 h-5 text-rose-400" />, progress: 25, lessons: 10, color: "border-rose-500", tags: ["Roteiro", "Diálogos", "Lore"] },
+          { id: 'game-design', title: "Game Design", description: "Estudo de mecânicas, balanceamento, loops de jogo e experiência do jogador.", icon: <Icon name="code-2" className="w-5 h-5 text-indigo-400" />, progress: 40, lessons: 16, color: "border-indigo-500", tags: ["Mecânicas", "Sistemas", "UX"] },
+          { id: 'multiplayer', title: "Multiplayer & Networking", description: "Conceitos de replicação de variáveis e arquitetura Cliente-Servidor.", icon: <Icon name="users" className="w-5 h-5 text-green-400" />, progress: 0, lessons: 12, color: "border-green-500", tags: ["Replicação", "RPCs", "Sessões"] },
+          { id: 'computer-science', title: "Ciência da Computação", description: "Lógica binária, matemática vetorial e o funcionamento do processamento da engine.", icon: <Icon name="cpu" className="w-5 h-5 text-slate-400" />, progress: 15, lessons: 20, color: "border-slate-500", tags: ["Binário", "Vetores", "Lógica"] },
+          { id: 'documentation', title: "Documentação Técnica", description: "Padronização de GDDs, TDDs e manutenção de conhecimento da equipe.", icon: <Icon name="file-text" className="w-5 h-5 text-emerald-600" />, progress: 50, lessons: 8, color: "border-emerald-600", tags: ["GDD", "TDD", "Padrões"] },
+          { id: 'project-management', title: "Gestão de Projetos", description: "Organização de tarefas, sprints e pipelines de produção no desenvolvimento.", icon: <Icon name="briefcase" className="w-5 h-5 text-amber-600" />, progress: 10, lessons: 10, color: "border-amber-600", tags: ["Agile", "Scrum", "Pipeline"] }
+        ];
+
+        const DAILY_NODE = {
+          name: "Branch",
+          category: "Flow Control",
+          description: "O nó fundamental de tomada de decisão. Ele verifica se uma condição booleana é verdadeira ou falsa e direciona o fluxo de execução para o caminho correspondente.",
+          usage: "Use para criar portas lógicas, checar vida do jogador ou validar interações."
+        };
+
+        const MOCK_LESSONS = [
+          { id: 1, title: "O que são Variáveis?", type: "theory", status: "completed" },
+          { id: 2, title: "Tipos de Dados Básicos", type: "theory", status: "completed" },
+          { id: 3, title: "O Nó Set e Get", type: "practice", status: "active" },
+          { id: 4, title: "Event BeginPlay", type: "theory", status: "locked" },
+          { id: 5, title: "Event Tick (e porque evitá-lo)", type: "theory", status: "locked" },
+          { id: 6, title: "Custom Events", type: "practice", status: "locked" }
+        ];
+
+        // ============================================================================
+        // COMPONENTES (Funcionam como "Includes")
+        // ============================================================================
+
+        const NavItem = ({ label, active = false, onClick }) => (
+          <button 
+            onClick={onClick}
+            className={`px-4 py-5 text-[12px] font-black uppercase tracking-[0.15em] transition-all border-b-[3px] h-full flex items-center ${active ? 'text-white border-blue-500' : 'text-gray-400 border-transparent hover:text-white hover:border-white/20'}`}
+          >
+            {label}
+          </button>
+        );
+
+        const TrackCard = ({ track }) => (
+          <div className={`bg-[#1a1a1c] border-t-2 ${track.color} rounded-xl p-6 hover:bg-[#232326] transition-all cursor-pointer group flex flex-col h-full shadow-2xl hover:-translate-y-1`}>
+            <div className="flex justify-between items-start mb-6">
+              <div className="p-3 bg-black/40 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
+                {track.icon}
               </div>
-              <div className="w-full bg-black/40 h-1.5 rounded-full mb-3 overflow-hidden">
-                <div className="bg-blue-600 h-full w-[65%] shadow-[0_0_12px_rgba(37,99,235,0.4)]"></div>
+              <div className="flex flex-wrap gap-1.5 justify-end max-w-[150px]">
+                {track.tags.map(tag => (
+                  <span key={tag} className="text-[9px] bg-white/5 px-2 py-0.5 rounded text-gray-500 uppercase tracking-tighter font-black border border-white/5">
+                    {tag}
+                  </span>
+                ))}
               </div>
-              <p className="text-[9px] text-gray-500 text-center font-bold uppercase tracking-tighter">1,450 XP para a próxima etapa</p>
+            </div>
+            
+            <h3 className="text-lg font-black text-white mb-2 group-hover:text-blue-400 transition-colors uppercase tracking-tight">
+              {track.title}
+            </h3>
+            <p className="text-gray-400 text-sm mb-8 leading-relaxed flex-1 font-medium">
+              {track.description}
+            </p>
+            
+            <div className="mt-auto pt-5 border-t border-white/5 space-y-4">
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="text-gray-500 font-black uppercase tracking-widest">{track.lessons} Lições</span>
+                <span className="text-white font-black">{track.progress}%</span>
+              </div>
+              <div className="w-full bg-black/60 h-1.5 rounded-full overflow-hidden p-[1px]">
+                <div 
+                  className="bg-gradient-to-r from-blue-600 to-indigo-400 h-full rounded-full transition-all duration-1000" 
+                  style={{ width: `${track.progress}%` }}
+                />
+              </div>
             </div>
           </div>
-        </aside>
+        );
 
-        <main className="flex-1 p-10 lg:p-16 overflow-y-auto">
-          
-          {/* VIEW: DASHBOARD PRINCIPAL */}
-          {currentView === 'dashboard' && (
-            <div className="max-w-[1300px] mx-auto animate-in fade-in duration-500">
-              {/* Hero Section */}
-              <section className="mb-20 relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-900/30 to-gray-800/30 rounded-[32px] blur opacity-50 transition duration-1000"></div>
-                <div className="relative bg-[#121212] border border-white/10 rounded-[32px] p-12 overflow-hidden shadow-2xl">
-                  <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.05),transparent)] pointer-events-none"></div>
-                  
-                  <div className="relative z-10 grid xl:grid-cols-2 gap-16 items-center">
-                    <div>
-                      <span className="bg-blue-500/10 text-blue-400 text-[11px] font-black tracking-[0.2em] uppercase px-4 py-1.5 rounded-full border border-blue-500/20 mb-8 inline-block">
-                        Ambiente de Estudo
-                      </span>
-                      <h1 className="text-6xl font-black text-white mb-6 leading-[1.05] tracking-[-0.04em]">
-                        BeginPlay
-                      </h1>
-                      <h2 className="text-2xl font-bold text-gray-300 mb-8">
-                        Fundamentos de Unreal Engine 5.
-                      </h2>
-                      <p className="text-gray-400 text-lg leading-relaxed mb-10 max-w-lg font-medium">
-                        Explore a estrutura do motor, a programação visual e as lógicas de simulação de forma prática. Um caminho passo a passo para construir a base dos seus projetos.
-                      </p>
-                      <div className="flex flex-wrap gap-4">
+        const TrackDetailView = ({ track, onBack }) => {
+          return (
+            <div className="max-w-[800px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
+              <button 
+                onClick={onBack}
+                className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 group transition-colors"
+              >
+                <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
+                  <Icon name="arrow-left" className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
+              </button>
+
+              <div className={`bg-[#1a1a1c] border-t-4 ${track.color} rounded-[32px] p-10 shadow-2xl mb-12 relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 p-10 opacity-5 scale-150 pointer-events-none">
+                  {track.icon}
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 bg-black/40 rounded-xl border border-white/5">
+                      {track.icon}
+                    </div>
+                    <span className="text-[10px] bg-white/5 px-3 py-1 rounded-full text-gray-400 uppercase tracking-widest font-black border border-white/5">
+                      Módulo de Estudo
+                    </span>
+                  </div>
+                  <h1 className="text-5xl font-black text-white mb-4 tracking-[-0.04em]">{track.title}</h1>
+                  <p className="text-gray-400 text-lg font-medium max-w-xl leading-relaxed">{track.description}</p>
+                </div>
+              </div>
+
+              <div className="relative py-10 flex flex-col items-center">
+                <div className="absolute top-0 bottom-0 w-1.5 bg-gray-800 rounded-full left-1/2 -translate-x-1/2 z-0"></div>
+
+                {MOCK_LESSONS.map((lesson, index) => {
+                  const isCompleted = lesson.status === 'completed';
+                  const isActive = lesson.status === 'active';
+                  const isLocked = lesson.status === 'locked';
+
+                  return (
+                    <div key={lesson.id} className={`relative z-10 flex items-center justify-center w-full my-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+                      <div className="w-1/2 hidden md:block"></div>
+
+                      <div className="flex flex-col items-center relative group cursor-pointer">
+                        <div className={`absolute -top-12 whitespace-nowrap bg-[#1a1a1c] border border-white/10 px-4 py-2 rounded-xl shadow-xl transition-all ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'} pointer-events-none`}>
+                          <p className="text-xs font-black text-white">{lesson.title}</p>
+                          <p className="text-[9px] text-gray-500 uppercase tracking-widest text-center mt-1">
+                            {lesson.type === 'theory' ? 'Teoria' : 'Prática'}
+                          </p>
+                        </div>
+
                         <button 
-                          onClick={() => handleTrackClick(TRACKS[1])}
-                          className="bg-white text-black hover:bg-gray-200 font-black py-4 px-12 rounded-xl transition-all transform active:scale-95 flex items-center gap-3 shadow-2xl uppercase text-sm tracking-widest"
+                          disabled={isLocked}
+                          className={`w-20 h-20 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative
+                            ${isCompleted ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : ''}
+                            ${isActive ? 'bg-[#121212] border-blue-500 text-blue-400 scale-110 shadow-[0_0_30px_rgba(37,99,235,0.6)]' : ''}
+                            ${isLocked ? 'bg-[#1a1a1c] border-gray-800 text-gray-600 grayscale cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
+                          `}
                         >
-                          <CirclePlay className="w-5 h-5 fill-current" />
-                          Continuar Trilha
+                          {isActive && (
+                            <div className="absolute inset-[-8px] border-2 border-blue-500/30 rounded-full animate-ping pointer-events-none"></div>
+                          )}
+                          {isCompleted ? <Icon name="check-circle" className="w-8 h-8" /> : (isLocked ? <Icon name="lock" className="w-6 h-6" /> : <Icon name="play-circle" className="w-8 h-8" />)}
                         </button>
                       </div>
+
+                      <div className="w-1/2 hidden md:block"></div>
                     </div>
-                    
-                    <div className="hidden xl:block relative h-[320px] bg-black/60 rounded-2xl border border-white/10 p-10 overflow-hidden group/node">
-                      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-                      <div className="relative flex flex-col items-center justify-center h-full space-y-6">
-                        <div className="w-[200px] bg-gray-800 rounded-lg border border-white/20 shadow-2xl overflow-hidden scale-110">
-                          <div className="bg-blue-900/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-b border-white/10">
-                            <span>Event BeginPlay</span>
-                            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                          </div>
-                          <div className="p-4 space-y-2">
-                            <div className="flex items-center justify-end">
-                              <div className="w-12 h-2 bg-white/10 rounded mr-2"></div>
-                              <div className="w-3 h-3 bg-white rounded-sm"></div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        };
+
+        // ============================================================================
+        // COMPONENTE PRINCIPAL (Motor do App)
+        // ============================================================================
+        function App() {
+          const [activeNav, setActiveNav] = useState('aprender');
+          const [currentView, setCurrentView] = useState('dashboard');
+          const [selectedTrack, setSelectedTrack] = useState(null);
+
+          const handleTrackClick = (track) => {
+            setSelectedTrack(track);
+            setCurrentView('track-detail');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+
+          const handleBackToDashboard = () => {
+            setCurrentView('dashboard');
+            setSelectedTrack(null);
+          };
+
+          return (
+            <div className="min-h-screen flex flex-col">
+              
+              {/* NAVEGAÇÃO SUPERIOR */}
+              <nav className="h-[72px] bg-[#121212] border-b border-white/5 sticky top-0 z-50 px-10 flex items-center justify-between shadow-2xl">
+                <div className="flex items-center gap-12 h-full">
+                  <div className="flex items-center gap-3 cursor-pointer group" onClick={handleBackToDashboard}>
+                    <div className="w-9 h-9 bg-white rounded flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
+                      <span className="text-black font-black text-xl">U</span>
+                    </div>
+                    <span className="font-black tracking-[-0.05em] text-2xl text-white uppercase">Unrealingo</span>
+                  </div>
+                  
+                  <div className="hidden xl:flex items-center gap-2 h-full">
+                    <NavItem label="Aprender" active={activeNav === 'aprender'} onClick={() => { setActiveNav('aprender'); handleBackToDashboard(); }} />
+                    <NavItem label="Documentação" active={activeNav === 'doc'} onClick={() => setActiveNav('doc')} />
+                    <NavItem label="Fórum" />
+                    <NavItem label="Roteiro" />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div className="hidden lg:flex items-center gap-5 px-5 h-10 bg-black/40 rounded-lg border border-white/10">
+                    <div className="flex items-center gap-2 text-orange-500">
+                      <Icon name="flame" className="w-4 h-4" />
+                      <span className="text-[13px] font-black uppercase">12 Dias</span>
+                    </div>
+                    <div className="w-px h-5 bg-white/10" />
+                    <div className="flex items-center gap-2 text-cyan-400">
+                      <Icon name="zap" className="w-4 h-4" />
+                      <span className="text-[13px] font-black uppercase">4,250 XP</span>
+                    </div>
+                  </div>
+                  <button className="p-2.5 hover:bg-white/5 rounded-lg transition-colors relative">
+                    <Icon name="bell" className="w-5 h-5 text-gray-400" />
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-[#121212]"></span>
+                  </button>
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 border border-white/10 shadow-lg cursor-pointer hover:scale-105 transition-transform"></div>
+                </div>
+              </nav>
+
+              <div className="flex flex-1">
+                
+                {/* BARRA LATERAL (SIDEBAR) */}
+                <aside className="w-[280px] border-r border-white/5 bg-[#0e0e0f] sticky top-[72px] h-[calc(100vh-72px)] hidden lg:flex flex-col p-8">
+                  <div className="space-y-2 mb-12">
+                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em] mb-6 ml-2">Navegação</p>
+                    {[
+                      { icon: <Icon name="layout-grid" className="w-5 h-5" />, label: "Início", active: true, onClick: handleBackToDashboard },
+                      { icon: <Icon name="play-circle" className="w-5 h-5" />, label: "Minhas Trilhas" },
+                      { icon: <Icon name="library" className="w-5 h-5" />, label: "Recursos" },
+                      { icon: <Icon name="file-text" className="w-5 h-5" />, label: "Manuais Técnicos" },
+                      { icon: <Icon name="settings" className="w-5 h-5" />, label: "Configurações" }
+                    ].map((item, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={item.onClick}
+                        className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-200 ${item.active ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
+                      >
+                        {item.icon}
+                        <span className="text-sm tracking-tight">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="mt-auto">
+                    <div className="bg-[#161618] p-6 rounded-2xl border border-white/5 shadow-inner">
+                      <div className="flex items-center gap-3 mb-5">
+                        <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                          <Icon name="terminal" className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div>
+                          <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Rank Atual</h4>
+                          <p className="text-white font-black text-sm">Iniciante</p>
+                        </div>
+                      </div>
+                      <div className="w-full bg-black/40 h-1.5 rounded-full mb-3 overflow-hidden">
+                        <div className="bg-blue-600 h-full w-[65%] shadow-[0_0_12px_rgba(37,99,235,0.4)]"></div>
+                      </div>
+                      <p className="text-[9px] text-gray-500 text-center font-bold uppercase tracking-tighter">1,450 XP para a próxima etapa</p>
+                    </div>
+                  </div>
+                </aside>
+
+                <main className="flex-1 p-10 lg:p-16 overflow-y-auto relative h-[calc(100vh-72px)]">
+                  
+                  {/* VIEW: DASHBOARD PRINCIPAL */}
+                  {currentView === 'dashboard' && (
+                    <div className="max-w-[1300px] mx-auto animate-in fade-in duration-500">
+                      {/* Hero Section */}
+                      <section className="mb-20 relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-900/30 to-gray-800/30 rounded-[32px] blur opacity-50 transition duration-1000"></div>
+                        <div className="relative bg-[#121212] border border-white/10 rounded-[32px] p-12 overflow-hidden shadow-2xl">
+                          <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.05),transparent)] pointer-events-none"></div>
+                          
+                          <div className="relative z-10 grid xl:grid-cols-2 gap-16 items-center">
+                            <div>
+                              <span className="bg-blue-500/10 text-blue-400 text-[11px] font-black tracking-[0.2em] uppercase px-4 py-1.5 rounded-full border border-blue-500/20 mb-8 inline-block">
+                                Ambiente de Estudo
+                              </span>
+                              <h1 className="text-6xl font-black text-white mb-6 leading-[1.05] tracking-[-0.04em]">
+                                BeginPlay
+                              </h1>
+                              <h2 className="text-2xl font-bold text-gray-300 mb-8">
+                                Fundamentos de Unreal Engine 5.
+                              </h2>
+                              <p className="text-gray-400 text-lg leading-relaxed mb-10 max-w-lg font-medium">
+                                Explore a estrutura do motor, a programação visual e as lógicas de simulação de forma prática. Um caminho passo a passo para construir a base dos seus projetos.
+                              </p>
+                              <div className="flex flex-wrap gap-4">
+                                <button 
+                                  onClick={() => handleTrackClick(TRACKS[1])}
+                                  className="bg-white text-black hover:bg-gray-200 font-black py-4 px-12 rounded-xl transition-all transform active:scale-95 flex items-center gap-3 shadow-2xl uppercase text-sm tracking-widest"
+                                >
+                                  <Icon name="play-circle" className="w-5 h-5" />
+                                  Continuar Trilha
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="hidden xl:block relative h-[320px] bg-black/60 rounded-2xl border border-white/10 p-10 overflow-hidden group/node">
+                              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+                              <div className="relative flex flex-col items-center justify-center h-full space-y-6">
+                                <div className="w-[200px] bg-gray-800 rounded-lg border border-white/20 shadow-2xl overflow-hidden scale-110">
+                                  <div className="bg-blue-900/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-b border-white/10">
+                                    <span>Event BeginPlay</span>
+                                    <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                                  </div>
+                                  <div className="p-4 space-y-2">
+                                    <div className="flex items-center justify-end">
+                                      <div className="w-12 h-2 bg-white/10 rounded mr-2"></div>
+                                      <div className="w-3 h-3 bg-white rounded-sm"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="text-[10px] text-gray-500 uppercase font-black tracking-[0.3em] animate-pulse">Aguardando Início...</p>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <p className="text-[10px] text-gray-500 uppercase font-black tracking-[0.3em] animate-pulse">Aguardando Início...</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
+                      </section>
 
-              {/* Trilhas de Estudo */}
-              <section className="mb-24">
-                <div className="flex items-end justify-between mb-12 px-4">
-                  <div>
-                    <h2 className="text-4xl font-black text-white mb-3 tracking-tight uppercase">Trilhas de Estudo</h2>
-                    <div className="w-24 h-1.5 bg-blue-600 rounded-full"></div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {TRACKS.map(track => (
-                    <div key={track.id} onClick={() => handleTrackClick(track)}>
-                      <TrackCard track={track} />
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* NODE do Dia e Biblioteca */}
-              <section className="grid grid-cols-1 xl:grid-cols-12 gap-12 items-start mb-24">
-                
-                <div className="xl:col-span-6 bg-[#121212] border border-white/5 rounded-[32px] p-10 shadow-2xl">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-black flex items-center gap-3 text-white">
-                      <Terminal className="w-7 h-7 text-blue-500" />
-                      NODE em Foco
-                    </h3>
-                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Referência Rápida</span>
-                  </div>
-                  
-                  <div className="bg-[#18181b] border border-white/10 rounded-2xl p-8 mb-8 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-5">
-                      <Info className="w-32 h-32" />
-                    </div>
-                    
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="px-4 py-2 bg-gray-700 rounded-lg border border-white/20 text-white font-black text-sm shadow-xl flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-white"></div>
-                        {DAILY_NODE.name}
-                      </div>
-                      <span className="text-[10px] bg-white/5 px-2 py-1 rounded text-gray-400 font-black uppercase tracking-widest">
-                        {DAILY_NODE.category}
-                      </span>
-                    </div>
-                    
-                    <p className="text-gray-300 text-sm leading-relaxed mb-6 font-medium italic">
-                      "{DAILY_NODE.description}"
-                    </p>
-                    
-                    <div className="bg-black/40 rounded-xl p-4 border border-white/5">
-                      <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <Info className="w-3 h-3" /> Contexto de uso:
-                      </h4>
-                      <p className="text-[12px] text-gray-400 font-medium">
-                        {DAILY_NODE.usage}
-                      </p>
-                    </div>
-                  </div>
-
-                  <button className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-xl transition-all border border-white/10 uppercase text-[10px] tracking-[0.2em]">
-                    Explorar Biblioteca de Nós
-                  </button>
-                </div>
-
-                <div className="xl:col-span-6 bg-[#121212] border border-white/5 rounded-[32px] p-10 shadow-2xl h-full">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-black flex items-center gap-3 text-white">
-                      <Library className="w-7 h-7 text-blue-500" />
-                      Manuais & Documentos
-                    </h3>
-                  </div>
-                  <div className="grid gap-5">
-                    {[
-                      { title: "Estrutura de GDD Simplificada", category: "Game Design", time: "Leitura: 8 min" },
-                      { title: "Padrões de Nomenclatura", category: "Organização", time: "Leitura: 5 min" },
-                      { title: "Fluxo de UI com UMG", category: "Interface", time: "Leitura: 12 min" }
-                    ].map((doc, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-5 bg-[#18181b]/50 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer">
-                        <div className="flex items-center gap-5">
-                          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-all duration-300">
-                            <FileText className="w-6 h-6" />
-                          </div>
+                      {/* Trilhas de Estudo */}
+                      <section className="mb-24">
+                        <div className="flex items-end justify-between mb-12 px-4">
                           <div>
-                            <p className="text-base font-black text-gray-200 group-hover:text-white transition-colors uppercase tracking-tight">{doc.title}</p>
-                            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mt-1">{doc.category}</p>
+                            <h2 className="text-4xl font-black text-white mb-3 tracking-tight uppercase">Trilhas de Estudo</h2>
+                            <div className="w-24 h-1.5 bg-blue-600 rounded-full"></div>
                           </div>
                         </div>
-                        <span className="text-[10px] text-gray-600 font-black uppercase tracking-widest">{doc.time}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
 
-              {/* RODAPÉ ATUALIZADO */}
-              <footer className="mt-24 pb-12 border-t border-white/5 pt-12">
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-                  <div className="flex items-center gap-4 text-center lg:text-left">
-                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0 mx-auto lg:mx-0">
-                      <span className="text-white font-black text-lg">U</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                          {TRACKS.map(track => (
+                            <div key={track.id} onClick={() => handleTrackClick(track)}>
+                              <TrackCard track={track} />
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+
+                      {/* NODE do Dia e Biblioteca */}
+                      <section className="grid grid-cols-1 xl:grid-cols-12 gap-12 items-start mb-24">
+                        
+                        <div className="xl:col-span-6 bg-[#121212] border border-white/5 rounded-[32px] p-10 shadow-2xl">
+                          <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-2xl font-black flex items-center gap-3 text-white">
+                              <Icon name="terminal" className="w-7 h-7 text-blue-500" />
+                              NODE em Foco
+                            </h3>
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Referência Rápida</span>
+                          </div>
+                          
+                          <div className="bg-[#18181b] border border-white/10 rounded-2xl p-8 mb-8 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-5">
+                              <Icon name="info" className="w-32 h-32 text-white" />
+                            </div>
+                            
+                            <div className="flex items-center gap-4 mb-6">
+                              <div className="px-4 py-2 bg-gray-700 rounded-lg border border-white/20 text-white font-black text-sm shadow-xl flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-white"></div>
+                                {DAILY_NODE.name}
+                              </div>
+                              <span className="text-[10px] bg-white/5 px-2 py-1 rounded text-gray-400 font-black uppercase tracking-widest">
+                                {DAILY_NODE.category}
+                              </span>
+                            </div>
+                            
+                            <p className="text-gray-300 text-sm leading-relaxed mb-6 font-medium italic">
+                              "{DAILY_NODE.description}"
+                            </p>
+                            
+                            <div className="bg-black/40 rounded-xl p-4 border border-white/5">
+                              <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <Icon name="info" className="w-3 h-3" /> Contexto de uso:
+                              </h4>
+                              <p className="text-[12px] text-gray-400 font-medium">
+                                {DAILY_NODE.usage}
+                              </p>
+                            </div>
+                          </div>
+
+                          <button className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-xl transition-all border border-white/10 uppercase text-[10px] tracking-[0.2em]">
+                            Explorar Biblioteca de Nós
+                          </button>
+                        </div>
+
+                        <div className="xl:col-span-6 bg-[#121212] border border-white/5 rounded-[32px] p-10 shadow-2xl h-full">
+                          <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-2xl font-black flex items-center gap-3 text-white">
+                              <Icon name="library" className="w-7 h-7 text-blue-500" />
+                              Manuais & Documentos
+                            </h3>
+                          </div>
+                          <div className="grid gap-5">
+                            {[
+                              { title: "Estrutura de GDD Simplificada", category: "Game Design", time: "Leitura: 8 min" },
+                              { title: "Padrões de Nomenclatura", category: "Organização", time: "Leitura: 5 min" },
+                              { title: "Fluxo de UI com UMG", category: "Interface", time: "Leitura: 12 min" }
+                            ].map((doc, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-5 bg-[#18181b]/50 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer">
+                                <div className="flex items-center gap-5">
+                                  <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-all duration-300">
+                                    <Icon name="file-text" className="w-6 h-6" />
+                                  </div>
+                                  <div>
+                                    <p className="text-base font-black text-gray-200 group-hover:text-white transition-colors uppercase tracking-tight">{doc.title}</p>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mt-1">{doc.category}</p>
+                                  </div>
+                                </div>
+                                <span className="text-[10px] text-gray-600 font-black uppercase tracking-widest">{doc.time}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </section>
+
+                      {/* RODAPÉ ATUALIZADO */}
+                      <footer className="mt-24 pb-12 border-t border-white/5 pt-12">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                          <div className="flex items-center gap-4 text-center lg:text-left">
+                            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0 mx-auto lg:mx-0">
+                              <span className="text-white font-black text-lg">U</span>
+                            </div>
+                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.15em] leading-relaxed">
+                              Unrealingo é um projeto da <a href="https://communities.unrealengine.com/joao-pessoa/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4">Unreal Engine João Pessoa Chapter</a><br className="hidden lg:block" />
+                              desenvolvido pela <a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4">Poligonal Hub</a>.
+                            </p>
+                          </div>
+                        </div>
+                      </footer>
                     </div>
-                    <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.15em] leading-relaxed">
-                      Unrealingo é um projeto da <a href="https://communities.unrealengine.com/joao-pessoa/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4">Unreal Engine João Pessoa Chapter</a><br className="hidden lg:block" />
-                      desenvolvido pela <a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4">Poligonal Hub</a>.
-                    </p>
-                  </div>
-                </div>
-              </footer>
+                  )}
+
+                  {/* VIEW: DETALHE DA TRILHA */}
+                  {currentView === 'track-detail' && selectedTrack && (
+                    <TrackDetailView track={selectedTrack} onBack={handleBackToDashboard} />
+                  )}
+
+                </main>
+              </div>
             </div>
-          )}
+          );
+        }
 
-          {/* VIEW: DETALHE DA TRILHA */}
-          {currentView === 'track-detail' && selectedTrack && (
-            <TrackDetailView track={selectedTrack} onBack={handleBackToDashboard} />
-          )}
-
-        </main>
-      </div>
-    </div>
-  );
-}
+        // Renderiza o aplicativo
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
