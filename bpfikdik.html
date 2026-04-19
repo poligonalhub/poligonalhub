@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNREAL BLUEPRINTS FIKDIK</title>
+    <title>UNREAL BLUEPRINTS FIKDIKs - Estética Unrealingo</title>
     <style>
         /* Importação da fonte Inter para um visual limpo e moderno */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
@@ -25,13 +25,18 @@
             --pin-int: #13e4b4;
             --pin-float: #91fa00;
             --pin-string: #df00d3;
+            --pin-name: #b18eed;
+            --pin-text: #e280a7;
             --pin-transform: #e26a00;
             --pin-vector: #ffc90e;
+            --pin-linearcolor: #0055ff;
             --pin-rotator: #9999ff;
+            --pin-object: #00a8ff;
             --pin-exec: #ffffff;
             --node-event: #900000;
             --node-flow: #cfcfcf;
             --node-shortcut: #71717a;
+            --pin-class: #6e44ff;
         }
 
         /* Estilos base da página */
@@ -115,11 +120,22 @@
             padding: 0 32px;
         }
 
+        /* Espaçamento extra para não colar no rodapé */
+        .bottom-container {
+            margin-top: 0;
+            margin-bottom: 60px;
+        }
+
         .col {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 32px;
+        }
+
+        .full-width-col {
+            width: 100%;
+            flex: 1 1 100%;
         }
 
         /* Cards de Tabela */
@@ -147,7 +163,7 @@
             display: inline-block;
         }
 
-        /* Estilização das Tabelas */
+        /* Estilização das Tabelas Padrão */
         table {
             width: 100%;
             border-collapse: separate;
@@ -166,7 +182,7 @@
 
         td {
             padding: 16px 20px;
-            vertical-align: top; /* Alterado para top por causa do tamanho dos textos */
+            vertical-align: top;
         }
 
         td:first-child {
@@ -185,6 +201,43 @@
             font-size: 0.95rem;
         }
 
+        /* --- Tabela Horizontal (Cards para Atalhos) --- */
+        .horizontal-table {
+            display: block;
+        }
+        .horizontal-table tbody {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+        .horizontal-table tr {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-row);
+            border-radius: 8px;
+            height: 100%;
+        }
+        .horizontal-table tr:hover {
+            transform: translateY(-4px); /* Elevação sutil em vez de scale */
+        }
+        .horizontal-table td {
+            display: block;
+            width: auto !important; /* Sobrescreve os 35% do layout padrão */
+        }
+        .horizontal-table td:first-child {
+            border-radius: 8px 8px 0 0;
+            border-left: none; /* Remove a barra esquerda */
+            border-top: 4px solid transparent; /* Move a barra colorida para o topo */
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .horizontal-table td:last-child {
+            border-radius: 0 0 8px 8px;
+            flex-grow: 1; /* Faz a célula esticar para alinhar os botões em baixo se houvesse */
+            padding-top: 16px;
+        }
+
         /* Customização dos Pins da Unreal Engine */
         .pin {
             display: inline-block;
@@ -201,31 +254,43 @@
             width: 14px;
         }
 
-        /* Realces na borda esquerda baseados na cor da Unreal */
+        /* Realces baseados na cor da Unreal (Tabelas Normais) */
         tr.bool-row td:first-child { border-left-color: var(--pin-bool); }
         tr.int-row td:first-child { border-left-color: var(--pin-int); }
         tr.float-row td:first-child { border-left-color: var(--pin-float); }
         tr.string-row td:first-child { border-left-color: var(--pin-string); }
+        tr.name-row td:first-child { border-left-color: var(--pin-name); }
+        tr.text-row td:first-child { border-left-color: var(--pin-text); }
         tr.transform-row td:first-child { border-left-color: var(--pin-transform); }
         tr.vector-row td:first-child { border-left-color: var(--pin-vector); }
+        tr.linearcolor-row td:first-child { border-left-color: var(--pin-linearcolor); }
         tr.rotator-row td:first-child { border-left-color: var(--pin-rotator); }
+        tr.object-row td:first-child { border-left-color: var(--pin-object); }
+        tr.class-row td:first-child { border-left-color: var(--pin-class); }
         tr.event-row td:first-child { border-left-color: var(--node-event); }
         tr.flow-row td:first-child { border-left-color: var(--node-flow); }
-        tr.shortcut-row td:first-child { border-left-color: var(--node-shortcut); }
+
+        /* Realces Tabela Horizontal (Barra no Topo) */
+        .horizontal-table tr.shortcut-row td:first-child { border-top-color: var(--node-shortcut); }
 
         /* Cores aplicadas aos Pins */
         .bg-bool { background-color: var(--pin-bool); color: var(--pin-bool); }
         .bg-int { background-color: var(--pin-int); color: var(--pin-int); }
         .bg-float { background-color: var(--pin-float); color: var(--pin-float); }
         .bg-string { background-color: var(--pin-string); color: var(--pin-string); }
+        .bg-name { background-color: var(--pin-name); color: var(--pin-name); }
+        .bg-text { background-color: var(--pin-text); color: var(--pin-text); }
         .bg-transform { background-color: var(--pin-transform); color: var(--pin-transform); }
         .bg-vector { background-color: var(--pin-vector); color: var(--pin-vector); }
+        .bg-linearcolor { background-color: var(--pin-linearcolor); color: var(--pin-linearcolor); }
         .bg-rotator { background-color: var(--pin-rotator); color: var(--pin-rotator); }
+        .bg-object { background-color: var(--pin-object); color: var(--pin-object); }
+        .bg-class { background-color: var(--pin-class); color: var(--pin-class); }
         .bg-exec { background-color: var(--pin-exec); color: var(--pin-exec); }
         .bg-event { background-color: var(--node-event); color: var(--node-event); border-radius: 4px; }
         .bg-shortcut { background-color: var(--node-shortcut); color: var(--node-shortcut); border-radius: 2px; }
 
-        /* Formatação dos Exemplos */
+        /* Formatação dos Casos Práticos */
         .example-text {
             display: block;
             margin-top: 10px;
@@ -267,6 +332,9 @@
             td:first-child {
                 width: 40%;
             }
+            .horizontal-table tbody {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         @media (max-width: 600px) {
@@ -287,6 +355,13 @@
                 padding-top: 8px;
                 border-left: 4px solid transparent; 
             }
+            /* Regras específicas para anular conflitos no mobile da horizontal */
+            .horizontal-table tbody {
+                grid-template-columns: 1fr;
+            }
+            .horizontal-table td:first-child {
+                border-left: none;
+            }
         }
     </style>
 </head>
@@ -300,64 +375,101 @@
         <p>Unreal Engine João Pessoa Chapter</p>
     </div>
 
-    <!-- Wrapper do Conteúdo -->
+    <!-- Wrapper do Conteúdo Superior (2 Colunas) -->
     <div class="container">
         
         <!-- Coluna Esquerda -->
         <div class="col left-col">
             
-            <!-- TIPOS DE VARIÁVEIS -->
+            <!-- TIPOS DE BLUEPRINTS -->
             <div class="table-container">
-                <h2>Tipos de Variáveis</h2>
+                <h2>Tipos de Blueprints</h2>
                 <table>
                     <tbody>
-                        <tr class="bool-row">
-                            <td class="col-title"><span class="pin bg-bool"></span> Boolean</td>
+                        <tr class="class-row">
+                            <td class="col-title"><span class="pin bg-class"></span> Level Blueprint</td>
                             <td class="col-desc">
-                                Vermelho Escuro. Armazena um valor de Verdadeiro ou Falso (True/False). Muito usada para condições em Branch.
-                                <span class="example-text">Verificar se o jogador possui a chave (HasKey?) antes de abrir a porta.</span>
+                                Cada nível (fase) possui um Level Blueprint único. Utilizado para referenciar e manipular Actors do cenário de forma direta, controlar cinemáticas (cutscenes) e gerenciar streaming de níveis e checkpoints.
+                                <span class="example-text">Desencadear o colapso de uma ponte ou uma sequência de boss quando o jogador entra em uma sala específica.</span>
                             </td>
                         </tr>
-                        <tr class="int-row">
-                            <td class="col-title"><span class="pin bg-int"></span> Integer</td>
+                        <tr class="class-row">
+                            <td class="col-title"><span class="pin bg-class"></span> Blueprint Class</td>
                             <td class="col-desc">
-                                Verde Água (Cyan). Representa números inteiros, ou seja, números sem partes decimais (ex: 1, 5, -10). Útil para contadores, pontuações, quantidades de itens.
-                                <span class="example-text">Contar a quantidade de vidas restantes do jogador (Lives = 3).</span>
+                                Essencial para criar assets interativos modulares, como portas, interruptores ou itens coletáveis. Usado para estender uma classe C++ com grande flexibilidade visual.
+                                <span class="example-text">Criar um baú que possui sua própria lógica de abertura e que pode ser duplicado cem vezes pelo mapa.</span>
                             </td>
                         </tr>
-                        <tr class="float-row">
-                            <td class="col-title"><span class="pin bg-float"></span> Float</td>
+                        <tr class="class-row">
+                            <td class="col-title"><span class="pin bg-class"></span> Widget Blueprint</td>
                             <td class="col-desc">
-                                Verde Limão (Light Green). Representa números com partes decimais, ou frações (ex: 3.14, 0.5, -2.7). Comumente usado para velocidade, saúde, distância.
-                                <span class="example-text">Barra de saúde do jogador (Health = 95.5).</span>
+                                Estende o sistema UUserWidget para a criação de elementos de Interface de Usuário (UI).
+                                <span class="example-text">Desenhar o menu principal, o inventário do jogador ou as telas de pausa (HUD).</span>
                             </td>
                         </tr>
-                        <tr class="string-row">
-                            <td class="col-title"><span class="pin bg-string"></span> String</td>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CLASSES PRINCIPAIS -->
+            <div class="table-container">
+                <h2>Classes Principais Comuns</h2>
+                <table>
+                    <tbody>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Actor</td>
                             <td class="col-desc">
-                                Magenta (Rosa Escuro). Usado para armazenar textos (ex: "Olá", "Menu Principal"). Diferente do Text, não é localizado para diferentes idiomas.
-                                <span class="example-text">Armazenar o nome de usuário digitado no login (PlayerName = "HeroiJP").</span>
+                                Um objeto base que pode ser colocado ou gerado (spawned) em um mundo.
+                                <span class="example-text">Qualquer prop 3D, uma arma jogada no chão, uma luz dinâmica ou zonas de trigger.</span>
                             </td>
                         </tr>
-                        <tr class="transform-row">
-                            <td class="col-title"><span class="pin bg-transform"></span> Transform</td>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Pawn</td>
                             <td class="col-desc">
-                                Laranja. É uma combinação de Vector (Localização), Rotator (Rotação) e Vector (Escala). Define a posição, rotação e tamanho de um ator no mundo.
-                                <span class="example-text">Definir o local exato, para onde o personagem olha e o tamanho de uma magia sendo conjurada.</span>
+                                Um Actor que pode ser "possuído" (controlado) e que aceita comandos vindos de um Controller (Jogador ou IA).
+                                <span class="example-text">Um carro de controle remoto ou um drone que recebe os inputs do jogador.</span>
                             </td>
                         </tr>
-                        <tr class="vector-row">
-                            <td class="col-title"><span class="pin bg-vector"></span> Vector</td>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Character</td>
                             <td class="col-desc">
-                                Amarelo/Ouro. Composto por três Floats (X, Y, Z). Geralmente usado para representar pontos no espaço 3D, direções, e forças físicas.
-                                <span class="example-text">Aplicar um impulso para empurrar um objeto na direção X (X=500, Y=0, Z=0).</span>
+                                Uma extensão do Pawn, incluindo nativamente a lógica para caminhar, correr, pular e cair de forma realista através do CharacterMovementComponent.
+                                <span class="example-text">O herói principal ou o inimigo humanoide clássico bípede.</span>
                             </td>
                         </tr>
-                        <tr class="rotator-row">
-                            <td class="col-title"><span class="pin bg-rotator"></span> Rotator</td>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Player Controller</td>
                             <td class="col-desc">
-                                Roxo/Lilás. Composto por três valores de ângulo (Pitch, Yaw, Roll). Representa a rotação de um ator em relação aos três eixos do mundo.
-                                <span class="example-text">Fazer a cabeça do inimigo girar para seguir o jogador (Yaw = 90).</span>
+                                O agente invisível responsável por ler e traduzir as teclas ou botões do jogador, entregando essa informação ao Pawn.
+                                <span class="example-text">Captar um clique do mouse e dizer ao Pawn selecionado para atirar.</span>
+                            </td>
+                        </tr>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Game Mode Base</td>
+                            <td class="col-desc">
+                                O gerente da partida. Define as regras principais, a pontuação, as condições de fim de jogo, e define quais as classes padrão que o motor deve gerar.
+                                <span class="example-text">Ditar que a partida de Deathmatch acaba assim que o tempo zerar ou 50 abates forem atingidos.</span>
+                            </td>
+                        </tr>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Actor Component</td>
+                            <td class="col-desc">
+                                Componente modular e reutilizável com lógica encapsulada, feito para ser anexado em qualquer Actor. Não possui representação espacial.
+                                <span class="example-text">Um "Sistema de Fome" ou "Sistema de Inventário" que funciona igualmente no jogador ou no cavalo que ele monte.</span>
+                            </td>
+                        </tr>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Scene Component</td>
+                            <td class="col-desc">
+                                Semelhante a um Componente normal, mas contém transformações no espaço 3D (Localização, Rotação e Escala), ajudando na hierarquia do Actor.
+                                <span class="example-text">O ponto exato da ponta do cano de uma arma de onde as balas devem nascer.</span>
+                            </td>
+                        </tr>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Game Instance</td>
+                            <td class="col-desc">
+                                A classe mestre que sobrevive à troca de fases (levels). Ela é criada ao abrir o jogo e destruída apenas ao fechá-lo.
+                                <span class="example-text">Manter as vidas, moedas e opções de idioma do jogador a salvo durante o carregamento de uma nova área.</span>
                             </td>
                         </tr>
                     </tbody>
@@ -370,73 +482,80 @@
                 <table>
                     <tbody>
                         <tr class="event-row">
-                            <td class="col-title"><span class="pin bg-event"></span> Event BeginPlay</td>
-                            <td class="col-desc">
-                                Ocorre quando o jogo começa para este Actor. É o ponto de partida ideal para inicializar variáveis e realizar ações de setup iniciais.
-                                <span class="example-text">Tocar uma animação de spawn e encher a barra de stamina do monstro assim que ele surge.</span>
-                            </td>
-                        </tr>
-                        <tr class="event-row">
-                            <td class="col-title"><span class="pin bg-event"></span> Event Tick</td>
-                            <td class="col-desc">
-                                É chamado a cada frame gerado na tela. A quantidade de vezes por segundo depende do FPS do jogo. Use com cuidado, pois lógicas pesadas no Tick reduzem a performance do jogo.
-                                <span class="example-text">Rotacionar constantemente as pás de um ventilador ou moinho de vento.</span>
-                            </td>
-                        </tr>
-                        <tr class="event-row">
                             <td class="col-title"><span class="pin bg-event"></span> Event ActorBeginOverlap</td>
                             <td class="col-desc">
-                                Disparado quando a colisão (ou trigger) deste Actor começa a sobrepor a colisão de outro Actor especificado. Ex: Entrar numa área para abrir a porta.
-                                <span class="example-text">O jogador encosta em uma poção caída no chão para recupera a vida.</span>
+                                Disparado quando a colisão (trigger) de um Actor começa a sobrepor a colisão de outro. Útil para limites invisíveis.
+                                <span class="example-text">O jogador encosta em uma poção caída no chão para recuperar a vida imediatamente.</span>
                             </td>
                         </tr>
                         <tr class="event-row">
                             <td class="col-title"><span class="pin bg-event"></span> Event ActorEndOverlap</td>
                             <td class="col-desc">
-                                Disparado no exato momento em que dois Actors deixam de se sobrepor/tocar. Ex: Sair da área de abrir a porta.
-                                <span class="example-text">O jogador sai da área segura, acendendo o aviso de perigo na tela.</span>
+                                Disparado no exato momento em que dois Actors deixam de se sobrepor/tocar e se separam fisicamente.
+                                <span class="example-text">O jogador sai do círculo da área segura, acendendo o aviso de perigo na tela.</span>
                             </td>
                         </tr>
                         <tr class="event-row">
-                            <td class="col-title"><span class="pin bg-event"></span> Event AnyDamage</td>
+                            <td class="col-title"><span class="pin bg-event"></span> Event BeginPlay</td>
                             <td class="col-desc">
-                                Gatilho geral para dano. Chamado sempre que o Actor recebe dano, não importando a origem. Passa informações como quantidade de dano e quem o causou.
-                                <span class="example-text">Subtrair vida, independentemente se o jogador pisou na lava ou tomou um tiro.</span>
+                                Ocorre imediatamente quando o jogo começa ou logo após o Actor ser gerado (spawned). Ponto de partida para a inicialização.
+                                <span class="example-text">Tocar uma animação e encher a barra de vida do monstro assim que ele surge na fase.</span>
                             </td>
                         </tr>
                         <tr class="event-row">
-                            <td class="col-title"><span class="pin bg-event"></span> Event PointDamage</td>
+                            <td class="col-title"><span class="pin bg-event"></span> Event Tick</td>
                             <td class="col-desc">
-                                Representa dano direcional causado por projéteis, armas hit-scan ou ataques corpo-a-corpo (melee).
-                                <span class="example-text">Se o hit-scan atingir o osso da cabeça, aplicar multiplicador de Headshot (x2).</span>
-                            </td>
-                        </tr>
-                        <tr class="event-row">
-                            <td class="col-title"><span class="pin bg-event"></span> Event RadialDamage</td>
-                            <td class="col-desc">
-                                Chamado quando o Actor recebe dano em área. Ex: Dano de explosão indireta.
-                                <span class="example-text">Granadas que machucam todos os inimigos no raio de 500 unidades.</span>
-                            </td>
-                        </tr>
-                        <tr class="event-row">
-                            <td class="col-title"><span class="pin bg-event"></span> Event EndPlay</td>
-                            <td class="col-desc">
-                                Notifica que este Actor está sendo deletado, destruído ou o nível está sendo encerrado.
-                                <span class="example-text">Salvar a posição do jogador no Checkpoint antes dele sumir ao sair da fase.</span>
+                                Chamado em cada frame de renderização da tela. Custo computacional elevado se abusado com lógica complexa.
+                                <span class="example-text">Rotacionar constantemente as pás de um ventilador ou moinho de vento suavemente.</span>
                             </td>
                         </tr>
                         <tr class="event-row">
                             <td class="col-title"><span class="pin bg-event"></span> Event Destroyed</td>
                             <td class="col-desc">
-                                Chamado quando o Actor é destruído. (Nota: Obsoleto, prefira usar o Event EndPlay).
-                                <span class="example-text">Espalhar partículas de madeira voando quando um barril for destruído.</span>
+                                Obsoleto: Chamado apenas quando o Actor é destruído. (Recomendação: Utilize o Event EndPlay na Unreal 5).
+                                <span class="example-text">Espalhar partículas de madeira voando quando o barril recebe dano letal.</span>
+                            </td>
+                        </tr>
+                        <tr class="event-row">
+                            <td class="col-title"><span class="pin bg-event"></span> Event Hit</td>
+                            <td class="col-desc">
+                                Disparado quando a colisão bloqueante deste Actor atinge outra colisão sólida. Exige que "Simulation Generates Hit Events" esteja ativado.
+                                <span class="example-text">Tocar o som de lataria amassando e criar faíscas no exato local de impacto do carro em um muro.</span>
+                            </td>
+                        </tr>
+                        <tr class="event-row">
+                            <td class="col-title"><span class="pin bg-event"></span> Event AnyDamage</td>
+                            <td class="col-desc">
+                                Gatilho geral para dano. Chamado sempre que o Actor recebe dano, não importando a origem (ambiental, ataque, etc.).
+                                <span class="example-text">Subtrair vida da variável Health, quer o jogador tenha pisado na lava ou levado um tiro.</span>
+                            </td>
+                        </tr>
+                        <tr class="event-row">
+                            <td class="col-title"><span class="pin bg-event"></span> Event PointDamage</td>
+                            <td class="col-desc">
+                                Representa dano direcional causado por projéteis, armas hit-scan ou ataques corpo-a-corpo. Fornece vetor e ponto de impacto.
+                                <span class="example-text">Se o tiro atingir o osso da cabeça, aplicar um multiplicador de Headshot (x2) no dano final.</span>
+                            </td>
+                        </tr>
+                        <tr class="event-row">
+                            <td class="col-title"><span class="pin bg-event"></span> Event RadialDamage</td>
+                            <td class="col-desc">
+                                Chamado quando o Actor recebe dano indireto baseado em um raio de explosão (área de efeito).
+                                <span class="example-text">Aplicar dano decrescente aos inimigos dependendo da distância até o centro da explosão da granada.</span>
                             </td>
                         </tr>
                         <tr class="event-row">
                             <td class="col-title"><span class="pin bg-event"></span> Event ActorBeginCursorOver</td>
                             <td class="col-desc">
-                                Disparado quando a interface de mouse é usada e o cursor entra nos limites físicos do Actor.
-                                <span class="example-text">Aplicar um outline brilhante no item do cenário quando passa o mouse por cima (RPG isométrico).</span>
+                                Disparado quando a interface de mouse está habilitada e o cursor entra nos limites do Actor na tela.
+                                <span class="example-text">Aplicar um outline brilhante no baú do cenário (comum em jogos isométricos e RTS).</span>
+                            </td>
+                        </tr>
+                        <tr class="event-row">
+                            <td class="col-title"><span class="pin bg-event"></span> Event ActorEndCursorOver</td>
+                            <td class="col-desc">
+                                Disparado quando o usuário retira o cursor do mouse de cima do Actor, encerrando a interação visual.
+                                <span class="example-text">Remover o material de brilho quando o jogador desvia a atenção da espada no chão.</span>
                             </td>
                         </tr>
                     </tbody>
@@ -448,45 +567,86 @@
         <!-- Coluna Direita -->
         <div class="col right-col">
 
-            <!-- ATALHOS DE TECLADO (BLUEPRINTS) -->
+            <!-- TIPOS DE VARIÁVEIS -->
             <div class="table-container">
-                <h2>Atalhos Úteis (Blueprints)</h2>
+                <h2>Tipos de Variáveis</h2>
                 <table>
                     <tbody>
-                        <tr class="shortcut-row">
-                            <td class="col-title"><span class="pin bg-shortcut"></span> Atalhos Rápidos de Nós</td>
+                        <tr class="bool-row">
+                            <td class="col-title"><span class="pin bg-bool"></span> Bool</td>
                             <td class="col-desc">
-                                Segure a tecla correspondente e faça um <span class="keycap">Left Click</span> na área livre do gráfico para spawnar o nó instantaneamente:<br><br>
-                                <span class="keycap">B</span> : Branch<br>
-                                <span class="keycap">S</span> : Sequence<br>
-                                <span class="keycap">D</span> : Delay<br>
-                                <span class="keycap">O</span> : Do Once<br>
-                                <span class="keycap">F</span> : ForEachLoop<br>
-                                <span class="keycap">M</span> : MultiGate
-                                <span class="example-text">Em vez de buscar por "Branch" na barra de busca, apenas segure B + clique para economizar tempo.</span>
+                                Vermelho Escuro. Armazena um valor de Verdadeiro ou Falso (True/False). Muito usada em condicionais (Branch).
+                                <span class="example-text">Validar se o jogador possui a chave (HasKey == True) antes de autorizar a abertura de portas.</span>
                             </td>
                         </tr>
-                        <tr class="shortcut-row">
-                            <td class="col-title"><span class="pin bg-shortcut"></span> Gerenciar Conexões</td>
+                        <tr class="int-row">
+                            <td class="col-title"><span class="pin bg-int"></span> Integer</td>
                             <td class="col-desc">
-                                <span class="keycap">Alt</span> + <span class="keycap">Left Click</span>: Quebra (desconecta) os fios de um pino específico.<br>
-                                <span class="keycap">Ctrl</span> + <span class="keycap">Drag</span>: Move todos os fios de um pino para outro.
-                                <span class="example-text">Errou a conexão de uma variável? Segure Alt e clique nela para apagá-la sem deletar o nó inteiro.</span>
+                                Verde Água (Cyan). Representa números inteiros limpos (sem partes decimais, ex: 1, 5, -10). Útil para quantificadores.
+                                <span class="example-text">Contabilizar a quantidade de vidas, rodadas ou limite de poções no inventário.</span>
                             </td>
                         </tr>
-                        <tr class="shortcut-row">
-                            <td class="col-title"><span class="pin bg-shortcut"></span> Organização e Comentários</td>
+                        <tr class="float-row">
+                            <td class="col-title"><span class="pin bg-float"></span> Float</td>
                             <td class="col-desc">
-                                Selecione vários nós e pressione <span class="keycap">C</span> para envolvê-los em uma caixa de Comentário. <br>
-                                Selecione dois nós ou mais e pressione <span class="keycap">Q</span> para alinhar seus nós em linha reta.
-                                <span class="example-text">Usar 'C' para escrever "Sistema de Pulo" envolvendo todos os blocos relacionados ao pulo.</span>
+                                Verde Limão. Representa números com casas decimais ou frações (ex: 3.14, -2.7). A base dos cálculos físicos em 3D.
+                                <span class="example-text">Representar o combustível restante de um jato de forma granular (JetFuel = 45.2).</span>
+                            </td>
+                        </tr>
+                        <tr class="name-row">
+                            <td class="col-title"><span class="pin bg-name"></span> Name</td>
+                            <td class="col-desc">
+                                Lilás/Lavanda. Tipo de texto ultraleve destinado exclusivamente à leitura interna da engine para categorizar entidades. Não manipular nem concatenar.
+                                <span class="example-text">Identificar um osso específico do esqueleto ou verificar se o inimigo tem a Tag "Voador".</span>
+                            </td>
+                        </tr>
+                        <tr class="string-row">
+                            <td class="col-title"><span class="pin bg-string"></span> String</td>
+                            <td class="col-desc">
+                                Magenta. Texto maleável e manipulável em tempo de execução. Permite recortes, adição de textos e formatação.
+                                <span class="example-text">Receber e guardar as credenciais de login inseridas, juntando o "Nome" e o "Sobrenome".</span>
+                            </td>
+                        </tr>
+                        <tr class="transform-row">
+                            <td class="col-title"><span class="pin bg-transform"></span> Transform</td>
+                            <td class="col-desc">
+                                Laranja. Objeto complexo que agrupa três grandezas cruciais: Vector (Localização), Rotator (Rotação) e Vector (Escala/Tamanho).
+                                <span class="example-text">Determinar o transform da zona de spawn para garantir que o monstro apareça na posição, rotação e escala exatas.</span>
+                            </td>
+                        </tr>
+                        <tr class="vector-row">
+                            <td class="col-title"><span class="pin bg-vector"></span> Vector</td>
+                            <td class="col-desc">
+                                Amarelo. Uma combinação de três Floats (X, Y e Z) usada para designar locais 3D, trajetórias, forças ou velocidades.
+                                <span class="example-text">Disparar um foguete empurrando-o intensamente no eixo X positivo (frente).</span>
+                            </td>
+                        </tr>
+                        <tr class="linearcolor-row">
+                            <td class="col-title"><span class="pin bg-linearcolor"></span> Linear Color</td>
+                            <td class="col-desc">
+                                Azul Escuro/Royal. Armazena valores de cor misturando quatro canais baseados em Floats: Vermelho, Verde, Azul e Alpha (Transparência).
+                                <span class="example-text">Mudar a cor de uma luz de alerta de verde para vermelho piscante quando o alarme for ativado.</span>
+                            </td>
+                        </tr>
+                        <tr class="rotator-row">
+                            <td class="col-title"><span class="pin bg-rotator"></span> Rotator</td>
+                            <td class="col-desc">
+                                Azul Claro/Lilás Suave. Os eixos de rotação do mundo: Pitch (inclinação acima/abaixo), Yaw (virar aos lados) e Roll (rodar como um barril).
+                                <span class="example-text">Garantir que a cabeça do girassol foque no jogador movendo apenas a horizontal (Yaw).</span>
+                            </td>
+                        </tr>
+                        <tr class="object-row">
+                            <td class="col-title"><span class="pin bg-object"></span> Object Reference</td>
+                            <td class="col-desc">
+                                Azul. Guarda uma ligação (ponteiro) para um Actor ou Componente real que já existe criado na memória do jogo.
+                                <span class="example-text">Guardar qual foi a porta específica que o jogador tocou para acionar a animação de abrir apenas nela.</span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <!-- CONTROLE DE FLUXO (UNIFICADO) -->
+
+            <!-- CONTROLE DE FLUXO -->
             <div class="table-container">
                 <h2>Controle de Fluxo</h2>
                 <table>
@@ -494,84 +654,152 @@
                         <tr class="flow-row">
                             <td class="col-title"><span class="pin pin-exec bg-exec"></span> Branch</td>
                             <td class="col-desc">
-                                Avalia uma condição Booleana e redireciona o fluxo de execução para "True" ou "False". Equivale ao "if" na programação tradicional.
-                                <span class="example-text">O jogador tem dinheiro suficiente? Se True, desconta o dinheiro e entrega o item; Se False, exibe mensagem "Sem ouro".</span>
+                                Avalia uma condição Booleana bifurcando a execução para "True" ou "False" conforme o estado. O papel do condicional "if/else".
+                                <span class="example-text">O jogador tem moedas? Se True, o portão abre; Se False, toca o áudio de negação.</span>
                             </td>
                         </tr>
                         <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Do N</td>
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Delay</td>
                             <td class="col-desc">
-                                Permite que um trecho de lógica seja executado exatamente "N" vezes. Após atingir N, ele bloqueia até que seja resetado através do pino de entrada "Reset".
-                                <span class="example-text">Uma arma que pode atirar apenas 3 rajadas (N=3) antes de quebrar permanentemente ou precisar recarregar.</span>
-                            </td>
-                        </tr>
-                        <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> DoOnce</td>
-                            <td class="col-desc">
-                                Garante que a lógica conectada a ele seja executada apenas uma única vez, a menos que receba um sinal no pino de entrada "Reset".
-                                <span class="example-text">Disparar um áudio de tutorial apenas na primeira vez que o jogador tentar pular.</span>
-                            </td>
-                        </tr>
-                        <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Flip Flop</td>
-                            <td class="col-desc">
-                                Alterna a execução entre duas saídas diferentes (A e B) cada vez que é chamado. Ótimo para interruptores do tipo Liga/Desliga.
-                                <span class="example-text">Apertar "F" liga a lanterna (A). Apertar "F" de novo desliga a lanterna (B).</span>
-                            </td>
-                        </tr>
-                        <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> For Loop</td>
-                            <td class="col-desc">
-                                Executa um bloco de ações repetidamente usando um índice que vai do número inicial até o número final definido. Ele finaliza na saída "Completed".
-                                <span class="example-text">Spawna 10 moedas em posições sequenciais no chão quando um baú for aberto.</span>
-                            </td>
-                        </tr>
-                        <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> For Loop with Break</td>
-                            <td class="col-desc">
-                                Idêntico ao For Loop, porém possui um pino de entrada "Break", que permite interromper a repetição prematuramente se uma condição for satisfeita.
-                                <span class="example-text">Procurar por uma Poção de Vida numa mochila de 20 slots. Interromper (Break) assim que achar, para poupar processamento.</span>
-                            </td>
-                        </tr>
-                        <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Gate</td>
-                            <td class="col-desc">
-                                Funciona como um portão. O fluxo entra por "Enter", mas só passa para "Exit" se o portão estiver no estado aberto (Open). Pode ser aberto, fechado e alternado dinamicamente.
-                                <span class="example-text">Um lança-chamas que só atira (Enter) se o botão do mouse estiver pressionado abrindo a válvula (Open) e para se soltar (Close).</span>
-                            </td>
-                        </tr>
-                        <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> MultiGate</td>
-                            <td class="col-desc">
-                                Possui uma entrada e múltiplas saídas numeradas. A cada vez que é acionado, ativa uma saída diferente de forma sequencial ou aleatória, dependendo das configurações.
-                                <span class="example-text">Fazer o NPC soltar um resmungo aleatório ou diferente cada vez que o jogador interagir repetidamente.</span>
+                                Pausa o fluxo de execução pelo tempo designado. Chamadas precoces para este mesmo nó são anuladas durante a espera.
+                                <span class="example-text">Aguardar 4 segundos da explosão antes de exibir a tela de Game Over.</span>
                             </td>
                         </tr>
                         <tr class="flow-row">
                             <td class="col-title"><span class="pin pin-exec bg-exec"></span> Retriggerable Delay</td>
                             <td class="col-desc">
-                                Atrasa a execução. Porém, se for chamado novamente antes do tempo acabar, o contador é reiniciado e ele começa a contar do zero.
-                                <span class="example-text">Manter o hud de vida visível na tela; se o jogador tomar dano de novo, zera a contagem e espera mais 5 segundos antes de escondê-lo.</span>
+                                Semelhante ao Delay, mas a recepção de um novo impulso recomeça a contagem do tempo a partir do zero.
+                                <span class="example-text">Ocultar a barra de vida após 5 segundos; se tomar dano novamente, forçar o reset do cronômetro.</span>
                             </td>
                         </tr>
                         <tr class="flow-row">
-                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Sequence</td>
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Do 'N' times</td>
                             <td class="col-desc">
-                                Recebe um fluxo de execução e dispara os pinos de saída em ordem (0, depois 1, depois 2...). Útil para organizar o gráfico e evitar fios longos, pois executa os blocos na mesma frame.
-                                <span class="example-text">Ao morrer, primeiro (0) toca a animação de morte, depois (1) atualiza a contagem de vidas, depois (2) mostra a tela de Game Over.</span>
+                                Mantém ativamente uma porta controlada pelo parâmetro numérico N. Bloqueia o canal após as N travessias até receber sinal no pino 'Reset'.
+                                <span class="example-text">Apertar o botão de "Impulso Especial", que só funciona três vezes por rodada.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Do Once</td>
+                            <td class="col-desc">
+                                Permite a passagem uma única vez, blindando a lógica até receber um Reset, não importando quantas vezes seja chamado.
+                                <span class="example-text">Conceder a conquista "Explorador da Caverna" no instante inicial em que o jogador entra na área.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Flip Flop</td>
+                            <td class="col-desc">
+                                Alternador binário sequencial: No primeiro impulso vai pela saída [A], no segundo inverte para [B], recomeçando infinitamente.
+                                <span class="example-text">Apertar "F" liga a lanterna pelo pino [A]. Apertar "F" novamente a desliga pelo pino [B].</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> For Loop</td>
+                            <td class="col-desc">
+                                Executa e processa em cadeia o bloco partindo do índice inicial até o teto estipulado, disparando o "Completed" ao terminar.
+                                <span class="example-text">Gerar vinte blocos de construção distribuídos matematicamente para formar uma parede.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> For Loop with Break</td>
+                            <td class="col-desc">
+                                A versão adaptativa do For Loop, dotada do pino "Break". Interrompe repetições cíclicas assim que a condição for satisfeita.
+                                <span class="example-text">Procurar uma poção em 50 caixas e estilhaçar o Loop (Break) assim que achar, salvando memória.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> For Each Loop</td>
+                            <td class="col-desc">
+                                Itera todo e qualquer grupo (Array), executando a lógica em cada item sequencialmente e entregando a referência deles.
+                                <span class="example-text">Pegar a lista de todos os inimigos presentes na sala e aplicar dano elétrico em cada um deles.</span>
                             </td>
                         </tr>
                         <tr class="flow-row">
                             <td class="col-title"><span class="pin pin-exec bg-exec"></span> While Loop</td>
                             <td class="col-desc">
-                                Executa a saída de loop repetidamente enquanto a condição Booleana acoplada for verdadeira (True). Cuidado para não gerar loops infinitos que travam o motor.
-                                <span class="example-text">Fazer cálculos matemáticos complexos até alcançar o resultado desejado de uma distância de navegação da Inteligência Artificial.</span>
+                                Força bruta de processamento. Opera as saídas enquanto o Booleano for Verdadeiro. Grande risco de travar a engine (Loop infinito).
+                                <span class="example-text">Aplicar cálculos complexos de navegação e reajustar posições até não detectar mais nenhuma colisão.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Gate</td>
+                            <td class="col-desc">
+                                Funciona como um portão. Os processos entram por "Enter", mas só são descarregados em "Exit" se o portão estiver Aberto (Open).
+                                <span class="example-text">Atirar balas sem parar (Tick no Enter) enquanto o dedo segurar o gatilho (Open), parando ao soltar (Close).</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Multigate</td>
+                            <td class="col-desc">
+                                Uma entrada única e múltiplas vias de saída. A cada acionamento, ativa uma saída diferente sequencialmente ou de forma aleatória.
+                                <span class="example-text">Providenciar que um NPC solte uma fala diferente a cada vez que o jogador tentar interagir.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Sequence</td>
+                            <td class="col-desc">
+                                Segmenta as tarefas ordenadas de forma [0], depois [1], etc., num curtíssimo espaço do mesmo frame, organizando a árvore.
+                                <span class="example-text">Ao morrer: Ativa primeiro a explosão, atualiza as vidas na sequência e depois exibe a tela de falha.</span>
+                            </td>
+                        </tr>
+                        <tr class="flow-row">
+                            <td class="col-title"><span class="pin pin-exec bg-exec"></span> Switch (On Int/Enum/Name)</td>
+                            <td class="col-desc">
+                                Ferramenta de múltiplas escolhas que substitui Branches agrupados, segmentando o comportamento dependendo da variável avaliada.
+                                <span class="example-text">Verificar a arma (Enum): Se for Pistola, toca som agudo; se for Rifle, rajada; se for Faca, som de corte.</span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Wrapper do Conteúdo Inferior (Full Width / Horizontal) -->
+    <div class="container bottom-container">
+        <div class="col full-width-col">
+            <!-- ATALHOS DE TECLADO (BLUEPRINTS) -->
+            <div class="table-container">
+                <h2>Atalhos Úteis (Blueprints)</h2>
+                <table class="horizontal-table">
+                    <tbody>
+                        <tr class="shortcut-row">
+                            <td class="col-title"><span class="pin bg-shortcut"></span> Teclas Rápidas de Criação (Nós)</td>
+                            <td class="col-desc">
+                                Segure a tecla enquanto clica com o <span class="keycap">LMB</span> (Botão Esquerdo do Mouse) na malha para invocar o nó instantaneamente:<br><br>
+                                <span class="keycap">B</span> : Branch<br>
+                                <span class="keycap">S</span> : Sequence<br>
+                                <span class="keycap">D</span> : Delay<br>
+                                <span class="keycap">G</span> : Gate<br>
+                                <span class="keycap">O</span> : Do Once<br>
+                                <span class="keycap">N</span> : Do N Times<br>
+                                <span class="keycap">F</span> : ForEachLoop<br>
+                                <span class="keycap">M</span> : MultiGate<br>
+                                <span class="keycap">P</span> : Event BeginPlay
+                            </td>
+                        </tr>
+                        <tr class="shortcut-row">
+                            <td class="col-title"><span class="pin bg-shortcut"></span> Gerenciamento, Limpeza e Comentários</td>
+                            <td class="col-desc">
+                                <span class="keycap">Ctrl</span> + <span class="keycap">RMB Drag</span>: Arrasta e move todas as conexões (fios) de um pino para outro.<br><br>
+                                <span class="keycap">Alt</span> + <span class="keycap">LMB Click</span>: Elimina/Quebra uma conexão de fio específica clicando nela.<br><br>
+                                Pressione <span class="keycap">C</span> (com nós selecionados) para encaixar todos em um Bloco de Comentário.<br><br>
+                                Pressione <span class="keycap">Q</span> (com nós selecionados) para alinhar visualmente todos os pinos de forma reta na horizontal.
+                            </td>
+                        </tr>
+                        <tr class="shortcut-row">
+                            <td class="col-title"><span class="pin bg-shortcut"></span> Otimização de Interface e Testes</td>
+                            <td class="col-desc">
+                                <span class="keycap">F7</span>: Compile Blueprints (Compila o código que você está trabalhando no momento).<br><br>
+                                <span class="keycap">Ctrl</span> + <span class="keycap">D</span>: Duplicate Selected Node (Duplica nós rapidamente).<br><br>
+                                <span class="keycap">Ctrl</span> + <span class="keycap">F</span>: Find in Blueprint (Busca e localiza funções e variáveis ativas no mapa da Blueprint).<br><br>
+                                <span class="keycap">Alt</span> + <span class="keycap">P</span>: Play In Editor (Inicia a simulação do jogo sem precisar ir até a janela principal).
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
