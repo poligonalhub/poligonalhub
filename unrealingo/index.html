@@ -15,7 +15,7 @@
     <!-- Importação do Babel (Traduz o código JSX para o navegador entender) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Importação dos Ícones (Iconify - Carrega o Lucide de forma nativa e sem bugs no React) -->
+    <!-- Importação dos Ícones (Iconify) -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </head>
 <body class="bg-[#0a0a0b] text-gray-200 antialiased selection:bg-blue-600 selection:text-white">
@@ -26,7 +26,7 @@
     <script type="text/babel">
         const { useState } = React;
         
-        // Componente Universal de Ícone usando o Iconify (Bypass nos bugs do lucide-react UMD)
+        // Componente Universal de Ícone
         const Icon = ({ name, className }) => (
             <iconify-icon icon={`lucide:${name}`} class={className} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}></iconify-icon>
         );
@@ -56,7 +56,7 @@
           name: "Branch",
           category: "Flow Control",
           description: "O nó fundamental de tomada de decisão. Ele verifica se uma condição booleana é verdadeira ou falsa e direciona o fluxo de execução para o caminho correspondente.",
-          usage: "Use para criar portas lógicas, checar vida do jogador ou validar interações."
+          usage: "Use para criar portas lógicas (ex: o jogador tem a chave?), checar vida do jogador ou validar interações condicionais."
         };
 
         const MOCK_LESSONS = [
@@ -69,21 +69,105 @@
         ];
 
         // ============================================================================
-        // COMPONENTES (Funcionam como "Includes")
+        // COMPONENTES REUTILIZÁVEIS
         // ============================================================================
 
-        const NavItem = ({ label, active = false, onClick }) => (
-          <button 
-            onClick={onClick}
-            className={`px-4 py-5 text-[12px] font-black uppercase tracking-[0.15em] transition-all border-b-[3px] h-full flex items-center ${active ? 'text-white border-blue-500' : 'text-gray-400 border-transparent hover:text-white hover:border-white/20'}`}
-          >
-            {label}
-          </button>
-        );
+        const BlueprintNode = ({ title, type = 'function', inputs = [], outputs = [], className = "" }) => {
+            const HEADER_COLORS = {
+                event: 'bg-gradient-to-r from-red-700 to-red-800',
+                function: 'bg-gradient-to-r from-blue-600 to-blue-800',
+                pure: 'bg-gradient-to-r from-green-600 to-green-800',
+                flow: 'bg-gradient-to-r from-gray-500 to-gray-700'
+            };
+
+            const PIN_COLORS = {
+                exec: 'white', // Usado para o stroke/fill do SVG
+                bool: 'bg-red-700 border-red-700',
+                float: 'bg-green-400 border-green-400',
+                int: 'bg-teal-400 border-teal-400',
+                string: 'bg-pink-400 border-pink-400',
+                object: 'bg-blue-400 border-blue-400',
+                vector: 'bg-yellow-400 border-yellow-400'
+            };
+
+            const headerBg = HEADER_COLORS[type] || HEADER_COLORS.function;
+
+            const RenderPin = ({ label, pinType, isInput, isConnected }) => {
+                const isExec = pinType === 'exec';
+                let PinShape;
+                
+                if (isExec) {
+                    // Refinamento do SVG do pino Executável para parecer uma seta de Unreal
+                    PinShape = (
+                        <div className="w-[13px] h-[13px] flex-shrink-0 relative overflow-visible mt-0.5">
+                            <svg viewBox="0 0 14 14" className="w-full h-full block">
+                                <path 
+                                    d="M 1 2 L 7 2 L 12 7 L 7 12 L 1 12 Z" 
+                                    fill={isConnected ? "white" : "transparent"} 
+                                    stroke="white" 
+                                    strokeWidth="1.5"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </div>
+                    );
+                } else {
+                    const colors = PIN_COLORS[pinType] || 'bg-gray-400 border-gray-400';
+                    const [bgClass, borderClass] = colors.split(' ');
+                    PinShape = (
+                        <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-0.5 ${isConnected ? bgClass : 'bg-transparent border-[2px] ' + borderClass}`} />
+                    );
+                }
+
+                return (
+                    <div className={`flex items-center gap-2 mb-1.5 ${isInput ? 'flex-row' : 'flex-row-reverse'}`}>
+                        {PinShape}
+                        {label && <span className="text-[11px] font-bold text-gray-300 tracking-wide drop-shadow-md">{label}</span>}
+                    </div>
+                );
+            };
+
+            return (
+                <div className={`bg-[#1e1e22] rounded-xl border border-black/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex flex-col font-sans select-none min-w-[160px] ${className}`}>
+                    <div className={`${headerBg} px-3 py-1.5 border-b border-black/50 flex items-center justify-between overflow-hidden relative rounded-t-xl`}>
+                        <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==')] pointer-events-none"></div>
+                        <div className="flex items-center gap-2 relative z-10">
+                            {type === 'function' && <span className="text-white font-serif italic text-[14px] font-black leading-none pb-0.5 pr-1 drop-shadow-md">f</span>}
+                            {type === 'event' && <Icon name="zap" className="w-3 h-3 text-white drop-shadow-md" />}
+                            {type === 'flow' && <Icon name="git-branch" className="w-3 h-3 text-white drop-shadow-md" />}
+                            <span className="text-white text-[12px] font-bold tracking-wide drop-shadow-md">{title}</span>
+                        </div>
+                    </div>
+                    <div className="p-3 bg-gradient-to-b from-[#242429] to-[#1a1a1e] flex justify-between gap-6 relative rounded-b-xl">
+                        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '12px 12px' }}></div>
+                        <div className="flex flex-col items-start relative z-10 w-1/2">
+                            {inputs.map((pin, i) => <RenderPin key={`in-${i}`} {...pin} isInput={true} />)}
+                        </div>
+                        <div className="flex flex-col items-end relative z-10 w-1/2">
+                            {outputs.map((pin, i) => <RenderPin key={`out-${i}`} {...pin} isInput={false} />)}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const NavItem = ({ label, active = false, onClick, href }) => {
+          const classes = `px-3 py-4 text-[11px] font-black uppercase tracking-[0.15em] transition-all border-b-[3px] h-full flex items-center whitespace-nowrap ${active ? 'text-white border-blue-500' : 'text-gray-400 border-transparent hover:text-white hover:border-white/20'}`;
+          
+          if (href) {
+            return <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>{label}</a>;
+          }
+          
+          return (
+            <button onClick={onClick} className={classes}>
+              {label}
+            </button>
+          );
+        };
 
         const TrackCard = ({ track }) => (
-          <div className={`bg-[#1a1a1c] border-t-2 ${track.color} rounded-xl p-6 hover:bg-[#232326] transition-all cursor-pointer group flex flex-col h-full shadow-2xl hover:-translate-y-1`}>
-            <div className="flex justify-between items-start mb-6">
+          <div className={`bg-[#1a1a1c] border-t-2 ${track.color} rounded-xl p-5 hover:bg-[#232326] transition-all cursor-pointer group flex flex-col h-full shadow-xl hover:-translate-y-1`}>
+            <div className="flex justify-between items-start mb-4">
               <div className="p-3 bg-black/40 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
                 {track.icon}
               </div>
@@ -95,15 +179,13 @@
                 ))}
               </div>
             </div>
-            
             <h3 className="text-lg font-black text-white mb-2 group-hover:text-blue-400 transition-colors uppercase tracking-tight">
               {track.title}
             </h3>
-            <p className="text-gray-400 text-sm mb-8 leading-relaxed flex-1 font-medium">
+            <p className="text-gray-400 text-xs mb-6 leading-relaxed flex-1 font-medium">
               {track.description}
             </p>
-            
-            <div className="mt-auto pt-5 border-t border-white/5 space-y-4">
+            <div className="mt-auto pt-4 border-t border-white/5 space-y-3">
               <div className="flex justify-between items-center text-[10px]">
                 <span className="text-gray-500 font-black uppercase tracking-widest">{track.lessons} Lições</span>
                 <span className="text-white font-black">{track.progress}%</span>
@@ -120,36 +202,27 @@
 
         const TrackDetailView = ({ track, onBack }) => {
           return (
-            <div className="max-w-[800px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-              <button 
-                onClick={onBack}
-                className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 md:mb-8 group transition-colors"
-              >
+            <div className="max-w-[800px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500 pb-16">
+              <button onClick={onBack} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 group transition-colors">
                 <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
                   <Icon name="arrow-left" className="w-4 h-4" />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
               </button>
 
-              <div className={`bg-[#1a1a1c] border-t-4 ${track.color} rounded-[24px] md:rounded-[32px] p-6 md:p-10 shadow-2xl mb-8 md:mb-12 relative overflow-hidden`}>
-                <div className="absolute top-0 right-0 p-6 md:p-10 opacity-5 scale-150 pointer-events-none">
-                  {track.icon}
-                </div>
+              <div className={`bg-[#1a1a1c] border-t-4 ${track.color} rounded-[24px] p-8 shadow-2xl mb-8 relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 p-8 opacity-5 scale-150 pointer-events-none">{track.icon}</div>
                 <div className="relative z-10">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-black/40 rounded-xl border border-white/5">
-                      {track.icon}
-                    </div>
-                    <span className="text-[10px] bg-white/5 px-3 py-1 rounded-full text-gray-400 uppercase tracking-widest font-black border border-white/5">
-                      Módulo de Estudo
-                    </span>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2.5 bg-black/40 rounded-xl border border-white/5">{track.icon}</div>
+                    <span className="text-[10px] bg-white/5 px-3 py-1 rounded-full text-gray-400 uppercase tracking-widest font-black border border-white/5">Módulo de Estudo</span>
                   </div>
-                  <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-[-0.04em]">{track.title}</h1>
-                  <p className="text-gray-400 text-sm md:text-lg font-medium max-w-xl leading-relaxed">{track.description}</p>
+                  <h1 className="text-3xl md:text-4xl font-black text-white mb-3 tracking-[-0.04em]">{track.title}</h1>
+                  <p className="text-gray-400 text-sm font-medium max-w-xl leading-relaxed">{track.description}</p>
                 </div>
               </div>
 
-              <div className="relative py-10 flex flex-col items-center">
+              <div className="relative py-8 flex flex-col items-center">
                 <div className="absolute top-0 bottom-0 w-1.5 bg-gray-800 rounded-full left-1/2 -translate-x-1/2 z-0"></div>
 
                 {MOCK_LESSONS.map((lesson, index) => {
@@ -158,32 +231,25 @@
                   const isLocked = lesson.status === 'locked';
 
                   return (
-                    <div key={lesson.id} className={`relative z-10 flex items-center justify-center w-full my-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+                    <div key={lesson.id} className={`relative z-10 flex items-center justify-center w-full my-6 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
                       <div className="w-1/2 hidden md:block"></div>
-
                       <div className="flex flex-col items-center relative group cursor-pointer">
-                        <div className={`absolute -top-12 whitespace-nowrap bg-[#1a1a1c] border border-white/10 px-4 py-2 rounded-xl shadow-xl transition-all ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'} pointer-events-none`}>
-                          <p className="text-xs font-black text-white">{lesson.title}</p>
-                          <p className="text-[9px] text-gray-500 uppercase tracking-widest text-center mt-1">
-                            {lesson.type === 'theory' ? 'Teoria' : 'Prática'}
-                          </p>
+                        <div className={`absolute -top-10 whitespace-nowrap bg-[#1a1a1c] border border-white/10 px-3 py-1.5 rounded-lg shadow-xl transition-all ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'} pointer-events-none z-20`}>
+                          <p className="text-[11px] font-black text-white">{lesson.title}</p>
                         </div>
 
                         <button 
                           disabled={isLocked}
-                          className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative
+                          className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative z-10
                             ${isCompleted ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : ''}
                             ${isActive ? 'bg-[#121212] border-blue-500 text-blue-400 scale-110 shadow-[0_0_30px_rgba(37,99,235,0.6)]' : ''}
                             ${isLocked ? 'bg-[#1a1a1c] border-gray-800 text-gray-600 grayscale cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                           `}
                         >
-                          {isActive && (
-                            <div className="absolute inset-[-8px] border-2 border-blue-500/30 rounded-full animate-ping pointer-events-none"></div>
-                          )}
-                          {isCompleted ? <Icon name="check-circle" className="w-6 h-6 md:w-8 md:h-8" /> : (isLocked ? <Icon name="lock" className="w-5 h-5 md:w-6 md:h-6" /> : <Icon name="play-circle" className="w-6 h-6 md:w-8 md:h-8" />)}
+                          {isActive && <div className="absolute inset-[-8px] border-2 border-blue-500/30 rounded-full animate-ping pointer-events-none"></div>}
+                          {isCompleted ? <Icon name="check-circle" className="w-6 h-6" /> : (isLocked ? <Icon name="lock" className="w-5 h-5" /> : <Icon name="play-circle" className="w-6 h-6" />)}
                         </button>
                       </div>
-
                       <div className="w-1/2 hidden md:block"></div>
                     </div>
                   );
@@ -197,11 +263,9 @@
         // COMPONENTE PRINCIPAL (Motor do App)
         // ============================================================================
         function App() {
-          const [activeNav, setActiveNav] = useState('aprender');
+          const [activeNav, setActiveNav] = useState('aprenda');
           const [currentView, setCurrentView] = useState('dashboard');
           const [selectedTrack, setSelectedTrack] = useState(null);
-          
-          // Novo Estado para o Menu Mobile
           const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
           const handleTrackClick = (track) => {
@@ -215,58 +279,50 @@
             setSelectedTrack(null);
           };
 
-          const handleMobileNav = (onClickAction) => {
-            if (onClickAction) onClickAction();
-            setIsMobileMenuOpen(false);
-          };
-
           return (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col overflow-x-hidden">
               
               {/* NAVEGAÇÃO SUPERIOR */}
-              <nav className="h-[72px] bg-[#121212] border-b border-white/5 sticky top-0 z-50 px-4 md:px-10 flex items-center justify-between shadow-2xl">
-                <div className="flex items-center gap-4 md:gap-12 h-full">
-                  
-                  {/* Botão Hambúrguer (Mobile) */}
-                  <button 
-                    className="lg:hidden text-gray-400 hover:text-white p-2"
-                    onClick={() => setIsMobileMenuOpen(true)}
-                  >
-                    <Icon name="menu" className="w-6 h-6" />
+              <nav className="h-14 bg-[#121212] border-b border-white/5 sticky top-0 z-50 px-4 flex items-center justify-between shadow-xl">
+                <div className="flex items-center gap-3 h-full overflow-hidden">
+                  <button className="xl:hidden text-gray-400 hover:text-white p-1" onClick={() => setIsMobileMenuOpen(true)}>
+                    <Icon name="menu" className="w-5 h-5" />
                   </button>
 
-                  <div className="flex items-center gap-2 md:gap-3 cursor-pointer group" onClick={handleBackToDashboard}>
-                    <div className="w-8 h-8 md:w-9 md:h-9 bg-white rounded flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-                      <span className="text-black font-black text-lg md:text-xl">U</span>
+                  <div className="flex items-center gap-2 cursor-pointer group" onClick={handleBackToDashboard}>
+                    <div className="w-7 h-7 bg-white rounded flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300 shrink-0">
+                      <span className="text-black font-black text-sm">U</span>
                     </div>
-                    <span className="font-black tracking-[-0.05em] text-xl md:text-2xl text-white uppercase hidden sm:block">Unrealingo</span>
+                    <span className="font-black tracking-[-0.05em] text-lg text-white uppercase hidden sm:block">Unrealingo</span>
                   </div>
                   
-                  <div className="hidden xl:flex items-center gap-2 h-full">
-                    <NavItem label="Aprender" active={activeNav === 'aprender'} onClick={() => { setActiveNav('aprender'); handleBackToDashboard(); }} />
-                    <NavItem label="Documentação" active={activeNav === 'doc'} onClick={() => setActiveNav('doc')} />
-                    <NavItem label="Fórum" />
-                    <NavItem label="Roteiro" />
+                  {/* Menu Desktop */}
+                  <div className="hidden xl:flex items-center gap-2 ml-6 h-full">
+                    <NavItem label="Aprenda" active={activeNav === 'aprenda'} onClick={() => { setActiveNav('aprenda'); handleBackToDashboard(); }} />
+                    <NavItem label="Construa" href="https://github.com/poligonalhub/poligonalhub/tree/main/unrealingo" />
+                    <NavItem label="Apoie" href="https://apoia.se/poligonal" />
+                    <NavItem label="Fórum" href="https://discord.gg/VtY3zgVCR6" />
+                    <NavItem label="Documentação" href="https://dev.epicgames.com/documentation/unreal-engine/" />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="hidden lg:flex items-center gap-5 px-5 h-10 bg-black/40 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-2 text-orange-500">
-                      <Icon name="flame" className="w-4 h-4" />
-                      <span className="text-[13px] font-black uppercase">12 Dias</span>
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="hidden md:flex items-center gap-4 px-3 py-1.5 bg-black/40 rounded-md border border-white/10">
+                    <div className="flex items-center gap-1.5 text-orange-500">
+                      <Icon name="flame" className="w-3.5 h-3.5" />
+                      <span className="text-[11px] font-black uppercase">12 Dias</span>
                     </div>
-                    <div className="w-px h-5 bg-white/10" />
-                    <div className="flex items-center gap-2 text-cyan-400">
-                      <Icon name="zap" className="w-4 h-4" />
-                      <span className="text-[13px] font-black uppercase">4,250 XP</span>
+                    <div className="w-px h-3.5 bg-white/20" />
+                    <div className="flex items-center gap-1.5 text-cyan-400">
+                      <Icon name="zap" className="w-3.5 h-3.5" />
+                      <span className="text-[11px] font-black uppercase">4.2k XP</span>
                     </div>
                   </div>
-                  <button className="p-2 hover:bg-white/5 rounded-lg transition-colors relative">
-                    <Icon name="bell" className="w-5 h-5 text-gray-400" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full border-2 border-[#121212]"></span>
+                  <button className="p-1.5 hover:bg-white/5 rounded-md transition-colors relative">
+                    <Icon name="bell" className="w-4 h-4 text-gray-400" />
+                    <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-blue-500 rounded-full border border-[#121212]"></span>
                   </button>
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 border border-white/10 shadow-lg cursor-pointer hover:scale-105 transition-transform"></div>
+                  <div className="w-7 h-7 rounded-md bg-gradient-to-br from-gray-700 to-gray-800 border border-white/10 shadow-sm cursor-pointer hover:scale-105 transition-transform"></div>
                 </div>
               </nav>
 
@@ -274,131 +330,113 @@
                 
                 {/* BACKDROP MOBILE */}
                 {isMobileMenuOpen && (
-                  <div 
-                    className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  ></div>
+                  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 xl:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>
                 )}
 
                 {/* BARRA LATERAL (SIDEBAR) */}
-                <aside className={`fixed lg:sticky top-0 lg:top-[72px] left-0 z-50 h-full lg:h-[calc(100vh-72px)] w-[280px] border-r border-white/5 bg-[#0e0e0f] transform transition-transform duration-300 ease-in-out flex flex-col p-6 md:p-8 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-                  
-                  {/* Botão Fechar (Mobile) */}
-                  <div className="flex justify-end mb-6 lg:hidden">
-                    <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg">
-                      <Icon name="x" className="w-5 h-5" />
+                <aside className={`fixed xl:sticky top-0 xl:top-14 left-0 z-50 h-full xl:h-[calc(100vh-56px)] w-[260px] border-r border-white/5 bg-[#0e0e0f] transform transition-transform duration-300 ease-in-out flex flex-col p-6 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} xl:translate-x-0`}>
+                  <div className="flex justify-end mb-4 xl:hidden">
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 text-gray-400 hover:text-white bg-white/5 rounded-md">
+                      <Icon name="x" className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <div className="space-y-2 mb-12">
-                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.25em] mb-6 ml-2">Navegação</p>
+                  <div className="space-y-1 mb-8">
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4 ml-2">Navegação</p>
                     {[
-                      { icon: <Icon name="layout-grid" className="w-5 h-5" />, label: "Início", active: true, onClick: handleBackToDashboard },
-                      { icon: <Icon name="play-circle" className="w-5 h-5" />, label: "Minhas Trilhas" },
-                      { icon: <Icon name="library" className="w-5 h-5" />, label: "Recursos" },
-                      { icon: <Icon name="file-text" className="w-5 h-5" />, label: "Manuais Técnicos" },
-                      { icon: <Icon name="settings" className="w-5 h-5" />, label: "Configurações" }
+                      { icon: <Icon name="layout-grid" className="w-4 h-4" />, label: "Início", active: true, onClick: handleBackToDashboard },
+                      { icon: <Icon name="play-circle" className="w-4 h-4" />, label: "Minhas Trilhas" },
+                      { icon: <Icon name="library" className="w-4 h-4" />, label: "Recursos" },
+                      { icon: <Icon name="file-text" className="w-4 h-4" />, label: "Manuais Técnicos" }
                     ].map((item, idx) => (
                       <button 
                         key={idx}
-                        onClick={() => handleMobileNav(item.onClick)}
-                        className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-200 ${item.active ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
+                        onClick={() => { if(item.onClick) item.onClick(); setIsMobileMenuOpen(false); }}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${item.active ? 'bg-white/5 text-blue-400 font-bold' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
                       >
                         {item.icon}
-                        <span className="text-sm tracking-tight">{item.label}</span>
+                        <span className="text-xs tracking-tight">{item.label}</span>
                       </button>
                     ))}
                   </div>
 
                   <div className="mt-auto">
-                    <div className="bg-[#161618] p-6 rounded-2xl border border-white/5 shadow-inner">
-                      <div className="flex items-center gap-3 mb-5">
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20 shrink-0">
-                          <Icon name="terminal" className="w-5 h-5 text-blue-400" />
+                    <div className="bg-[#161618] p-4 rounded-xl border border-white/5 shadow-inner">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20 shrink-0">
+                          <Icon name="terminal" className="w-4 h-4 text-blue-400" />
                         </div>
                         <div>
-                          <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Rank Atual</h4>
-                          <p className="text-white font-black text-sm line-clamp-1">Iniciante</p>
+                          <h4 className="text-[9px] font-black uppercase tracking-widest text-gray-500">Rank Atual</h4>
+                          <p className="text-white font-black text-xs line-clamp-1">Iniciante</p>
                         </div>
                       </div>
-                      <div className="w-full bg-black/40 h-1.5 rounded-full mb-3 overflow-hidden">
-                        <div className="bg-blue-600 h-full w-[65%] shadow-[0_0_12px_rgba(37,99,235,0.4)]"></div>
+                      <div className="w-full bg-black/40 h-1 rounded-full mb-2 overflow-hidden">
+                        <div className="bg-blue-600 h-full w-[65%] shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
                       </div>
-                      <p className="text-[9px] text-gray-500 text-center font-bold uppercase tracking-tighter">1,450 XP para a próxima etapa</p>
+                      <p className="text-[8px] text-gray-500 text-center font-bold uppercase tracking-tighter">1,450 XP para a próxima etapa</p>
                     </div>
                   </div>
                 </aside>
 
-                <main className="flex-1 p-4 md:p-10 lg:p-16 overflow-y-auto relative lg:h-[calc(100vh-72px)]">
+                <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto relative xl:h-[calc(100vh-56px)]">
                   
                   {/* VIEW: DASHBOARD PRINCIPAL */}
                   {currentView === 'dashboard' && (
-                    <div className="max-w-[1300px] mx-auto animate-in fade-in duration-500">
+                    <div className="max-w-[1200px] mx-auto animate-in fade-in duration-500">
                       
                       {/* Hero Section */}
-                      <section className="mb-12 md:mb-20 relative group">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-900/30 to-gray-800/30 rounded-[24px] md:rounded-[32px] blur opacity-50 transition duration-1000"></div>
-                        <div className="relative bg-[#121212] border border-white/10 rounded-[24px] md:rounded-[32px] p-6 md:p-12 overflow-hidden shadow-2xl">
+                      <section className="mb-10 md:mb-16 relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-900/30 to-gray-800/30 rounded-[20px] md:rounded-[28px] blur opacity-50 transition duration-1000"></div>
+                        <div className="relative bg-[#121212] border border-white/10 rounded-[20px] md:rounded-[28px] p-6 md:p-10 overflow-hidden shadow-2xl">
                           <div className="absolute top-0 right-0 w-full md:w-1/2 h-full bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.05),transparent)] pointer-events-none"></div>
                           
-                          <div className="relative z-10 grid xl:grid-cols-2 gap-8 md:gap-16 items-center">
-                            <div>
-                              <span className="bg-blue-500/10 text-blue-400 text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase px-4 py-1.5 rounded-full border border-blue-500/20 mb-6 md:mb-8 inline-block">
+                          <div className="relative z-10 flex flex-col lg:flex-row gap-8 md:gap-12 items-center">
+                            <div className="flex-1">
+                              <span className="bg-blue-500/10 text-blue-400 text-[9px] md:text-[10px] font-black tracking-[0.2em] uppercase px-3 py-1 rounded-full border border-blue-500/20 mb-4 inline-block">
                                 Ambiente de Estudo
                               </span>
-                              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 md:mb-6 leading-[1.05] tracking-[-0.04em]">
+                              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 leading-[1.05] tracking-[-0.04em]">
                                 BeginPlay
                               </h1>
-                              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-300 mb-6 md:mb-8">
+                              <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-300 mb-4">
                                 Fundamentos de Unreal Engine 5.
                               </h2>
-                              <p className="text-gray-400 text-sm md:text-lg leading-relaxed mb-8 md:mb-10 max-w-lg font-medium">
+                              <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-6 max-w-lg font-medium">
                                 Explore a estrutura do motor, a programação visual e as lógicas de simulação de forma prática. Um caminho passo a passo para construir a base dos seus projetos.
                               </p>
-                              <div className="flex flex-wrap gap-4">
-                                <button 
-                                  onClick={() => handleTrackClick(TRACKS[1])}
-                                  className="w-full sm:w-auto bg-white text-black hover:bg-gray-200 font-black py-3 md:py-4 px-8 md:px-12 rounded-xl transition-all transform active:scale-95 flex items-center justify-center gap-3 shadow-2xl uppercase text-xs md:text-sm tracking-widest"
-                                >
-                                  <Icon name="play-circle" className="w-4 h-4 md:w-5 md:h-5" />
-                                  Continuar Trilha
-                                </button>
-                              </div>
+                              <button 
+                                onClick={() => handleTrackClick(TRACKS[1])}
+                                className="w-full sm:w-auto bg-white text-black hover:bg-gray-200 font-black py-3 px-8 rounded-lg transition-all transform active:scale-95 flex items-center justify-center gap-2 shadow-xl uppercase text-[10px] md:text-xs tracking-widest"
+                              >
+                                <Icon name="play-circle" className="w-4 h-4" />
+                                Continuar Trilha
+                              </button>
                             </div>
                             
-                            {/* Mockup Desktop Only */}
-                            <div className="hidden xl:block relative h-[320px] bg-black/60 rounded-2xl border border-white/10 p-10 overflow-hidden group/node">
+                            <div className="hidden lg:flex flex-1 justify-center relative p-4">
                               <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-                              <div className="relative flex flex-col items-center justify-center h-full space-y-6">
-                                <div className="w-[200px] bg-gray-800 rounded-lg border border-white/20 shadow-2xl overflow-hidden scale-110">
-                                  <div className="bg-blue-900/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-b border-white/10">
-                                    <span>Event BeginPlay</span>
-                                    <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                                  </div>
-                                  <div className="p-4 space-y-2">
-                                    <div className="flex items-center justify-end">
-                                      <div className="w-12 h-2 bg-white/10 rounded mr-2"></div>
-                                      <div className="w-3 h-3 bg-white rounded-sm"></div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <p className="text-[10px] text-gray-500 uppercase font-black tracking-[0.3em] animate-pulse">Aguardando Início...</p>
-                              </div>
+                              <BlueprintNode 
+                                title="Event BeginPlay" 
+                                type="event" 
+                                outputs={[{ label: '', pinType: 'exec', isConnected: true }]} 
+                                className="scale-125 transform origin-center shadow-[0_0_40px_rgba(220,38,38,0.15)]"
+                              />
                             </div>
                           </div>
                         </div>
                       </section>
 
                       {/* Trilhas de Estudo */}
-                      <section className="mb-16 md:mb-24">
-                        <div className="flex items-end justify-between mb-8 md:mb-12 px-2 md:px-4">
+                      <section className="mb-12 md:mb-16">
+                        <div className="flex items-end justify-between mb-6 md:mb-8 px-2">
                           <div>
-                            <h2 className="text-2xl md:text-4xl font-black text-white mb-2 md:mb-3 tracking-tight uppercase">Trilhas de Estudo</h2>
-                            <div className="w-16 md:w-24 h-1.5 bg-blue-600 rounded-full"></div>
+                            <h2 className="text-xl md:text-3xl font-black text-white mb-2 tracking-tight uppercase">Trilhas de Estudo</h2>
+                            <div className="w-12 md:w-16 h-1 bg-blue-600 rounded-full"></div>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                           {TRACKS.map(track => (
                             <div key={track.id} onClick={() => handleTrackClick(track)}>
                               <TrackCard track={track} />
@@ -408,93 +446,108 @@
                       </section>
 
                       {/* NODE do Dia e Biblioteca */}
-                      <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-12 items-start mb-16 md:mb-24">
+                      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start mb-16">
                         
-                        <div className="bg-[#121212] border border-white/5 rounded-[24px] md:rounded-[32px] p-6 md:p-10 shadow-2xl w-full">
-                          <div className="flex items-center justify-between mb-6 md:mb-8">
-                            <h3 className="text-xl md:text-2xl font-black flex items-center gap-2 md:gap-3 text-white">
-                              <Icon name="terminal" className="w-5 h-5 md:w-7 md:h-7 text-blue-500 shrink-0" />
-                              NODE em Foco
+                        <div className="bg-[#121212] border border-white/5 rounded-[20px] md:rounded-[24px] p-5 md:p-8 shadow-2xl w-full">
+                          <div className="flex items-center justify-between mb-5 md:mb-6">
+                            <h3 className="text-lg md:text-xl font-black flex items-center gap-2 text-white">
+                              <Icon name="terminal" className="w-5 h-5 text-blue-500 shrink-0" />
+                              Banco de NODEs
                             </h3>
-                            <span className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest hidden sm:block">Referência Rápida</span>
+                            <span className="text-[8px] md:text-[9px] font-black text-gray-500 uppercase tracking-widest hidden sm:block">Referência Rápida</span>
                           </div>
                           
-                          <div className="bg-[#18181b] border border-white/10 rounded-2xl p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                              <Icon name="info" className="w-24 h-24 md:w-32 md:h-32 text-white" />
+                          <div className="bg-[#18181b] border border-white/10 rounded-xl p-5 md:p-6 mb-5 md:mb-6 relative overflow-hidden group">
+                            <div className="absolute top-4 right-4 opacity-10 pointer-events-none">
+                              <BlueprintNode 
+                                title="Branch" 
+                                type="flow" 
+                                inputs={[{ label: '', pinType: 'exec', isConnected: true }, { label: 'Condition', pinType: 'bool', isConnected: true }]} 
+                                outputs={[{ label: 'True', pinType: 'exec', isConnected: true }, { label: 'False', pinType: 'exec', isConnected: false }]} 
+                                className="scale-75 origin-top-right grayscale opacity-50"
+                              />
                             </div>
                             
-                            <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-4 md:mb-6">
-                              <div className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-700 rounded-lg border border-white/20 text-white font-black text-xs md:text-sm shadow-xl flex items-center gap-2 md:gap-3">
-                                <div className="w-2 h-2 rounded-full bg-white shrink-0"></div>
-                                {DAILY_NODE.name}
-                              </div>
-                              <span className="text-[9px] md:text-[10px] bg-white/5 px-2 py-1 rounded text-gray-400 font-black uppercase tracking-widest">
+                            <div className="relative z-10 mb-4">
+                              <span className="text-[8px] md:text-[9px] bg-gray-700/50 border border-gray-500 px-2 py-1 rounded text-gray-300 font-black uppercase tracking-widest inline-block mb-3">
                                 {DAILY_NODE.category}
                               </span>
+                              <h4 className="text-white font-black text-base md:text-lg mb-2">{DAILY_NODE.name}</h4>
+                              <p className="text-gray-400 text-xs md:text-sm leading-relaxed font-medium italic max-w-[85%]">
+                                "{DAILY_NODE.description}"
+                              </p>
                             </div>
                             
-                            <p className="text-gray-300 text-xs md:text-sm leading-relaxed mb-4 md:mb-6 font-medium italic relative z-10">
-                              "{DAILY_NODE.description}"
-                            </p>
-                            
-                            <div className="bg-black/40 rounded-xl p-4 border border-white/5 relative z-10">
-                              <h4 className="text-[9px] md:text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <div className="bg-black/40 rounded-lg p-3 border border-white/5 relative z-10">
+                              <h5 className="text-[8px] md:text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                                 <Icon name="info" className="w-3 h-3 shrink-0" /> Contexto de uso:
-                              </h4>
-                              <p className="text-[11px] md:text-[12px] text-gray-400 font-medium">
+                              </h5>
+                              <p className="text-[10px] md:text-[11px] text-gray-400 font-medium">
                                 {DAILY_NODE.usage}
                               </p>
                             </div>
                           </div>
 
-                          <button className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-3 md:py-4 rounded-xl transition-all border border-white/10 uppercase text-[9px] md:text-[10px] tracking-[0.2em]">
-                            Explorar Biblioteca de Nós
+                          <div className="flex justify-center mb-6 overflow-x-auto pb-4 scrollbar-hide">
+                             <BlueprintNode 
+                                title="Branch" 
+                                type="flow" 
+                                inputs={[
+                                    { label: '', pinType: 'exec', isConnected: true }, 
+                                    { label: 'Condition', pinType: 'bool', isConnected: true }
+                                ]} 
+                                outputs={[
+                                    { label: 'True', pinType: 'exec', isConnected: true }, 
+                                    { label: 'False', pinType: 'exec', isConnected: false }
+                                ]} 
+                                className="shadow-lg"
+                              />
+                          </div>
+
+                          <button className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-3 rounded-lg transition-all border border-white/10 uppercase text-[9px] tracking-[0.2em]">
+                            Explorar Todos os Nós
                           </button>
                         </div>
 
-                        <div className="bg-[#121212] border border-white/5 rounded-[24px] md:rounded-[32px] p-6 md:p-10 shadow-2xl h-full w-full">
-                          <div className="flex items-center justify-between mb-6 md:mb-8">
-                            <h3 className="text-xl md:text-2xl font-black flex items-center gap-2 md:gap-3 text-white">
-                              <Icon name="library" className="w-5 h-5 md:w-7 md:h-7 text-blue-500 shrink-0" />
+                        <div className="bg-[#121212] border border-white/5 rounded-[20px] md:rounded-[24px] p-5 md:p-8 shadow-2xl h-full w-full">
+                          <div className="flex items-center justify-between mb-5 md:mb-6">
+                            <h3 className="text-lg md:text-xl font-black flex items-center gap-2 text-white">
+                              <Icon name="library" className="w-5 h-5 text-blue-500 shrink-0" />
                               Manuais & Documentos
                             </h3>
                           </div>
-                          <div className="grid gap-4 md:gap-5">
+                          <div className="grid gap-3 md:gap-4">
                             {[
                               { title: "Estrutura de GDD Simplificada", category: "Game Design", time: "8 min" },
                               { title: "Padrões de Nomenclatura", category: "Organização", time: "5 min" },
                               { title: "Fluxo de UI com UMG", category: "Interface", time: "12 min" }
                             ].map((doc, idx) => (
-                              <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 p-4 md:p-5 bg-[#18181b]/50 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 md:w-12 md:h-12 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-all duration-300 shrink-0">
-                                    <Icon name="file-text" className="w-5 h-5 md:w-6 md:h-6" />
+                              <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 p-3 md:p-4 bg-[#18181b]/50 rounded-xl border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 md:w-10 md:h-10 bg-white/5 rounded-lg flex items-center justify-center group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-all duration-300 shrink-0">
+                                    <Icon name="file-text" className="w-4 h-4 md:w-5 md:h-5" />
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-sm md:text-base font-black text-gray-200 group-hover:text-white transition-colors uppercase tracking-tight truncate leading-tight">{doc.title}</p>
-                                    <p className="text-[9px] md:text-[10px] text-gray-500 uppercase tracking-widest font-black mt-1">{doc.category}</p>
+                                    <p className="text-xs md:text-sm font-black text-gray-200 group-hover:text-white transition-colors uppercase tracking-tight truncate leading-tight">{doc.title}</p>
+                                    <p className="text-[8px] md:text-[9px] text-gray-500 uppercase tracking-widest font-black mt-0.5">{doc.category}</p>
                                   </div>
                                 </div>
-                                <span className="text-[9px] md:text-[10px] text-gray-600 font-black uppercase tracking-widest sm:ml-4">{doc.time}</span>
+                                <span className="text-[8px] md:text-[9px] text-gray-600 font-black uppercase tracking-widest sm:ml-4">{doc.time}</span>
                               </div>
                             ))}
                           </div>
                         </div>
                       </section>
 
-                      {/* RODAPÉ ATUALIZADO */}
-                      <footer className="mt-16 md:mt-24 pb-8 md:pb-12 border-t border-white/5 pt-8 md:pt-12">
-                        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8">
-                          <div className="flex items-center gap-4 text-center lg:text-left">
-                            <div className="w-8 h-8 md:w-10 md:h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0 mx-auto lg:mx-0">
-                              <span className="text-white font-black text-base md:text-lg">U</span>
-                            </div>
-                            <p className="text-[9px] md:text-[11px] text-gray-500 font-black uppercase tracking-[0.1em] md:tracking-[0.15em] leading-relaxed">
-                              Unrealingo é um projeto da <a href="https://communities.unrealengine.com/joao-pessoa/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4">Unreal Engine João Pessoa Chapter</a><br className="hidden lg:block" />
-                              desenvolvido pela <a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4">Poligonal Hub</a>.
-                            </p>
+                      {/* RODAPÉ ATUALIZADO E EM LINHA ÚNICA */}
+                      <footer className="mt-8 mb-4 pt-6 border-t border-white/5">
+                        <div className="flex items-center justify-center gap-3 px-2">
+                          <div className="w-6 h-6 bg-white/10 rounded flex items-center justify-center shrink-0">
+                            <span className="text-white font-black text-[10px]">U</span>
                           </div>
+                          <p className="text-[8px] md:text-[10px] text-gray-500 font-black uppercase tracking-[0.1em] md:tracking-widest leading-relaxed text-center">
+                            Unrealingo é um projeto da <a href="https://communities.unrealengine.com/joao-pessoa/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4 mx-0.5">Unreal Engine João Pessoa Chapter</a> desenvolvido pela <a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors underline decoration-blue-500/30 underline-offset-4 mx-0.5">Poligonal Hub</a>.
+                          </p>
                         </div>
                       </footer>
                     </div>
