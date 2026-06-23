@@ -1,0 +1,899 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MABeTe | Documentação Arquitetural Completa</title>
+    
+    <meta property="og:title" content="MABeTe | Documentação Arquitetural">
+    <meta property="og:description" content="Motor Arterial Baseado em Texto para Unreal Engine 5. De roteirista pra roteirista.">
+    <meta property="og:image" content="https://poligonalhub.com/mabetedoc/mabeteshare.png">
+    <meta property="og:url" content="https://poligonalhub.com/mabetedoc/">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MABeTe | Documentação Arquitetural">
+    <meta name="twitter:description" content="Motor Arterial Baseado em Texto para Unreal Engine 5. De roteirista pra roteirista.">
+    <meta name="twitter:image" content="https://poligonalhub.com/mabetedoc/mabeteshare.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ====================================================================
+           [MÓDULO: CONFIGURAÇÕES GERAIS]
+           ==================================================================== */
+        :root {
+            --main-color: rgb(186, 2, 74);
+            --main-color-hover: rgb(220, 20, 100);
+            --color-two: rgb(84, 0, 69);
+            --color-three: rgb(18, 12, 18);
+            
+            --bg-base: #0a0a0b;
+            --text-main: #e5e7eb;
+            --text-muted: #a0a0a0;
+            --bg-card: rgba(84, 0, 69, 0.15);
+            --border-card: rgba(186, 2, 74, 0.3);
+            --code-bg: #050505;
+            --accent-green: #4af626;
+            --accent-cyan: #26f6f6;
+            --selection-bg: #2563eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background-color: var(--selection-bg); color: #ffffff; }
+
+        ::-webkit-scrollbar { width: 10px; background-color: transparent; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to top, var(--color-two) 0%, var(--main-color) 100%);
+            border-radius: 10px;
+            border: 2px solid transparent;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to top, var(--main-color) 0%, var(--color-two) 100%);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .blueprint-grid {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(#ffffff 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px;
+            position: relative; z-index: 1;
+        }
+
+        section { padding: 80px 0; position: relative; }
+        @media (max-width: 768px) { section { padding: 50px 0; } }
+
+        .border-top-gradient {
+            height: 4px; width: 100%;
+            background: linear-gradient(90deg, var(--color-two) 0%, var(--main-color) 100%);
+        }
+
+        /* --- Estilos Compartilhados de Seções --- */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; border-bottom: 2px solid var(--main-color);
+            margin-bottom: 30px; padding-bottom: 10px;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .section-header:hover { background-color: rgba(186, 2, 74, 0.05); opacity: 0.9; }
+
+        .section-title { font-size: 2.2rem; font-weight: 700; color: #fff; margin: 0; letter-spacing: -0.5px; }
+        .toggle-icon { font-size: 1.5rem; color: var(--main-color); font-weight: bold; user-select: none; }
+
+        .section-content { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; opacity: 1; }
+        .section-content.hidden { display: none; opacity: 0; }
+
+        .text-content { font-size: 1.1rem; color: var(--text-muted); max-width: 900px; margin-bottom: 40px; font-weight: 300; }
+        .text-content p { margin-bottom: 15px; }
+        .text-content strong { color: var(--text-main); font-weight: 600; }
+        
+        .text-content code, .terminal-box, .typewriter-text { font-family: 'Courier Prime', monospace; }
+        .text-content code {
+            background-color: var(--code-bg); padding: 3px 8px;
+            border-radius: 4px; color: #fca5a5; font-size: 0.9em;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--color-two); padding-left: 20px;
+            margin: 40px 0; font-style: italic; color: var(--text-main);
+            background: rgba(84, 0, 69, 0.1); padding: 20px; border-radius: 0 8px 8px 0;
+            font-weight: 300;
+        }
+
+        .note-box {
+            background-color: rgba(186, 2, 74, 0.1); border-left: 4px solid var(--main-color);
+            padding: 15px 20px; margin-bottom: 30px; border-radius: 0 4px 4px 0; font-size: 0.95rem;
+        }
+        .note-box strong { color: var(--main-color); font-weight: 600; }
+
+        /* Componente Genérico: Terminal Box */
+        .terminal-box {
+            background: var(--code-bg); border: 1px solid var(--color-two);
+            border-left: 4px solid var(--main-color); padding: 20px 25px;
+            border-radius: 6px; font-size: 0.9rem; color: var(--text-muted);
+            max-width: 650px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); overflow-x: auto;
+            line-height: 1.5;
+        }
+        .terminal-box .green { color: var(--accent-green); }
+        .terminal-box .magenta { color: var(--main-color); }
+        .terminal-box .cyan { color: var(--accent-cyan); }
+        .terminal-box .comment { color: #666; font-style: italic; }
+
+        /* ====================================================================
+           [MÓDULO: HERO]
+           ==================================================================== */
+        .hero {
+            min-height: 80vh; display: flex; flex-direction: column; justify-content: center;
+            position: relative; background: radial-gradient(circle at center, rgba(84,0,69,0.2) 0%, var(--bg-base) 70%);
+        }
+        .hero h1 {
+            font-size: 4.5rem; color: var(--main-color); margin-bottom: 10px;
+            letter-spacing: -2px; font-weight: 900;
+        }
+        .hero h1 span { color: var(--text-main); }
+
+        .typewriter-wrapper {
+            font-size: 1.2rem; color: var(--text-muted); min-height: 2.5em;
+            margin-bottom: 40px; display: flex; align-items: center;
+        }
+        .typewriter-text {
+            border-right: 2px solid var(--main-color); white-space: nowrap;
+            overflow: hidden; animation: blinkCursor 0.75s step-end infinite;
+        }
+        @keyframes blinkCursor { from, to { border-color: transparent } 50% { border-color: var(--main-color) } }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .typewriter-wrapper { font-size: 1rem; }
+            .terminal-box { font-size: 0.8rem; }
+        }
+
+        /* ====================================================================
+           [MÓDULO: SUMÁRIO]
+           ==================================================================== */
+        .toc-section { padding: 40px 0 20px 0; }
+        
+        .toc-box {
+            background: var(--code-bg); border: 1px solid var(--border-card);
+            padding: 30px 40px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 800px; /* Mantém o sumário contido e legível */
+        }
+        .toc-box h3 { 
+            color: #fff; margin-bottom: 20px; font-size: 1.4rem; font-weight: 700; 
+            display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; 
+        }
+        .toc-box h3 .cyan { color: var(--accent-cyan); margin-right: 10px; font-family: 'Courier Prime', monospace; }
+        
+        .toc-list { display: flex; flex-direction: column; gap: 8px; }
+        
+        .toc-list a {
+            display: flex; align-items: baseline; color: var(--text-muted); text-decoration: none; 
+            transition: all 0.2s ease; padding: 12px 20px; border-radius: 6px; 
+            background: rgba(255,255,255,0.02); border: 1px solid transparent; font-size: 1.05rem;
+        }
+        .toc-list a:hover { 
+            color: var(--text-main); background: rgba(186, 2, 74, 0.1); 
+            border-color: var(--border-card); transform: translateX(8px); 
+        }
+        .toc-num {
+            color: var(--main-color); font-family: 'Courier Prime', monospace; 
+            font-weight: 700; margin-right: 15px; font-size: 1em;
+        }
+
+        /* Botão Flutuante */
+        .back-to-toc-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            background-color: var(--main-color); color: #fff;
+            padding: 12px 20px; border-radius: 4px; text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            opacity: 0; visibility: hidden; z-index: 999;
+            transition: all 0.3s ease;
+        }
+        .back-to-toc-btn:hover {
+            transform: translateY(-3px); background-color: var(--main-color-hover); color: #fff;
+            box-shadow: 0 6px 20px rgba(186, 2, 74, 0.4);
+        }
+        .back-to-toc-btn.show { opacity: 1; visibility: visible; }
+
+        @media (max-width: 768px) {
+            .toc-box { padding: 25px 20px; }
+            .toc-list a { font-size: 0.95rem; padding: 10px 15px; }
+            .back-to-toc-btn { bottom: 20px; right: 20px; padding: 10px 15px; font-size: 0.8rem; }
+        }
+
+        /* ====================================================================
+           [MÓDULO: VISÃO GERAL]
+           (Usa estilos gerais definidos em [MÓDULO: CONFIGURAÇÕES GERAIS])
+           ==================================================================== */
+
+        /* ====================================================================
+           [MÓDULO: TOPOLOGIA]
+           (Usa estilos gerais + terminal box definidos no Módulo de Configurações)
+           ==================================================================== */
+
+        /* ====================================================================
+           [MÓDULO: COMPOSIÇÃO]
+           ==================================================================== */
+        .diagram-container {
+            display: flex; flex-wrap: wrap; gap: 20px; margin: 40px 0; justify-content: center;
+        }
+        .diagram-box {
+            background: var(--code-bg); border: 1px dashed var(--main-color); border-radius: 8px;
+            padding: 20px; width: 100%; max-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .diagram-box.central { border: 1px solid var(--accent-cyan); background: rgba(38, 246, 246, 0.05); }
+        .diagram-box h4 {
+            color: #fff; font-size: 1.1rem; margin-bottom: 12px; text-align: center;
+            border-bottom: 1px solid var(--border-card); padding-bottom: 8px; font-weight: 600;
+        }
+        .diagram-box ul { list-style-type: none; font-size: 0.85rem; color: var(--text-muted); font-family: 'Courier Prime', monospace;}
+        .diagram-box ul li { margin-bottom: 6px; }
+        .diagram-box ul li strong { color: var(--accent-cyan); }
+
+        /* ====================================================================
+           [MÓDULO: MANAGERS]
+           ==================================================================== */
+        .managers-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; margin-top: 40px;
+        }
+        .manager-card {
+            background: var(--bg-card); border: 1px solid var(--border-card);
+            padding: 30px; border-radius: 8px; transition: all 0.3s ease;
+        }
+        .manager-card:hover {
+            transform: translateY(-5px); box-shadow: 0 10px 20px rgba(186, 2, 74, 0.1); border-color: var(--main-color);
+        }
+        .manager-card h3 { color: var(--main-color); font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; font-weight: 700; }
+        .manager-card h3::before { content: '>'; margin-right: 10px; color: var(--text-main); font-family: 'Courier Prime', monospace; }
+        .manager-card p { font-size: 0.95rem; color: var(--text-muted); font-weight: 300; }
+
+        @media (max-width: 768px) { .managers-grid { grid-template-columns: 1fr; } }
+
+        /* ====================================================================
+           [MÓDULO: EVENT BUS]
+           ==================================================================== */
+        .event-bus-box {
+            background-color: var(--code-bg); padding: 30px; border-radius: 8px; border: 1px solid var(--border-card); margin-top: 30px;
+        }
+        .event-bus-box ul { list-style-type: none; margin-top: 15px; }
+        .event-bus-box li { margin-bottom: 10px; padding-left: 20px; position: relative; font-weight: 300; }
+        .event-bus-box li::before { content: '•'; color: var(--main-color); position: absolute; left: 0; font-weight: bold; }
+
+        /* ====================================================================
+           [MÓDULO: TAGS]
+           ==================================================================== */
+        .tag-table { width: 100%; border-collapse: collapse; margin: 30px 0; font-size: 0.95rem; }
+        .tag-table th, .tag-table td { border: 1px solid var(--border-card); padding: 15px; text-align: left; }
+        .tag-table th { background-color: var(--color-two); color: #fff; font-weight: 600; }
+        .tag-table tr:nth-child(even) { background-color: rgba(84, 0, 69, 0.1); }
+        .tag-table code { font-family: 'Courier Prime', monospace; }
+        
+        @media (max-width: 768px) {
+            .tag-table, .tag-table thead, .tag-table tbody, .tag-table th, .tag-table td, .tag-table tr { display: block; }
+            .tag-table thead tr { position: absolute; top: -9999px; left: -9999px; }
+            .tag-table tr { border: 1px solid var(--border-card); margin-bottom: 15px; }
+            .tag-table td { border: none; border-bottom: 1px solid var(--bg-card); position: relative; padding-left: 50%; font-size: 0.9rem;}
+            .tag-table td:before { position: absolute; top: 15px; left: 15px; width: 40%; padding-right: 10px; white-space: nowrap; font-weight: 600; color: var(--main-color); }
+            .tag-table td:nth-of-type(1):before { content: "Categoria"; }
+            .tag-table td:nth-of-type(2):before { content: "Tag"; }
+            .tag-table td:nth-of-type(3):before { content: "Função"; }
+        }
+
+        /* ====================================================================
+           [MÓDULO: RDAS]
+           ==================================================================== */
+        .rda-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .rda-card {
+            background-color: var(--color-three); border: 1px solid var(--color-two); border-left: 6px solid var(--main-color);
+            padding: 25px; border-radius: 6px;
+        }
+        .rda-card h3 {
+            color: #fff; margin-bottom: 10px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center; font-weight: 600;
+        }
+        .rda-badge {
+            background-color: var(--main-color); color: #fff; font-size: 0.75rem;
+            padding: 4px 10px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .rda-context {
+            font-style: italic; color: #888; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--color-two); font-weight: 300;
+        }
+        .rda-decision { color: var(--text-muted); font-weight: 300;}
+        .rda-decision strong { color: var(--accent-green); font-weight: 600; }
+
+        @media (max-width: 768px) { .rda-card h3 { flex-direction: column; align-items: flex-start; gap: 10px; } }
+
+        /* ====================================================================
+           [MÓDULO: ROADMAP]
+           ==================================================================== */
+        .timeline { position: relative; max-width: 900px; margin: 40px auto; padding: 20px 0; }
+        .timeline::after {
+            content: ''; position: absolute; width: 2px; background: var(--color-two);
+            top: 0; bottom: 0; left: 50%; margin-left: -1px;
+        }
+        .timeline-container { padding: 10px 40px; position: relative; background-color: inherit; width: 50%; }
+        .timeline-container::after {
+            content: ''; position: absolute; width: 16px; height: 16px; right: -8px;
+            background-color: var(--bg-base); border: 4px solid var(--main-color); top: 15px; border-radius: 50%; z-index: 1;
+        }
+        .left { left: 0; }
+        .right { left: 50%; }
+        .right::after { left: -8px; }
+        .timeline-content {
+            padding: 25px 30px; background: var(--bg-card); border: 1px solid var(--border-card);
+            position: relative; border-radius: 8px;
+        }
+        .timeline-content h3 { color: var(--main-color); font-size: 1.15rem; margin-bottom: 12px; font-weight: 700; }
+        .timeline-content ul { list-style-type: none; font-size: 0.9rem; color: var(--text-muted); }
+        .timeline-content ul li { margin-bottom: 8px; position: relative; padding-left: 15px; font-weight: 300;}
+        .timeline-content ul li::before { content: '>'; position: absolute; left:0; color: var(--color-two); font-family: 'Courier Prime', monospace; font-weight: bold;}
+        .timeline-content ul li strong { color: var(--text-main); font-weight: 600;}
+
+        @media (max-width: 768px) {
+            .timeline::after { left: 31px; }
+            .timeline-container { width: 100%; padding-left: 70px; padding-right: 0px; }
+            .timeline-container::after { left: 23px; }
+            .right { left: 0%; }
+        }
+
+        /* ====================================================================
+           [MÓDULO: FOOTER]
+           ==================================================================== */
+        .footer-bottom {
+            background-color: #120c12;
+            padding: 25px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .footer-bottom .container {
+            display: flex; justify-content: center; align-items: center; text-align: center;
+        }
+        .footer_copyright {
+            color: #a0a0a0; font-size: 14px; font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="border-top-gradient"></div>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: HERO]                                                       -->
+    <!-- ==================================================================== -->
+    <section class="hero">
+        <div class="blueprint-grid"></div>
+        <div class="container">
+            <h1>MABe<span>Te</span></h1>
+            
+            <div class="typewriter-wrapper">
+                <span id="typewriter" class="typewriter-text"></span>
+            </div>
+
+            <div class="terminal-box">
+                <p><span class="green">user@poligonalhub:~$</span> ./init_mabete.sh</p>
+                <p><span class="magenta">[LOG]</span> Carregando Topologia de Diretórios...</p>
+                <p><span class="magenta">[LOG]</span> Inicializando Event Bus (AP Style)...</p>
+                <p><span class="magenta">[LOG]</span> Calculando Data Assets (PDA_Lexic)...</p>
+                <p><span class="magenta">[LOG]</span> Cartucho Narrativo Ausente...</p>
+                <p><span class="green">Status:</span> Aguardando Roteirista...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: SUMÁRIO]                                                    -->
+    <!-- ==================================================================== -->
+    <section id="sumario" class="toc-section" style="background-color: var(--color-three);">
+        <div class="container">
+            <div class="toc-box">
+                <h3><span class="cyan">#</span> Índice de Módulos</h3>
+                <div class="toc-list">
+                    <a href="#visao-geral"><span class="toc-num">01.</span> Visão Geral</a>
+                    <a href="#topologia"><span class="toc-num">02.</span> Topologia de Diretórios</a>
+                    <a href="#composicao-estruturas"><span class="toc-num">03.</span> Modelagem por Composição</a>
+                    <a href="#arquitetura"><span class="toc-num">04.</span> Gerenciadores</a>
+                    <a href="#event-bus"><span class="toc-num">05.</span> Barramento Central</a>
+                    <a href="#lexico-tags"><span class="toc-num">06.</span> Léxico de Tags</a>
+                    <a href="#rdas"><span class="toc-num">07.</span> Decisões Arquiteturais (RDAs)</a>
+                    <a href="#roadmap"><span class="toc-num">08.</span> Plano de Desenvolvimento</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: VISÃO GERAL]                                                -->
+    <!-- ==================================================================== -->
+    <section id="visao-geral" style="background-color: var(--bg-base);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-visao', this)">
+                <h2 class="section-title">01. Visão Geral</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-visao" class="section-content">
+                <div class="note-box">
+                    <strong>[!] Documentação de Referência Obrigatória.</strong> Última sincronização: <strong>23/06/2026</strong>.
+                </div>
+
+                <div class="text-content">
+                    <p>A <strong>MABeTe</strong> é uma arquitetura de ficção interativa projetada para a Unreal Engine 5. Ela foi criada para separar o núcleo funcional do motor (Core) da especificação de conteúdo narrativo (Cartucho).</p>
+                    <p>Nascida da necessidade de contornar limitações nativas e abraçar uma topologia de Componentes mediada por um Barramento de Eventos (Event Bus), ela permite um workflow <em>"Drop-and-Play"</em>. Game Designers e Roteiristas expandem o mundo infinitamente, criando dados de forma independente e segura, sem intervir diretamente no código-fonte.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: TOPOLOGIA]                                                  -->
+    <!-- ==================================================================== -->
+    <section id="topologia" style="background-color: var(--color-three);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-topologia', this)">
+                <h2 class="section-title">02. Topologia de Diretórios</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-topologia" class="section-content">
+                <div class="text-content">
+                    <p>A estrutura de diretórios divide claramente o núcleo funcional do motor (<strong>Core</strong>) e a especificação de conteúdo narrativo/geográfico do cenário ativo (<strong>Game/Cartucho</strong>). Essa separação é vital para a operação isolada da engine e indexação via Asset Manager.</p>
+                    
+                    <div class="terminal-box" style="max-width: 100%; font-size: 1rem; line-height: 1.4;">
+<pre>
+<span class="cyan">/Game/MABeTe/</span>
+├── <span class="cyan">Core/</span>                         <span class="comment">← Sistemas do Motor</span>
+│   ├── <span class="cyan">DataAssets/</span>               <span class="comment">← Classes base PDAs</span>
+│   │   ├── PDA_RoomBase.uasset
+│   │   ├── PDA_ItemBase.uasset
+│   │   └── PDA_NPCBase.uasset    <span class="comment">← NPCs independentes</span>
+│   ├── <span class="cyan">Structures/</span>               <span class="comment">← Estruturas globais (F_)</span>
+│   │   ├── F_EntityBase.uasset   <span class="comment">← Base Composition Struct</span>
+│   │   ├── F_Room.uasset
+│   │   ├── F_Item.uasset
+│   │   ├── F_StateUpdate.uasset
+│   │   └── ...
+├── <span class="cyan">Cartuchos/</span>                    <span class="comment">← Área dos Roteiristas</span>
+│   └── <span class="cyan">CartuchoDemo/</span>
+│       ├── <span class="cyan">Rooms/</span>                <span class="comment">← Instâncias de Salas</span>
+│       ├── <span class="cyan">Items/</span>                <span class="comment">← Objetos interativos</span>
+│       └── <span class="cyan">Dialogues/</span>            <span class="comment">← Grafos Narrativos</span>
+</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: COMPOSIÇÃO]                                                 -->
+    <!-- ==================================================================== -->
+    <section id="composicao-estruturas" style="background-color: var(--bg-base);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-composicao', this)">
+                <h2 class="section-title">03. Modelagem por Composição</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-composicao" class="section-content">
+                <div class="text-content">
+                    <p>Para evitar redundância de dados fundamentais (como Nome, Descrição e Chaves de Validação), a MABeTe implementa o padrão de <strong>Struct Composition</strong> (Composição de Estruturas). Em vez de recriar esses campos em salas, itens e NPCs, todos eles contêm internamente uma <code>F_EntityBase</code>.</p>
+                </div>
+
+                <div class="diagram-container">
+                    <div class="diagram-box central">
+                        <h4>F_EntityBase</h4>
+                        <ul>
+                            <li><strong>+ID:</strong> GameplayTag</li>
+                            <li><strong>+Name:</strong> Text</li>
+                            <li><strong>+Description:</strong> Text</li>
+                            <li><strong>+RequiredTag:</strong> GameplayTag</li>
+                            <li><strong>+InvertReq:</strong> Boolean</li>
+                            <li><strong>+LockMessage:</strong> Text</li>
+                            <li><strong>+SFX:</strong> SoftSoundBase</li>
+                        </ul>
+                    </div>
+
+                    <div class="diagram-box">
+                        <h4>F_Room</h4>
+                        <ul>
+                            <li><strong class="cyan">+BaseData:</strong> F_EntityBase</li>
+                            <li><strong>+Exits:</strong> Array&lt;F_Exit&gt;</li>
+                            <li><strong>+Items:</strong> Array&lt;F_Item&gt;</li>
+                        </ul>
+                    </div>
+
+                    <div class="diagram-box">
+                        <h4>F_Item</h4>
+                        <ul>
+                            <li><strong class="cyan">+BaseData:</strong> F_EntityBase</li>
+                            <li><strong>+IsConsumable:</strong> Boolean</li>
+                            <li><strong>+Weight:</strong> Float</li>
+                        </ul>
+                    </div>
+
+                    <div class="diagram-box">
+                        <h4>F_Interactable</h4>
+                        <ul>
+                            <li><strong class="cyan">+BaseData:</strong> F_EntityBase</li>
+                            <li><strong>+IsNPC:</strong> Boolean</li>
+                            <li><strong>+DialogueGraph:</strong> Map</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="text-content">
+                    <p>Essa arquitetura permite que se novos atributos globais precisarem ser adicionados no futuro (como indicador de acessibilidade ou suporte a voz sintetizada), basta alterar a struct raiz <code>F_EntityBase</code> para propagar a mudança automaticamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: MANAGERS]                                                   -->
+    <!-- ==================================================================== -->
+    <section id="arquitetura" style="background-color: var(--color-three);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-managers', this)">
+                <h2 class="section-title">04. Gerenciadores</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-managers" class="section-content">
+                <div class="text-content">
+                    <p>Para contornar a limitação de Subsystems nativos e abraçar uma topologia orientada a componentes, toda a lógica ativa roda localmente em 6 Managers. Eles são instanciados e inicializados no <code>BeginPlay</code> do <code>BP_PlayerController</code>, seguindo o padrão de <em>Dependency Injection</em> e <em>Component Pattern</em>.</p>
+                </div>
+
+                <div class="managers-grid">
+                    <div class="manager-card">
+                        <h3>BPC_NavigationManager</h3>
+                        <p>Responsável pela movimentação espacial e fluxo entre as salas do mundo textual, resolvendo caminhos e verificando cadeados dinâmicos nas saídas (Exits).</p>
+                    </div>
+                    <div class="manager-card">
+                        <h3>BPC_InventoryManager</h3>
+                        <p>Gerencia a bolsa do jogador, regras de posse, verificação de requerimentos e acumulação de Gameplay Tags associadas a itens guardados.</p>
+                    </div>
+                    <div class="manager-card">
+                        <h3>BPC_Parser</h3>
+                        <p>Processamento sintático e tradução do input do jogador em comandos compreensíveis para o motor. Utiliza o Data Asset unificado <code>PDA_Lexic</code> para mapear verbos e sinônimos.</p>
+                    </div>
+                    <div class="manager-card">
+                        <h3>BPC_DialogueManager</h3>
+                        <p>Gestão ativa de grafos narrativos, nós de conversação ramificados e controle de estado em conversas com NPCs.</p>
+                    </div>
+                    <div class="manager-card">
+                        <h3>BPC_AudioManager</h3>
+                        <p>Orquestrador reativo. Escuta atualizações de estado do sistema de eventos e executa crossfades de música atmosférica ou reproduz triggers pontuais de SFX.</p>
+                    </div>
+                    <div class="manager-card">
+                        <h3>BPC_StateManager</h3>
+                        <p>O coração de toda a arquitetura reativa. Ouve os componentes, unifica os dados de estado em memória volátil e faz o broadcast para os painéis de UI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: EVENT BUS]                                                  -->
+    <!-- ==================================================================== -->
+    <section id="event-bus" style="background-color: var(--bg-base);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-eventbus', this)">
+                <h2 class="section-title">05. Barramento Central</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-eventbus" class="section-content">
+                <div class="text-content">
+                    <p>Nenhum Manager conversa de forma <em>hardcoded</em> com sistemas reativos (UI, Áudio, etc). A MABeTe institui uma comunicação totalmente desacoplada.</p>
+                    
+                    <div class="event-bus-box">
+                        <p>Em vez de chamar funções diretas, utilizamos a estrutura global <code>F_StateUpdate</code>. O <code>BPC_StateManager</code> expõe a função de interface <code>PublishEvent(F_StateUpdate)</code>, que encapsula os seguintes dados:</p>
+                        <ul>
+                            <li><strong>Payload Event Tag:</strong> (Gameplay Tag) Define o que aconteceu (ex: <code>Event.Item.Collected</code>).</li>
+                            <li><strong>Instigator:</strong> (Actor opcional) Quem causou o evento no fluxo atual.</li>
+                            <li><strong>Target:</strong> (Object opcional) O alvo do evento (o Item, a Sala ou NPC afetado).</li>
+                            <li><strong>Magnitude:</strong> (Float) Valor numérico auxiliar (ex: quantidade de itens, nível de alteração).</li>
+                        </ul>
+                        <p style="margin-top: 15px;">Sempre que ocorre uma mudança sistêmica, o <code>PublishEvent</code> é chamado. O <code>BPC_StateManager</code> processa a informação, atualiza o Container de Longo Prazo (<code>BP_AGI</code>) e realiza o broadcast para a UI e Áudio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: TAGS]                                                       -->
+    <!-- ==================================================================== -->
+    <section id="lexico-tags" style="background-color: var(--color-three);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-tags', this)">
+                <h2 class="section-title">06. Léxico de Tags</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-tags" class="section-content">
+                <div class="text-content">
+                    <p>Como definido na decisão <strong>RDA-002</strong>, todo o fluxo narrativo e mecânico é mapeado usando a hierarquia rigorosa de Gameplay Tags do motor.</p>
+                    
+                    <table class="tag-table">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Gameplay Tag de Exemplo</th>
+                                <th>Significado / Função</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Estados de Progresso</strong></td>
+                                <td><code>State.Story.Chapter1.Completed</code></td>
+                                <td>Indica que o jogador concluiu o primeiro arco da narrativa.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inventário & Propriedade</strong></td>
+                                <td><code>Inventory.Key.Rusty</code></td>
+                                <td>O jogador possui a chave enferrujada guardada em sua bolsa.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Interações com Mundo</strong></td>
+                                <td><code>Event.Item.Collected</code></td>
+                                <td>Disparado no Event Bus quando qualquer item entra para o inventário.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Filtros Sonoros</strong></td>
+                                <td><code>Audio.Ambient.Spooky</code></td>
+                                <td>Modifica dinamicamente a trilha e os efeitos tocados pelo AudioManager.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: RDAS]                                                       -->
+    <!-- ==================================================================== -->
+    <section id="rdas" style="background-color: var(--bg-base);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-rdas', this)">
+                <h2 class="section-title">07. Decisões Arquiteturais (RDAs)</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-rdas" class="section-content">
+                <div class="text-content">
+                    <p>Para garantir a escalabilidade e evitar Dívida Técnica, toda mudança de paradigma na MABeTe é documentada através de RDAs.</p>
+                </div>
+
+                <div class="rda-grid">
+                    <div class="rda-card">
+                        <h3>RDA-001: GameInstance Subsystem <span class="rda-badge">Core Engine</span></h3>
+                        <div class="rda-context">
+                            <strong>Contexto:</strong> Forçar o projeto final a derivar sua classe principal da engine cria uma dependência rígida, limitando a flexibilidade da equipe.
+                        </div>
+                        <div class="rda-decision">
+                            <strong>Decisão:</strong> Optou-se por isolar todo o núcleo de memória e processamento da MABeTe em um GameInstance Subsystem (AGIS). O motor nasce, opera e morre de forma autônoma e paralela ao ciclo de vida do jogo principal.
+                        </div>
+                    </div>
+
+                    <div class="rda-card">
+                        <h3>RDA-002: Gameplay Tags > Lógicas Booleanas <span class="rda-badge">Data Control</span></h3>
+                        <div class="rda-context">
+                            <strong>Contexto:</strong> Rastreamento narrativo baseado em variáveis literais booleanas gera código espaguete e validações frágeis.
+                        </div>
+                        <div class="rda-decision">
+                            <strong>Decisão:</strong> Abolição total das lógicas booleanas literais para controle de estado. A MABeTe adota exclusivamente o ecossistema hierárquico de <strong>Gameplay Tags</strong>. O código torna-se limpo e focado na verificação de "Cadeados Universais".
+                        </div>
+                    </div>
+
+                    <div class="rda-card">
+                        <h3>RDA-005: Struct Composition e Delta State <span class="rda-badge">Data Modeling</span></h3>
+                        <div class="rda-context">
+                            <strong>Contexto:</strong> Redundância de variáveis espalhadas em dezenas de <em>USTRUCTs</em> independentes dificulta a manutenção em massa.
+                        </div>
+                        <div class="rda-decision">
+                            <strong>Decisão:</strong> Aplicação do padrão de "Composição de Estruturas" (<code>F_EntityBase</code>). Aliado a isso, exige-se um <strong>Delta State Minimalista</strong>: é proibido guardar referências a objetos complexos, serializando apenas modificações pontuais de tags.
+                        </div>
+                    </div>
+
+                    <div class="rda-card">
+                        <h3>RDA-010: Editor Utility Widgets (EUW) <span class="rda-badge">Tooling</span></h3>
+                        <div class="rda-context">
+                            <strong>Contexto:</strong> Preencher estruturas e criar Primary Data Assets manualmente através do painel nativo da Unreal é lento e sujeito a erros.
+                        </div>
+                        <div class="rda-decision">
+                            <strong>Decisão:</strong> Desenvolvimento de um painel visual personalizado usando EUW integrado diretamente no editor Unreal, fornecendo campos validados e preenchimento automático.
+                        </div>
+                    </div>
+
+                    <div class="rda-card">
+                        <h3>RDA-013: Validador Silencioso (Sanity Checker) <span class="rda-badge">Validation</span></h3>
+                        <div class="rda-context">
+                            <strong>Contexto:</strong> Referências órfãs quebram o motor em runtime silenciosamente.
+                        </div>
+                        <div class="rda-decision">
+                            <strong>Decisão:</strong> Criação de um script de validação automática. Ao tentar salvar um Data Asset, o validador inspeciona recursivamente os caminhos de <code>PrimaryAssetId</code>. Se estiver corrompido, a compilação é bloqueada.
+                        </div>
+                    </div>
+
+                    <div class="rda-card">
+                        <h3>RDA-014: Rigidez de Topologia <span class="rda-badge">Asset Management</span></h3>
+                        <div class="rda-context">
+                            <strong>Contexto:</strong> Organização descentralizada quebra a indexação de <em>PrimaryAssetIds</em>.
+                        </div>
+                        <div class="rda-decision">
+                            <strong>Decisão:</strong> Blindagem absoluta da árvore de diretórios raiz do Cartucho. O <em>Asset Manager</em> escaneará única e exclusivamente caminhos especificados.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: ROADMAP]                                                    -->
+    <!-- ==================================================================== -->
+    <section id="roadmap" style="background-color: var(--color-three);">
+        <div class="container">
+            <div class="section-header" onclick="toggleSection('content-roadmap', this)">
+                <h2 class="section-title">08. Plano de Desenvolvimento</h2>
+                <span class="toggle-icon">[-]</span>
+            </div>
+            
+            <div id="content-roadmap" class="section-content">
+                <div class="text-content">
+                    <p>O desenvolvimento e implementação do motor MABeTe é executado através de um cronograma sequencial de entregas críticas (Fases e Hero Cards).</p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-container left">
+                        <div class="timeline-content">
+                            <h3>FASE 1: Fundação & Pipeline de Dados</h3>
+                            <ul>
+                                <li><strong>Hero Card 1:</strong> Configuração do Asset Manager e Rigidez Topológica.</li>
+                                <li><strong>Hero Card 2:</strong> Inicialização do Dicionário Global de Gameplay Tags.</li>
+                                <li><strong>Hero Card 3:</strong> Modelagem das Structs e Classes Base de Data Assets.</li>
+                                <li><strong>Hero Card 4:</strong> Mockup e Instanciação Manual do Cartucho de demonstração.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-container right">
+                        <div class="timeline-content">
+                            <h3>FASE 2: O Cérebro Lógico & Tradutor</h3>
+                            <ul>
+                                <li><strong>Hero Card 1:</strong> Acoplamento do Subsistema Nativo MABeTe (AGIS).</li>
+                                <li><strong>Hero Card 2:</strong> Implementação do Event Bus (PublishEvent).</li>
+                                <li><strong>Hero Card 3:</strong> Construção do BPC_Parser (Tradutor neural de input).</li>
+                                <li><strong>Hero Card 4:</strong> Inicialização da Máquina de Estados e Loop de Input.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- [MÓDULO: FOOTER]                                                     -->
+    <!-- ==================================================================== -->
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="footer_copyright">
+                © <script>document.write(/\d{4}/.exec(Date())[0])</script> Centro Comunitário-Criativo Poligonal.
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante (Retorno Rápido ao Sumário) -->
+    <a href="#sumario" id="btn-back-to-toc" class="back-to-toc-btn" title="Voltar ao Índice">
+        &#8679; Índice
+    </a>
+
+    <!-- ==================================================================== -->
+    <!-- SCRIPTS                                                              -->
+    <!-- ==================================================================== -->
+    <script>
+        // --- 1. Efeito Typewriter (Hero) ---
+        const phrases = [
+            "Motor Arterial Baseado em Texto.",
+            "De Roteirista pra Roteirista.",
+            "Arquitetura Baseada em Objetos para Histórias Baseadas em Dados.",
+            "\"Unreal Engine 5 pra histórias em texto?! Pra quê?!?\" - Dev Médio.",
+            "Escreva a história. Nós cuidamos do resto."
+        ];
+        
+        let currentPhraseIndex = 0;
+        let currentCharIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 50;
+        let erasingSpeed = 30;
+        let delayBetweenPhrases = 2000;
+
+        const typewriterElement = document.getElementById('typewriter');
+
+        function type() {
+            const currentPhrase = phrases[currentPhraseIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentPhrase.substring(0, currentCharIndex - 1);
+                currentCharIndex--;
+            } else {
+                typewriterElement.textContent = currentPhrase.substring(0, currentCharIndex + 1);
+                currentCharIndex++;
+            }
+
+            let timeoutSpeed = isDeleting ? erasingSpeed : typingSpeed;
+
+            if (!isDeleting && currentCharIndex === currentPhrase.length) {
+                timeoutSpeed = delayBetweenPhrases;
+                isDeleting = true;
+            } else if (isDeleting && currentCharIndex === 0) {
+                isDeleting = false;
+                currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                timeoutSpeed = 500;
+            }
+
+            const humanize = !isDeleting ? (Math.random() * 30) : 0;
+            setTimeout(type, timeoutSpeed + humanize);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(type, 1000);
+        });
+
+        // --- 2. Toggle Sections Logic (Acoplar/Desacoplar) ---
+        function toggleSection(contentId, headerElement) {
+            const content = document.getElementById(contentId);
+            const icon = headerElement.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '[-]';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '[+]';
+            }
+        }
+
+        // --- 3. Floating Button Logic (Monitora Scroll do Sumário) ---
+        const backToTocBtn = document.getElementById('btn-back-to-toc');
+        const tocSection = document.getElementById('sumario');
+
+        window.addEventListener('scroll', () => {
+            // Calcula o ponto exato onde o sumário termina na tela
+            const tocBottomOffset = tocSection.offsetTop + tocSection.offsetHeight;
+            
+            // Se o usuário rolou a página além do final do sumário, mostra o botão
+            if (window.scrollY > tocBottomOffset) {
+                backToTocBtn.classList.add('show');
+            } else {
+                backToTocBtn.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
