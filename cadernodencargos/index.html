@@ -418,16 +418,40 @@
       z-index: 6;
     }
 
-    .hero-anim-logo {
+    .hero-logo-wrap {
       will-change: max-width, width, transform;
       width: 90%;
       max-width: 680px;
       height: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.95));
-      display: block;
+      position: relative;
       margin: 0 auto;
+      display: block;
+      filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.95));
       transition: none;
+    }
+
+    .hero-logo-layer {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .hero-logo-color {
+      position: relative;
+      z-index: 2;
+      opacity: 1;
+    }
+
+    .hero-logo-white {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      opacity: 0;
     }
 
     .hero-anim-content {
@@ -461,45 +485,11 @@
       margin-right: auto;
     }
 
-    .hero-tags-stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .intro-credentials {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.65rem;
-      flex-wrap: wrap;
-      margin-bottom: 0.75rem;
-    }
-
-    .cred-pill {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--tinta-suave);
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid var(--regra-forte);
-      padding: 0.35rem 0.85rem;
-      border-radius: var(--r-full);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    .cred-sep {
-      color: var(--ouro-capacete);
-      font-size: 0.8rem;
-      opacity: 0.6;
-    }
-
     .intro-scroll-prompt {
-      margin-top: 0.85rem;
+      position: absolute;
+      bottom: clamp(2rem, 4.5vh, 3.25rem);
+      left: 50%;
+      transform: translateX(-50%);
       display: inline-flex;
       flex-direction: column;
       align-items: center;
@@ -510,32 +500,40 @@
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      transition: transform 0.2s ease, color 0.2s ease;
-      animation: bouncePrompt 2.2s infinite ease-in-out;
+      transition: opacity 0.25s ease, color 0.2s ease;
       cursor: pointer;
+      z-index: 25;
+      padding: 0.5rem 1rem;
+      user-select: none;
     }
 
     .intro-scroll-prompt:hover {
-      transform: translateY(3px);
       color: var(--ouro-hover);
     }
 
+    .intro-scroll-prompt:hover .prompt-arrow {
+      border-color: var(--ouro-hover);
+      background: rgba(255, 178, 1, 0.22);
+    }
+
     .prompt-arrow {
-      width: 34px;
-      height: 34px;
-      border: 1px solid var(--ouro-capacete);
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid var(--ouro-capacete);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.05rem;
-      background: rgba(255, 178, 1, 0.1);
-      box-shadow: 0 2px 10px rgba(255, 178, 1, 0.15);
+      font-size: 1.1rem;
+      background: rgba(255, 178, 1, 0.12);
+      box-shadow: 0 2px 12px rgba(255, 178, 1, 0.2);
+      animation: bounceArrow 2s infinite ease-in-out;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
 
-    @keyframes bouncePrompt {
+    @keyframes bounceArrow {
       0%, 100% { transform: translateY(0); opacity: 0.85; }
-      50% { transform: translateY(8px); opacity: 1; }
+      50% { transform: translateY(6px); opacity: 1; }
     }
 
     /* ==========================================================================
@@ -1084,7 +1082,7 @@
       position: fixed;
       bottom: 1.25rem;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(24px);
       z-index: 95;
       display: flex;
       flex-direction: column;
@@ -1092,6 +1090,9 @@
       gap: 0.45rem;
       pointer-events: none;
       max-width: 96vw;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
     }
 
     .dock-active-banner {
@@ -1858,7 +1859,7 @@
       .hero-sticky {
         padding: 1.5rem 1rem;
       }
-      .hero-anim-logo {
+      .hero-logo-wrap {
         max-width: 340px;
         width: 90%;
       }
@@ -1866,15 +1867,16 @@
         padding: 0.75rem 1rem;
         font-size: 0.72rem;
       }
-      .intro-credentials {
-        gap: 0.35rem;
+      .intro-scroll-prompt {
+        bottom: 1.5rem;
+        font-size: 0.68rem;
+        gap: 0.4rem;
+        padding: 0.35rem 0.75rem;
       }
-      .cred-pill {
-        font-size: 0.62rem;
-        padding: 0.25rem 0.55rem;
-      }
-      .cred-sep {
-        display: none;
+      .prompt-arrow {
+        width: 30px;
+        height: 30px;
+        font-size: 0.95rem;
       }
       .filter-section {
         padding: 0.65rem 0.85rem;
@@ -1907,11 +1909,16 @@
     <header class="hero-sticky" id="heroSticky">
       <canvas id="heroDebrisCanvas" class="hero-debris-canvas"></canvas>
       <div id="heroBlock" class="hero-block">
-        <img src="assets/logo-narrato-white.svg" 
-             id="heroLogo" 
-             alt="NarrATO" 
-             class="hero-anim-logo" 
-             style="max-width: 680px; width: 90%;">
+        <div id="heroLogoWrap" class="hero-logo-wrap" style="max-width: 680px; width: 90%;">
+          <img src="assets/logo-narrato-color.svg" 
+               id="heroLogoColor" 
+               alt="NarrATO" 
+               class="hero-logo-layer hero-logo-color">
+          <img src="assets/logo-narrato-white.svg" 
+               id="heroLogoWhite" 
+               alt="NarrATO" 
+               class="hero-logo-layer hero-logo-white">
+        </div>
 
         <div id="heroText" class="hero-anim-content intro-slogan-box" style="max-height: 0px; margin-top: 0px; opacity: 0;">
           <span class="slogan-line">
@@ -1924,20 +1931,12 @@
           </span>
         </div>
 
-        <div id="heroTags" class="hero-anim-content hero-tags-stage" style="max-height: 0px; margin-top: 0px; opacity: 0;">
-          <div class="intro-credentials">
-            <span class="cred-pill">📐 50 MATÉRIAS &amp; MATERIAIS</span>
-            <span class="cred-sep">•</span>
-            <span class="cred-pill">🏗️ 10 MÓDULOS DE CANTEIRO</span>
-            <span class="cred-sep">•</span>
-            <span class="cred-pill">⚖️ 5 EIXOS DIALÉTICOS</span>
-          </div>
-          <a href="#conteudoPrincipal" class="intro-scroll-prompt" id="introScrollPrompt" onclick="rolarParaConteudo(event)">
-            <span class="prompt-label">ENTRAR NO CANTEIRO</span>
-            <div class="prompt-arrow">↓</div>
-          </a>
-        </div>
       </div>
+
+      <a href="#conteudoPrincipal" class="intro-scroll-prompt" id="introScrollPrompt" onclick="rolarParaConteudo(event)">
+        <span class="prompt-label">ENTRAR NO CANTEIRO</span>
+        <div class="prompt-arrow">↓</div>
+      </a>
     </header>
   </div>
 
@@ -3347,7 +3346,7 @@
   </main>
 
   <!-- DOCK FLUTUANTE INFERIOR - TOOLBELT COM BANNER DINÂMICO E SEM SCROLLBAR (4A) -->
-  <div class="toolbelt-wrapper">
+  <div class="toolbelt-wrapper" id="toolbeltWrapper">
     <div class="dock-active-banner" id="dockActiveBanner">
       <span id="dockActiveIcon">🗺️</span>
       <span id="dockActiveText">Capítulo 1 • A Planta Baixa</span>
@@ -3717,9 +3716,10 @@
       let progress = -rect.top / maxScroll;
       progress = Math.max(0, Math.min(progress, 1)); 
 
-      const logo = document.getElementById('heroLogo');
+      const logoWrap = document.getElementById('heroLogoWrap');
+      const logoColor = document.getElementById('heroLogoColor');
+      const logoWhite = document.getElementById('heroLogoWhite');
       const text = document.getElementById('heroText');
-      const tags = document.getElementById('heroTags');
       const siteHeader = document.getElementById('siteHeader');
 
       const isMobile = window.innerWidth < 768;
@@ -3730,10 +3730,15 @@
 
       // 1. Logo encolhe com o scroll de 680px para 280px (ou proporcional em mobile)
       const logoProgress = Math.min(progress / 0.5, 1);
-      if (logo) {
-        logo.style.maxWidth = `${startMaxW - ((startMaxW - endMaxW) * logoProgress)}px`;
-        logo.style.width = `${startW - ((startW - endW) * logoProgress)}%`;
+      if (logoWrap) {
+        logoWrap.style.maxWidth = `${startMaxW - ((startMaxW - endMaxW) * logoProgress)}px`;
+        logoWrap.style.width = `${startW - ((startW - endW) * logoProgress)}%`;
       }
+
+      // Dissolve suave do colorido para o branco (início colorido -> versão branca)
+      const colorDissolve = Math.min(progress / 0.40, 1);
+      if (logoWhite) logoWhite.style.opacity = `${colorDissolve}`;
+      if (logoColor) logoColor.style.opacity = `${1 - colorDissolve}`;
 
       // 2. Slogan abre gaveta e surge suavemente (max-height, opacity, translateY)
       const textProgress = Math.max(0, Math.min((progress - 0.22) / 0.40, 1));
@@ -3744,21 +3749,36 @@
         text.style.transform = `translateY(${(1 - textProgress) * 22}px)`;
       }
 
-      // 3. Credenciais e botão de rolar revelam na reta final (0.52 a 0.88)
-      const tagsProgress = Math.max(0, Math.min((progress - 0.52) / 0.36, 1));
-      if (tags) {
-        tags.style.maxHeight = `${tagsProgress * 180}px`;
-        tags.style.marginTop = `${tagsProgress * 1.3}rem`;
-        tags.style.opacity = tagsProgress;
-        tags.style.transform = `translateY(${(1 - tagsProgress) * 20}px)`;
+      // 3. Botão de scroll: fade out suave ao aproximar da conclusão da hero
+      const prompt = document.getElementById('introScrollPrompt');
+      if (prompt) {
+        if (progress > 0.8) {
+          const fadeOut = Math.max(0, 1 - (progress - 0.8) / 0.18);
+          prompt.style.opacity = `${fadeOut}`;
+          prompt.style.pointerEvents = fadeOut > 0.1 ? 'auto' : 'none';
+        } else {
+          prompt.style.opacity = '1';
+          prompt.style.pointerEvents = 'auto';
+        }
       }
 
-      // 4. Header docking ao finalizar a saída do track da hero
-      if (siteHeader) {
-        if (scrollY >= track.offsetHeight - 80) {
-          siteHeader.classList.remove('hero-docked');
-        } else {
-          siteHeader.classList.add('hero-docked');
+      // 4. Header & Toolbelt docking ao finalizar a saída do track da hero
+      const toolbeltWrapper = document.getElementById('toolbeltWrapper');
+      if (scrollY >= track.offsetHeight - 80) {
+        if (siteHeader) siteHeader.classList.remove('hero-docked');
+        if (toolbeltWrapper) {
+          toolbeltWrapper.style.opacity = '1';
+          toolbeltWrapper.style.visibility = 'visible';
+          toolbeltWrapper.style.pointerEvents = 'auto';
+          toolbeltWrapper.style.transform = 'translateX(-50%) translateY(0)';
+        }
+      } else {
+        if (siteHeader) siteHeader.classList.add('hero-docked');
+        if (toolbeltWrapper) {
+          toolbeltWrapper.style.opacity = '0';
+          toolbeltWrapper.style.visibility = 'hidden';
+          toolbeltWrapper.style.pointerEvents = 'none';
+          toolbeltWrapper.style.transform = 'translateX(-50%) translateY(24px)';
         }
       }
 
