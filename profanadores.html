@@ -11,9 +11,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --theme-bg: #050505;
+            --theme-surface: rgba(10, 10, 10, 0.5);
+            --theme-border: rgba(212, 175, 55, 0.15);
+            --theme-accent: #D4AF37;
+            --theme-accent-alt: #E74C3C;
+            --theme-text: #ffffff;
+            --theme-text-muted: #b0b0b0;
+            --theme-font-title: 'Playfair Display', serif;
+            --theme-font-body: 'Inter', sans-serif;
+
+            /* Aliases legados */
+            --text-title-gold: var(--theme-accent);
+            --text-body-gray: var(--theme-text-muted);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #050505;
+            background-color: var(--theme-bg);
             background-image: 
                 radial-gradient(circle at top right, rgba(212, 175, 55, 0.04), transparent 40%),
                 radial-gradient(circle at bottom left, rgba(231, 76, 60, 0.03), transparent 50%);
@@ -151,7 +167,10 @@
 </head>
 <body class="text-white">
 
-    <div class="container mx-auto p-4 md:p-8">
+    <!-- Global Hub Bar da Poligonal -->
+    <script src="shared/hub-bar.js"></script>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
 
         <header class="text-center my-24">
             <h1 class="font-title text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-wider title-fire">Profanadores</h1>
@@ -168,35 +187,30 @@
                 </p>
             </section>
 
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="card-bg p-8 rounded-lg baroque-border">
-                    <h3 class="font-title text-3xl mb-6 text-title-gold section-title">Modos de Jogo</h3>
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="font-bold text-xl text-title-gold">Single-Player</h4>
-                            <p class="text-body-gray">O jogador escolhe um dos dois protagonistas, alternando entre eles no hub central para resolver desafios com suas habilidades únicas. Uma jornada focada na exploração metódica e na absorção da narrativa sombria.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-xl text-title-gold">Cooperativo Local</h4>
-                            <p class="text-body-gray">Dois jogadores controlam Benedita e Balthazar simultaneamente. A dificuldade é ajustada para a dupla, incentivando a combinação estratégica de habilidades para um combate dinâmico e recompensador.</p>
-                        </div>
+            <!-- MODOS DE JOGO -->
+            <section class="card-bg p-8 rounded-lg baroque-border">
+                <h3 class="font-title text-2xl md:text-3xl mb-6 text-title-gold section-title">Modos de Jogo</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-xl text-title-gold mb-2">Single-Player</h4>
+                        <p class="text-body-gray leading-relaxed text-sm">O jogador escolhe um dos dois protagonistas, alternando entre eles no hub central para resolver desafios com suas habilidades únicas. Uma jornada focada na exploração metódica e na absorção da narrativa sombria.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl text-title-gold mb-2">Cooperativo Local</h4>
+                        <p class="text-body-gray leading-relaxed text-sm">Dois jogadores controlam Benedita e Balthazar simultaneamente. A dificuldade é ajustada para a dupla, incentivando a combinação estratégica de habilidades para um combate dinâmico e recompensador.</p>
                     </div>
                 </div>
+            </section>
 
-                <div class="card-bg p-8 rounded-lg baroque-border flex flex-col">
-                    <h3 class="font-title text-3xl mb-6 text-title-gold section-title">Público e Plataformas</h3>
-                    <div class="flex-grow grid grid-cols-2 gap-4 items-center">
-                        <div class="text-center border-r border-gray-800 px-2">
-                             <div class="text-6xl mb-2">💀</div>
-                            <p class="text-5xl font-black text-title-gold">16+</p>
-                            <p class="text-lg text-body-gray">Faixa Etária Alvo</p>
-                        </div>
-                        <div class="text-center px-2">
-                            <div class="text-6xl mb-2">💻</div>
-                            <p class="text-2xl font-bold text-title-gold">Plataformas</p>
-                            <p class="text-lg text-body-gray">PC & Web</p>
-                        </div>
-                    </div>
+            <!-- PÚBLICO E PLATAFORMAS -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <div class="card-bg p-6 md:p-8 rounded-lg baroque-border flex flex-col justify-center items-center text-center">
+                    <p class="text-xs md:text-sm uppercase tracking-widest text-[var(--theme-text-muted)] opacity-80 mb-2">Faixa Etária Alvo</p>
+                    <p class="font-title text-5xl md:text-6xl font-black text-title-gold">16+</p>
+                </div>
+                <div class="card-bg p-6 md:p-8 rounded-lg baroque-border flex flex-col justify-center items-center text-center">
+                    <p class="text-xs md:text-sm uppercase tracking-widest text-[var(--theme-text-muted)] opacity-80 mb-2">Plataformas</p>
+                    <p class="font-title text-3xl md:text-4xl font-bold text-white">PC & Web</p>
                 </div>
             </section>
 
@@ -231,33 +245,28 @@
 
         </main>
 
-        <!-- Footer -->
-    <footer class="mt-16 py-8 border-t border-t-gray-800">
-        <div class="container mx-auto px-6 text-center text-gray-400">
-            <a href="http://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-highlight transition-colors">
-                © <script>document.write(/\d{4}/.exec(Date())[0])</script> Centro Comunitário-Criativo Poligonal.
-            </a>
-        </div>
-    </footer>
-
     </div>
 
-    <script>
-        const tooltipTitleCallback = (tooltipItems) => {
-            const item = tooltipItems[0];
-            let label = item.chart.data.labels[item.dataIndex];
-            if (Array.isArray(label)) {
-              return label.join(' ');
-            }
-            return label;
-        };
+    <!-- FOOTER GLOBAL POLIGONAL -->
+    <footer data-poligonal-footer></footer>
+    <script src="shared/hub-footer.js"></script>
 
-        const competitorAnalysisCtx = document.getElementById('competitorAnalysisChart').getContext('2d');
-        new Chart(competitorAnalysisCtx, {
-            type: 'radar',
-            data: {
-                labels: ['Exploração', 'Combate Desafiador', 'Narrativa Ambiental', ['Estética', 'Única'], 'Progressão de Habilidades'],
-                datasets: [
+    <!-- SCRIPT DO GRÁFICO (PRESET COMPARTILHADO) -->
+    <script src="shared/radar-preset.js"></script>
+    <script>
+        createPoligonalRadar({
+            canvasId: 'competitorAnalysisChart',
+            labels: ['Exploração', 'Combate Desafiador', 'Narrativa Ambiental', ['Estética', 'Única'], 'Progressão de Habilidades'],
+            fontFamily: "'Playfair Display', serif",
+            gridColor: 'rgba(212, 175, 55, 0.15)',
+            angleLineColor: 'rgba(212, 175, 55, 0.15)',
+            pointLabelColor: '#d4af37',
+            pointLabelFontSize: 12,
+            legendFontSize: 13,
+            legendPosition: 'top',
+            showTicks: true,
+            tickColor: '#a0a0a0',
+            datasets: [
                 {
                     label: 'Profanadores',
                     data: [8, 7, 9, 10, 8],
@@ -265,90 +274,49 @@
                     borderColor: '#D4AF37',
                     pointBackgroundColor: '#D4AF37',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#D4AF37'
+                    borderWidth: 3
                 },
                 {
                     label: 'Symphony of the Night',
+                    comparison: 'SOTN é nossa grande fundação metroidvania, porém buscamos uma estética local profunda e temas que extrapolam a fantasia gótica tradicional.',
                     data: [10, 6, 7, 9, 10],
                     backgroundColor: 'rgba(231, 76, 60, 0.2)',
                     borderColor: '#E74C3C',
                     pointBackgroundColor: '#E74C3C',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#E74C3C'
+                    borderWidth: 2
                 },
                 {
                     label: 'Hollow Knight',
+                    comparison: 'Compartilhamos a interconexão densa do mapa e a melancolia exploratória de Hollow Knight, mas transmutadas pelo nosso folclore profano.',
                     data: [10, 8, 7, 8, 9],
                     backgroundColor: 'rgba(52, 152, 219, 0.2)',
                     borderColor: '#3498DB',
                     pointBackgroundColor: '#3498DB',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#3498DB'
+                    borderWidth: 2
                 },
                 {
                     label: 'Blasphemous',
+                    comparison: 'Dividimos o mesmo tom de iconografia religiosa brutal, mas nosso ritmo de jogo favorece mais a mobilidade ágil sobre o combate denso.',
                     data: [7, 9, 8, 9, 6],
                     backgroundColor: 'rgba(142, 68, 173, 0.2)',
                     borderColor: '#8E44AD',
                     pointBackgroundColor: '#8E44AD',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#8E44AD'
+                    borderWidth: 2
                 },
-                 {
+                {
                     label: 'Dead Cells',
+                    comparison: 'Enquanto Dead Cells é regido pelo roguelike, nós nos apropriamos da sua fluidez de combate e movimento, mas aplicados em uma aventura metroidvania desenhada a mão.',
                     data: [7, 10, 6, 8, 7],
                     backgroundColor: 'rgba(26, 188, 156, 0.2)',
                     borderColor: '#1ABC9C',
                     pointBackgroundColor: '#1ABC9C',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#1ABC9C'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: { color: 'rgba(156, 163, 175, 0.1)' },
-                        grid: { color: 'rgba(156, 163, 175, 0.1)' },
-                        pointLabels: { 
-                            color: '#a0a0a0',
-                            font: {
-                                size: 12
-                            }
-                        },
-                        ticks: {
-                            color: '#a0a0a0',
-                            backdropColor: 'rgba(0,0,0,0.8)',
-                            stepSize: 2,
-                            font: {
-                                size: 10
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                         labels: {
-                            color: '#d1d5db',
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: tooltipTitleCallback
-                        }
-                    }
+                    borderWidth: 2
                 }
-            }
+            ]
         });
     </script>
 

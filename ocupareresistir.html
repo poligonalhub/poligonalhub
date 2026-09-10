@@ -29,10 +29,21 @@
     
     <style>
         :root {
-            --orange: #FF6127;
-            --green: #006D28;
-            --brown: #281D1A;
-            --beige: #BDB1A5;
+            --theme-bg: #281D1A;
+            --theme-surface: #1a1311;
+            --theme-border: rgba(189, 177, 165, 0.2);
+            --theme-accent: #FF6127;
+            --theme-accent-alt: #006D28;
+            --theme-text: #BDB1A5;
+            --theme-text-muted: rgba(189, 177, 165, 0.7);
+            --theme-font-title: 'Raleway', sans-serif;
+            --theme-font-body: 'Raleway', sans-serif;
+
+            /* Aliases legados */
+            --orange: var(--theme-accent);
+            --green: var(--theme-accent-alt);
+            --brown: var(--theme-bg);
+            --beige: var(--theme-text);
             --red: #EE3137;
         }
 
@@ -60,7 +71,7 @@
         /* --- PADRÕES DE SEÇÃO & TRANSIÇÕES FLUIDAS --- */
         .section-container {
             padding: 5rem 1.5rem;
-            max-width: 1200px;
+            max-width: 1024px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -143,13 +154,20 @@
             position: absolute;
             width: 320px;
             height: 460px;
-            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.65s cubic-bezier(0.25, 1, 0.5, 1);
             backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             top: 50%;
             left: 50%;
             margin-top: -230px;
             margin-left: -160px;
             z-index: 10;
+            transform: translateZ(0);
+            isolation: isolate;
+            will-change: transform;
+            outline: 1px solid transparent;
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            mask-image: radial-gradient(white, black);
         }
 
         .card-visuals {
@@ -160,45 +178,85 @@
             border-radius: 24px;
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
             overflow: hidden; 
-            transition: border-color 0.7s;
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
+            isolation: isolate;
+            outline: 1px solid transparent;
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            mask-image: radial-gradient(white, black);
         }
 
-        .card[data-pos="0"] .card-visuals { border-color: var(--orange); }
+        .card[data-pos="0"] .card-visuals { 
+            border-color: var(--orange); 
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 97, 39, 0.15);
+        }
 
+        /* --- ETIQUETAS LATERAIS ELEGANTES E MINIMALISTAS --- */
         .card-label {
             position: absolute;
             top: 50%;
             writing-mode: vertical-rl;
-            font-weight: 900;
+            text-orientation: mixed;
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.3em;
-            color: var(--beige);
+            font-size: 0.62rem;
+            letter-spacing: 0.18em;
+            color: #F0E6CD;
             opacity: 0;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             pointer-events: none;
-            height: 60%;
-            display: flex;
+            height: auto;
+            max-height: 44%;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            z-index: 50;
+            z-index: 60;
+            background: rgba(14, 10, 8, 0.68);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            padding: 8px 3.5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            line-height: 1;
         }
 
-        .label-left { left: 10px; transform: translateY(-50%) rotate(180deg); }
-        .label-right { right: 10px; transform: translateY(-50%); }
+        .label-left { left: 8px; transform: translateY(-50%) rotate(180deg); }
+        .label-right { right: 8px; transform: translateY(-50%); }
 
-        .card[data-side="right"]:not(.active) .label-right { opacity: 0.5; }
-        .card[data-side="left"]:not(.active) .label-left { opacity: 0.5; }
+        .card[data-side="right"]:not(.active) .label-right { opacity: 0.75; }
+        .card[data-side="left"]:not(.active) .label-left { opacity: 0.75; }
         
         .card:hover:not(.active)[data-side="right"] .label-right,
-        .card:hover:not(.active)[data-side="left"] .label-left { opacity: 1; color: var(--orange); }
+        .card:hover:not(.active)[data-side="left"] .label-left { 
+            opacity: 1; 
+            color: var(--orange); 
+            border-color: rgba(255, 97, 39, 0.45);
+            background: rgba(26, 16, 13, 0.88);
+            box-shadow: 0 0 12px rgba(255, 97, 39, 0.25), 0 2px 12px rgba(0, 0, 0, 0.5);
+            transform: translateY(-50%) scale(1.02);
+        }
+        .card:hover:not(.active)[data-side="left"] .label-left {
+            transform: translateY(-50%) rotate(180deg) scale(1.02);
+        }
 
-        .card.active .card-label { opacity: 0 !important; }
+        .card.active .card-label { opacity: 0 !important; pointer-events: none; }
+
+        /* Contraste e Atenuação das Cartas Laterais */
+        .card:not(.active) .card-content {
+            filter: brightness(0.65) contrast(0.95);
+            transition: filter 0.4s ease;
+        }
+        .card:hover:not(.active) .card-content {
+            filter: brightness(0.85) contrast(1);
+        }
 
         .card-content {
             opacity: 0;
-            transform: scale(0.9);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.95);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             pointer-events: none;
         }
 
@@ -206,20 +264,17 @@
             opacity: 1;
             transform: scale(1);
             pointer-events: auto;
-            transition-delay: 0.1s; 
+            transition-delay: 0.05s; 
         }
 
         /* --- CONTROLE DE VISIBILIDADE DO CONTEÚDO POR TIPO --- */
         .card[data-type="character"] .card-content,
-        .card[data-type="mystery"] .card-content {
+        .card[data-type="mystery"] .card-content,
+        .card[data-type="enemy"] .card-content,
+        .card[data-type="module"] .card-content {
             opacity: 1; 
             transform: scale(1);
             pointer-events: auto;
-        }
-
-        .card[data-type="character"] .card-label,
-        .card[data-type="mystery"] .card-label {
-            display: none !important;
         }
 
         .icon-filter-beige {
@@ -232,6 +287,11 @@
         .card[data-pos="2"] { z-index: 20; transform: translate3d(180px, 0, -40px) rotateY(-35deg); opacity: 0.5; cursor: pointer; }
         .card[data-pos="-1"] { z-index: 30; transform: translate3d(-110px, 0, 60px) rotateY(20deg); cursor: pointer; }
         .card[data-pos="-2"] { z-index: 20; transform: translate3d(-180px, 0, -40px) rotateY(35deg); opacity: 0.5; cursor: pointer; }
+
+        .card:hover:not(.active) {
+            opacity: 0.9;
+            filter: brightness(1.15);
+        }
 
         .deck-dots {
             display: flex;
@@ -252,9 +312,69 @@
 
         .dot.active { opacity: 1; background-color: var(--orange); width: 50px; }
 
+        /* ============================================================== */
+        /* COMPONENTE UNIVERSAL DE REVELAÇÃO (CARD REVEAL TEMPLATE)      */
+        /* ============================================================== */
+        .reveal-showcase, .reveal-details {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .reveal-showcase {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .reveal-details {
+            opacity: 0;
+            transform: translateY(15px);
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        /* Ativação por hover no desktop ou toggle por clique no mobile */
+        .card.active:hover .reveal-showcase,
+        .card.revealed .reveal-showcase {
+            opacity: 0;
+            transform: scale(0.9) translateY(-12px);
+            pointer-events: none;
+        }
+        .card.active:hover .reveal-details,
+        .card.revealed .reveal-details {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Stagger nos elementos de detalhes */
+        .reveal-stagger-1 { transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s; }
+        .reveal-stagger-2 { transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s; }
+        .reveal-stagger-3 { transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.18s; }
+
+        .card:not(.revealed):not(:hover) .reveal-stagger-1,
+        .card:not(.revealed):not(:hover) .reveal-stagger-2,
+        .card:not(.revealed):not(:hover) .reveal-stagger-3 {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .card.active:hover .reveal-stagger-1,
+        .card.revealed .reveal-stagger-1,
+        .card.active:hover .reveal-stagger-2,
+        .card.revealed .reveal-stagger-2,
+        .card.active:hover .reveal-stagger-3,
+        .card.revealed .reveal-stagger-3 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* --- ESTILOS EXCLUSIVOS: NARRATIVA E PERSONAGENS --- */
         .char-bust, .char-full, .char-speech, .char-info, .char-nameplate {
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .char-full, .char-speech, .char-info { 
@@ -264,25 +384,41 @@
         .card:not(.revealed) .char-bust { opacity: 1; transform: scale(1); }
         .card:not(.revealed) .char-nameplate { opacity: 1; transform: translateY(0); }
 
-        .card.revealed .char-bust { opacity: 0; transform: scale(0.9); pointer-events: none; }
-        .card.revealed .char-nameplate { opacity: 0; transform: translateY(10px); pointer-events: none; }
-        .card.revealed .char-full { opacity: 1; transform: translateY(0); }
-        .card.revealed .char-info { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
-        .card.revealed .char-speech { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+        .card.active:hover .char-bust,
+        .card.revealed .char-bust { 
+            opacity: 0; transform: scale(0.9); pointer-events: none; 
+        }
+        .card.active:hover .char-nameplate,
+        .card.revealed .char-nameplate { 
+            opacity: 0; transform: translateY(10px); pointer-events: none; 
+        }
+        .card.active:hover .char-full,
+        .card.revealed .char-full { 
+            opacity: 1; transform: translateY(0); 
+        }
+        .card.active:hover .char-info,
+        .card.revealed .char-info { 
+            opacity: 1; transform: translateY(0); transition-delay: 0.08s; 
+        }
+        .card.active:hover .char-speech,
+        .card.revealed .char-speech { 
+            opacity: 1; transform: translateY(0); transition-delay: 0.16s; 
+        }
 
         .card.active { cursor: pointer; }
 
         /* --- CHART CONTAINER --- */
         .chart-container {
             position: relative;
-            height: 500px;
+            min-height: 480px;
             width: 100%;
             max-width: 800px;
             margin: 2rem auto;
             background-color: rgba(26, 19, 17, 0.8);
             border-radius: 24px;
-            padding: 1rem;
+            padding: 1.5rem;
             border: 1px solid var(--beige);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
         }
     </style>
 </head>
@@ -303,9 +439,15 @@
                     </h3>
                 </div>
 
-                <div id="heroTags" class="flex flex-col gap-3 justify-center items-center w-full text-xs md:text-sm font-bold tracking-wider text-green-400 hero-anim-content" style="max-height: 0px; margin-top: 0px; opacity: 0;">
-                    <span class="bg-green-900/50 px-4 py-2 rounded border border-green-700 shadow-lg text-center">🌿 Selecionado na Trilha Crie Games 2025 | SEBRAE & Playbor 🌿</span>
-                    <span class="bg-green-900/50 px-4 py-2 rounded border border-green-700 shadow-lg text-center">🌿 Selecionado no Grupo de Desenvolvimento 2026 | Centro Cultural Marieta 🌿</span>
+                <div id="heroTags" class="hero-anim-content w-full max-w-2xl mx-auto" style="max-height: 0px; margin-top: 0px; opacity: 0;">
+                    <div class="rounded-xl border border-green-700/60 bg-green-950/60 backdrop-blur-md shadow-xl divide-y divide-green-800/40 overflow-hidden text-center text-xs md:text-sm font-bold tracking-wide text-green-300">
+                        <div class="py-2.5 px-4 transition-colors hover:bg-green-900/30">
+                            🌿 Selecionado na Trilha Crie Games 2025 | SEBRAE & Playbor 🌿
+                        </div>
+                        <div class="py-2.5 px-4 transition-colors hover:bg-green-900/30">
+                            🌿 Selecionado no Grupo de Desenvolvimento 2026 | Centro Cultural Marieta 🌿
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -397,16 +539,10 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="py-8 border-t bg-[#140e0c] relative z-20" style="border-color: rgba(189, 177, 165, 0.2);">
-        <div class="container mx-auto px-6 text-center" style="color: var(--beige);">
-            <p class="mb-2 opacity-80">Quer saber mais? Vamos conversar!</p>
-            <a href="mailto:poligonalhub@gmail.com" class="font-bold text-xl text-orange-500 hover:text-white transition-colors">poligonalhub@gmail.com</a>
-            <a href="http://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="block mt-4 text-lg hover:text-orange-500 transition-colors opacity-80">
-                © <script>document.write(/\d{4}/.exec(Date())[0])</script> Centro Comunitário-Criativo Poligonal.
-            </a>
-        </div>
-    </footer>
+    <!-- Rodapé Global Padronizado da Poligonal -->
+    <footer data-poligonal-footer></footer>
+    <script src="shared/hub-footer.js"></script>
+    <script src="shared/radar-preset.js"></script>
 
     <!-- SCRIPTS -->
     <script>
@@ -498,12 +634,12 @@
                             </div>
                         `;
                         innerContent = `
-                            <img src="${item.bust}" class="char-bust absolute bottom-0 left-0 w-full h-[85%] object-contain z-10 drop-shadow-2xl">
+                            <img src="${item.bust}" class="char-bust absolute bottom-0 left-[5%] w-[90%] h-[85%] object-contain z-10 drop-shadow-2xl">
                             <div class="char-nameplate absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black/80 to-transparent text-center z-30 pt-16 rounded-b-[24px]">
                                 <h4 class="text-3xl font-black uppercase text-[var(--orange)] leading-none tracking-tighter drop-shadow-md">${item.title}</h4>
                             </div>
 
-                            <img src="${item.full}" class="char-full absolute bottom-0 left-0 w-full h-[95%] object-contain z-0 drop-shadow-md">
+                            <img src="${item.full}" class="char-full absolute bottom-0 left-[5%] w-[90%] h-[95%] object-contain z-0 drop-shadow-md">
                             <div class="char-info absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black via-[var(--brown)] to-transparent text-center z-20 pt-16 rounded-b-[24px]">
                                 <h4 class="text-2xl font-black uppercase text-[var(--orange)] mb-1 leading-none tracking-tighter">${item.title}</h4>
                                 <p class="text-[0.65rem] text-orange-300 uppercase tracking-widest font-bold mb-2">${item.role}</p>
@@ -536,11 +672,65 @@
                         `;
                     }
                     else if (item.type === 'enemy') {
+                        usePadding = false;
                         innerContent = `
-                            <img src="${item.image}" class="w-full h-auto object-contain max-h-60 mb-2 rounded drop-shadow-2xl">
-                            <span class="text-[0.65rem] font-black px-3 py-1 rounded mb-4 mt-2 inline-block uppercase tracking-[0.2em]" style="background-color: ${item.tagColor || 'var(--orange)'}; color: var(--brown)">${item.tag}</span>
-                            <h4 class="text-3xl font-black uppercase mb-3 tracking-tighter leading-none" style="color: var(--orange)">${item.title}</h4>
-                            <p class="text-sm leading-relaxed opacity-80 px-2">${item.description}</p>
+                            <!-- 1. CAMADA SHOWCASE: MONSTRO EM DESTAQUE MÁXIMO -->
+                            <div class="reveal-showcase absolute inset-0 flex flex-col items-center justify-center p-3">
+                                <img src="${item.image}" class="w-full h-[76%] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)] transform transition-transform duration-500">
+                                <div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black via-black/85 to-transparent text-center pt-14 rounded-b-[24px]">
+                                    <span class="text-[0.65rem] font-black px-2.5 py-0.5 rounded uppercase tracking-widest inline-block mb-1.5 border border-white/10" style="background-color: ${item.tagColor || 'var(--orange)'}; color: var(--brown)">${item.tag}</span>
+                                    <h4 class="text-3xl font-black uppercase tracking-tighter leading-none" style="color: ${item.tagColor || 'var(--orange)'}">${item.title}</h4>
+                                </div>
+                            </div>
+
+                            <!-- 2. CAMADA REVEAL: DOSSIÊ TÁTICO E DESCRIÇÃO DIVERTIDA -->
+                            <div class="reveal-details absolute inset-0 flex flex-col justify-end p-5 bg-gradient-to-t from-black via-[#16100e]/95 to-transparent rounded-[24px] text-center">
+                                <div class="w-full h-36 flex items-center justify-center mb-2 reveal-stagger-1">
+                                    <img src="${item.image}" class="max-h-full object-contain drop-shadow-xl">
+                                </div>
+                                <div class="reveal-stagger-2 mb-2">
+                                    <span class="text-[0.65rem] font-black px-3 py-1 rounded-full uppercase tracking-widest inline-block shadow-md" style="background-color: ${item.tagColor || 'var(--orange)'}; color: var(--brown)">
+                                        AMEAÇA: ${item.tag}
+                                    </span>
+                                    <h4 class="text-2xl font-black uppercase mt-1 tracking-tighter leading-none" style="color: ${item.tagColor || 'var(--orange)'}">${item.title}</h4>
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-black/70 border border-orange-900/30 text-xs leading-relaxed text-slate-200 reveal-stagger-3 shadow-inner">
+                                    <p class="m-0">${item.description}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    else if (item.type === 'module') {
+                        usePadding = false;
+                        const iconClass = item.invertIcon ? 'icon-filter-beige max-w-[100px]' : 'max-w-[110px]';
+                        const category = item.category || 'Módulo da Ocupação';
+                        innerContent = `
+                            <!-- 1. CAMADA SHOWCASE: ÍCONE ARQUITETÔNICO EM DESTAQUE -->
+                            <div class="reveal-showcase absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                                <div class="w-32 h-32 rounded-full border-2 border-orange-500/20 bg-black/40 flex items-center justify-center mb-10 shadow-[0_0_40px_rgba(255,97,39,0.15)]">
+                                    <img src="${item.icon}" class="${iconClass} object-contain drop-shadow-xl">
+                                </div>
+                                <div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black via-black/85 to-transparent text-center pt-14 rounded-b-[24px]">
+                                    <span class="text-[0.65rem] font-bold text-orange-400 uppercase tracking-widest block mb-1">${category}</span>
+                                    <h4 class="text-2xl font-black uppercase tracking-tight text-white leading-none">${item.title}</h4>
+                                </div>
+                            </div>
+
+                            <!-- 2. CAMADA REVEAL: PLANTA E BENEFÍCIOS OPERACIONAIS -->
+                            <div class="reveal-details absolute inset-0 flex flex-col justify-end p-5 bg-gradient-to-t from-black via-[#16100e]/95 to-transparent rounded-[24px] text-center">
+                                <div class="w-20 h-20 rounded-full border border-orange-500/30 bg-black/60 flex items-center justify-center mx-auto mb-3 reveal-stagger-1 shadow-md">
+                                    <img src="${item.icon}" class="${item.invertIcon ? 'icon-filter-beige max-w-[50px]' : 'max-w-[55px]'} object-contain">
+                                </div>
+                                <div class="reveal-stagger-2 mb-2">
+                                    <span class="text-[0.65rem] font-bold px-2.5 py-0.5 rounded bg-orange-950/80 border border-orange-700/60 text-orange-300 uppercase tracking-wider inline-block mb-1">
+                                        ${category}
+                                    </span>
+                                    <h4 class="text-xl font-black uppercase tracking-tighter" style="color: var(--orange)">${item.title}</h4>
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-black/70 border border-orange-900/30 text-xs leading-relaxed text-slate-200 reveal-stagger-3 shadow-inner">
+                                    <p class="m-0">${item.description}</p>
+                                </div>
+                            </div>
                         `;
                     }
                     else {
@@ -624,9 +814,7 @@
             setIndex(index) {
                 if (this.currentIndex === index) {
                     const activeCard = this.container.children[index];
-                    if (activeCard.getAttribute('data-type') === 'character' || activeCard.getAttribute('data-type') === 'mystery') {
-                        activeCard.classList.toggle('revealed');
-                    }
+                    activeCard.classList.toggle('revealed');
                 } else {
                     this.currentIndex = index;
                     this.update();
@@ -701,9 +889,9 @@
         ];
 
         const modulosData = [
-            { shortTitle: "Paiol", title: "PAIOL", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/paiol.png", invertIcon: true, description: "Painel de Controle para gerenciamento de recursos, missões e Força de Trabalho." },
-            { shortTitle: "Escola", title: "ESCOLA", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/ENFF.png", invertIcon: true, description: "Enciclopédia sobre Agroecologia, Táticas, Inimigos, Movimentos Sociais e seus personagens jogáveis, a História da Ocupação Aratu, O Universo e Tudo Mais." },
-            { shortTitle: "Ateliê", title: "ATELIÊ METALÚRGICO", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/atelie.png", invertIcon: true, description: "Oficina para criar e aprimorar ferramentas, equipamentos e defesas utilizadas por toda Ocupação." }
+            { shortTitle: "Paiol", title: "PAIOL", type: "module", category: "Módulo da Ocupação", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/paiol.png", invertIcon: true, description: "Painel de Controle para gerenciamento de recursos, missões e Força de Trabalho." },
+            { shortTitle: "Escola", title: "ESCOLA", type: "module", category: "Módulo da Ocupação", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/ENFF.png", invertIcon: true, description: "Enciclopédia sobre Agroecologia, Táticas, Inimigos, Movimentos Sociais e seus personagens jogáveis, a História da Ocupação Aratu, O Universo e Tudo Mais." },
+            { shortTitle: "Ateliê", title: "ATELIÊ METALÚRGICO", type: "module", category: "Módulo da Ocupação", icon: "https://raw.githubusercontent.com/poligonalhub/poligonalhub/main/assets/images/aratu/atelie.png", invertIcon: true, description: "Oficina para criar e aprimorar ferramentas, equipamentos e defesas utilizadas por toda Ocupação." }
         ];
 
         const inimigosData = [
@@ -730,93 +918,87 @@
             new OcuparDeck('deck-inimigos', 'dots-inimigos', inimigosData);
             new OcuparDeck('deck-oportunidades', 'dots-oportunidades', oportunidadesData);
 
-            // --- LÓGICA DO GRÁFICO (POSICIONAMENTO) ---
-            const ctx = document.getElementById('correlatosChart');
-            if (ctx) {
-                const isMobile = window.innerWidth < 768;
-                const legendPosition = isMobile ? 'bottom' : 'right';
-                const pointLabelSize = isMobile ? 10 : 14;
-                const legendLabelSize = isMobile ? 12 : 14;
-                
-                let chartLabels = ['Defesa de Torre', 'Narrativa Social', 'Cultivo', 'Estética Original', 'Gameplay Ágil'];
-                if (isMobile) { chartLabels = ['Defesa', 'Narrativa', 'Cultivo', 'Estética', 'Gameplay']; }
+            // --- LÓGICA DO GRÁFICO (POSICIONAMENTO VIA PRESET COMPARTILHADO) ---
+            const isMobile = window.innerWidth < 768;
+            const chartLabels = isMobile 
+                ? ['Defesa', 'Narrativa', 'Cultivo', 'Estética', 'Gameplay']
+                : ['Defesa de Torre', 'Narrativa Social', 'Cultivo', 'Estética Original', 'Gameplay Ágil'];
 
-                new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [
-                            {
-                                label: 'Ocupar e Resistir', data: [7, 9, 7, 10, 8],
-                                borderWidth: 4, pointRadius: 6, pointHoverRadius: 8,
-                                backgroundColor: 'rgba(255, 97, 39, 0.4)', borderColor: '#FF6127',
-                                pointBackgroundColor: '#FF6127', pointBorderColor: '#fff'
-                            },
-                            {
-                                label: 'Orcs Must Die', data: [10, 3, 2, 5, 7],
-                                borderWidth: 2, pointRadius: 4,
-                                backgroundColor: 'rgba(133, 153, 0, 0.4)', borderColor: '#859900',
-                                pointBackgroundColor: '#859900', pointBorderColor: '#fff'
-                            },
-                            {
-                                label: 'Stardew Valley', data: [2, 6, 10, 7, 6],
-                                borderWidth: 2, pointRadius: 4,
-                                backgroundColor: 'rgba(38, 139, 210, 0.4)', borderColor: '#268bd2',
-                                pointBackgroundColor: '#268bd2', pointBorderColor: '#fff'
-                            },
-                            {
-                                label: 'Atomicrops', data: [6, 2, 8, 9, 10],
-                                borderWidth: 2, pointRadius: 4,
-                                backgroundColor: 'rgba(108, 113, 196, 0.4)', borderColor: '#6c71c4',
-                                pointBackgroundColor: '#6c71c4', pointBorderColor: '#fff'
-                            },
-                            {
-                                label: 'Tonight We Riot', data: [6, 8, 1, 8, 8],
-                                borderWidth: 2, pointRadius: 4,
-                                backgroundColor: 'rgba(211, 54, 130, 0.4)', borderColor: '#d33682',
-                                pointBackgroundColor: '#d33682', pointBorderColor: '#fff'
-                            },
-                            {
-                                label: 'Punhos de Repúdio', data: [1, 10, 1, 9, 9],
-                                borderWidth: 2, pointRadius: 4,
-                                backgroundColor: 'rgba(181, 137, 0, 0.4)', borderColor: '#b58900',
-                                pointBackgroundColor: '#b58900', pointBorderColor: '#fff'
-                            }
-                        ]
+            createPoligonalRadar({
+                canvasId: 'correlatosChart',
+                labels: chartLabels,
+                fontFamily: "'Raleway', sans-serif",
+                gridColor: 'rgba(189, 177, 165, 0.2)',
+                angleLineColor: 'rgba(189, 177, 165, 0.2)',
+                pointLabelColor: '#BDB1A5',
+                pointLabelFontSize: isMobile ? 11 : 13,
+                legendFontSize: isMobile ? 12 : 13,
+                legendPosition: 'bottom',
+                showTicks: true,
+                tickColor: '#BDB1A5',
+                datasets: [
+                    {
+                        label: 'Ocupar e Resistir',
+                        data: [7, 9, 7, 10, 8],
+                        borderWidth: 4,
+                        pointRadius: 6,
+                        backgroundColor: 'rgba(255, 97, 39, 0.4)',
+                        borderColor: '#FF6127',
+                        pointBackgroundColor: '#FF6127',
+                        pointBorderColor: '#fff'
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 1500, easing: 'easeInOutQuart' },
-                        scales: {
-                            r: {
-                                angleLines: { color: 'rgba(189, 177, 165, 0.2)' },
-                                grid: { color: 'rgba(189, 177, 165, 0.2)' },
-                                pointLabels: {
-                                    color: '#BDB1A5',
-                                    font: { family: "'Raleway', sans-serif", size: pointLabelSize, weight: 'bold' }
-                                },
-                                ticks: {
-                                    color: '#BDB1A5',
-                                    backdropColor: 'transparent',
-                                    stepSize: 2, min: 0, max: 10
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: legendPosition,
-                                labels: {
-                                    color: '#BDB1A5',
-                                    font: { family: "'Raleway', sans-serif", size: legendLabelSize, weight: 'bold' },
-                                    padding: 20, usePointStyle: true, boxWidth: 15
-                                }
-                            }
-                        }
+                    {
+                        label: 'Orcs Must Die',
+                        data: [10, 3, 2, 5, 7],
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        backgroundColor: 'rgba(133, 153, 0, 0.4)',
+                        borderColor: '#859900',
+                        pointBackgroundColor: '#859900',
+                        pointBorderColor: '#fff'
+                    },
+                    {
+                        label: 'Stardew Valley',
+                        data: [2, 6, 10, 7, 6],
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        backgroundColor: 'rgba(38, 139, 210, 0.4)',
+                        borderColor: '#268bd2',
+                        pointBackgroundColor: '#268bd2',
+                        pointBorderColor: '#fff'
+                    },
+                    {
+                        label: 'Atomicrops',
+                        data: [6, 2, 8, 9, 10],
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        backgroundColor: 'rgba(108, 113, 196, 0.4)',
+                        borderColor: '#6c71c4',
+                        pointBackgroundColor: '#6c71c4',
+                        pointBorderColor: '#fff'
+                    },
+                    {
+                        label: 'Tonight We Riot',
+                        data: [6, 8, 1, 8, 8],
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        backgroundColor: 'rgba(211, 54, 130, 0.4)',
+                        borderColor: '#d33682',
+                        pointBackgroundColor: '#d33682',
+                        pointBorderColor: '#fff'
+                    },
+                    {
+                        label: 'Punhos de Repúdio',
+                        data: [1, 10, 1, 9, 9],
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        backgroundColor: 'rgba(181, 137, 0, 0.4)',
+                        borderColor: '#b58900',
+                        pointBackgroundColor: '#b58900',
+                        pointBorderColor: '#fff'
                     }
-                });
-            }
+                ]
+            });
         };
     </script>
 </body>

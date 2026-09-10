@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #141416;
+    color: #FAF0E6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 40px;
+  }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .chapter-facade {
+    background: #1C1B1E;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 6px solid #8B1E17;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    min-height: 84px;
+    display: flex;
+    align-items: center;
+  }
+
+  .facade-body {
+    padding: 1.15rem 1.65rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 3;
+    width: 100%;
+  }
+
+  .facade-identity {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+  }
+  .facade-emblem {
+    font-size: 2rem;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #242327;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .facade-titles h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #FAF0E6;
+  }
+  .facade-sub {
+    font-size: 0.84rem;
+    color: #8E8D92;
+    margin-top: 2px;
+  }
+
+  /* WRAPPING TAPE CONTAINER (Right corner wrap) */
+  .facade-corner-wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 260px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .tape-strip {
+    position: absolute;
+    object-fit: cover;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+    opacity: 0.96;
+  }
+
+  /* Combo 1: Faixa diagonal simples no canto superior direito */
+  .c1 .t1 {
+    width: 280px;
+    height: 28px;
+    right: -40px;
+    top: 28px;
+    transform: rotate(28deg);
+  }
+  .c1 .t2 {
+    width: 260px;
+    height: 22px;
+    right: -20px;
+    top: 4px;
+    transform: rotate(28deg);
+    opacity: 0.85;
+  }
+
+  /* Combo 2: X cruzado no canto direito */
+  .c2 .t1 {
+    width: 260px;
+    height: 28px;
+    right: -20px;
+    top: 28px;
+    transform: rotate(25deg);
+  }
+  .c2 .t2 {
+    width: 260px;
+    height: 28px;
+    right: -20px;
+    top: 28px;
+    transform: rotate(-25deg);
+  }
+
+  /* Combo 3: Fita NarrATO dominante com inclinação negativa cortando a borda */
+  .c3 .t1 {
+    width: 320px;
+    height: 32px;
+    right: -50px;
+    top: 26px;
+    transform: rotate(-22deg);
+  }
+  .c3 .t2 {
+    width: 240px;
+    height: 20px;
+    right: -10px;
+    bottom: -5px;
+    transform: rotate(-22deg);
+    opacity: 0.75;
+  }
+
+  /* Combo 4: Dupla paralela cortando a ponta */
+  .c4 .t1 {
+    width: 280px;
+    height: 24px;
+    right: -30px;
+    top: 15px;
+    transform: rotate(32deg);
+  }
+  .c4 .t2 {
+    width: 300px;
+    height: 30px;
+    right: -40px;
+    top: 45px;
+    transform: rotate(32deg);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 style="font-size: 1.2rem; margin-bottom: 10px; color: #888;">Teste de Fitas Envolvendo o Container do Capítulo</h1>
+
+    <div class="chapter-facade c1">
+      <div class="facade-body">
+        <div class="facade-identity">
+          <div class="facade-emblem">🗺️</div>
+          <div class="facade-titles">
+            <h2>Capítulo 1 • A Planta Baixa</h2>
+            <div class="facade-sub">Introdução & Fundamentos</div>
+          </div>
+        </div>
+      </div>
+      <div class="facade-corner-wrap">
+        <img src="assets/fita-zebrada1.svg" class="tape-strip t2">
+        <img src="assets/fita-zebrada3.svg" class="tape-strip t1">
+      </div>
+    </div>
+
+    <div class="chapter-facade c2">
+      <div class="facade-body">
+        <div class="facade-identity">
+          <div class="facade-emblem">🔌</div>
+          <div class="facade-titles">
+            <h2>Capítulo 2 • Personagens / Fiação</h2>
+            <div class="facade-sub">Arcos Dramáticos & Eletricidade</div>
+          </div>
+        </div>
+      </div>
+      <div class="facade-corner-wrap">
+        <img src="assets/fita-zebrada2.svg" class="tape-strip t1">
+        <img src="assets/fita-zebrada3.svg" class="tape-strip t2">
+      </div>
+    </div>
+
+    <div class="chapter-facade c3">
+      <div class="facade-body">
+        <div class="facade-identity">
+          <div class="facade-emblem">🏠</div>
+          <div class="facade-titles">
+            <h2>Capítulo 3 • Tom, Tema & Gênero / Fachada</h2>
+            <div class="facade-sub">Tonalidade, Contratos & Molduras</div>
+          </div>
+        </div>
+      </div>
+      <div class="facade-corner-wrap">
+        <img src="assets/fita-zebrada3.svg" class="tape-strip t1">
+        <img src="assets/fita-zebrada1.svg" class="tape-strip t2">
+      </div>
+    </div>
+
+    <div class="chapter-facade c4">
+      <div class="facade-body">
+        <div class="facade-identity">
+          <div class="facade-emblem">🧱</div>
+          <div class="facade-titles">
+            <h2>Capítulo 4 • Enredo = Plot / Alvenaria</h2>
+            <div class="facade-sub">Arquitetura do Enredo & Sustentação</div>
+          </div>
+        </div>
+      </div>
+      <div class="facade-corner-wrap">
+        <img src="assets/fita-zebrada1.svg" class="tape-strip t1">
+        <img src="assets/fita-zebrada3.svg" class="tape-strip t2">
+      </div>
+    </div>
+  </div>
+</body>
+</html>

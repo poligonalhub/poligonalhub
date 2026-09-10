@@ -10,18 +10,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos baseados no Brandbook Duminguz */
+        /* Estilos baseados no Brandbook Duminguz com Tokens Semânticos Unificados */
         :root {
-            --bg-color: #0F0E12;
-            --text-primary: #F0E6CD;
-            --text-secondary: #a7a299;
-            --accent-red: #872819;
+            --theme-bg: #0F0E12;
+            --theme-surface: rgba(21, 20, 24, 0.5);
+            --theme-border: #155767;
+            --theme-accent: #872819;
+            --theme-accent-alt: #00EAFF;
+            --theme-text: #F0E6CD;
+            --theme-text-muted: #a7a299;
+            --theme-font-title: 'Montserrat', sans-serif;
+            --theme-font-body: 'Space Mono', monospace;
+
+            /* Aliases legados */
+            --bg-color: var(--theme-bg);
+            --text-primary: var(--theme-text);
+            --text-secondary: var(--theme-text-muted);
+            --accent-red: var(--theme-accent);
             --accent-brown: #B7633E;
-            --accent-blue: #155767;
+            --accent-blue: var(--theme-border);
             --accent-purple: #8900A5;
-            --accent-cyan: #00EAFF;
-            --font-header: 'Montserrat', sans-serif;
-            --font-body: 'Space Mono', monospace;
+            --accent-cyan: var(--theme-accent-alt);
+            --font-header: var(--theme-font-title);
+            --font-body: var(--theme-font-body);
         }
 
         body {
@@ -87,6 +98,9 @@
 </head>
 <body class="antialiased">
 
+    <!-- Global Hub Bar da Poligonal -->
+    <script src="shared/hub-bar.js"></script>
+
     <div class="container mx-auto p-4 md:p-8 max-w-5xl">
 
         <header class="text-center my-16 md:my-24">
@@ -111,19 +125,15 @@
                 </p>
             </section>
 
-            <section class="card-bg p-8 rounded-lg">
-                <h3 class="font-header text-3xl mb-6 section-title" style="color: var(--text-primary);">Público e Plataformas</h3>
-                <div class="grid grid-cols-2 gap-4 items-center text-center">
-                    <div>
-                        <span class="text-6xl" role="img" aria-label="crânio">💀</span>
-                        <p class="text-5xl font-black mt-2" style="color: var(--accent-cyan);">16+</p>
-                        <p class="text-lg" style="color: var(--text-secondary);">Classificação</p>
-                    </div>
-                    <div>
-                        <span class="text-6xl" role="img" aria-label="computador">💻</span>
-                        <p class="text-5xl font-bold mt-2" style="color: var(--accent-cyan);">PC</p>
-                        <p class="text-lg" style="color: var(--text-secondary);">Plataforma</p>
-                    </div>
+            <!-- PÚBLICO E PLATAFORMAS -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <div class="card-bg p-6 md:p-8 rounded-lg flex flex-col justify-center items-center text-center">
+                    <p class="font-body text-xs md:text-sm uppercase tracking-widest text-[var(--theme-text-muted)] opacity-80 mb-2">Classificação Indicativa</p>
+                    <p class="font-header text-5xl md:text-6xl font-black text-[var(--theme-accent-alt)]">16+</p>
+                </div>
+                <div class="card-bg p-6 md:p-8 rounded-lg flex flex-col justify-center items-center text-center">
+                    <p class="font-body text-xs md:text-sm uppercase tracking-widest text-[var(--theme-text-muted)] opacity-80 mb-2">Plataforma Principal</p>
+                    <p class="font-header text-4xl md:text-5xl font-bold text-[var(--theme-text)]">PC (Steam / Epic)</p>
                 </div>
             </section>
 
@@ -160,107 +170,78 @@
 
         </main>
 
-        <!-- Footer -->
-    <footer class="mt-16 py-8 border-t border-t-gray-800">
-        <div class="container mx-auto px-6 text-center text-gray-400">
-            <a href="http://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-highlight transition-colors">
-                © <script>document.write(/\d{4}/.exec(Date())[0])</script> Centro Comunitário-Criativo Poligonal.
-            </a>
-        </div>
-    </footer>
-
     </div>
 
+    <!-- FOOTER GLOBAL POLIGONAL -->
+    <footer data-poligonal-footer></footer>
+    <script src="shared/hub-footer.js"></script>
+
+    <!-- SCRIPT DO GRÁFICO (PRESET COMPARTILHADO) -->
+    <script src="shared/radar-preset.js"></script>
     <script>
-        const ctx = document.getElementById('correlatosChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: [
-                    'Combate 3ª Pessoa', 
-                    'Narrativa Onírica', 
-                    ['Estética', 'Única'], 
-                    'Estrutura Roguelike', 
-                    'Level Design Procedural'
-                ],
-                datasets: [{
+        createPoligonalRadar({
+            canvasId: 'correlatosChart',
+            labels: [
+                'Combate 3ª Pessoa', 
+                'Narrativa Onírica', 
+                ['Estética', 'Única'], 
+                'Estrutura Roguelike', 
+                'Level Design Procedural'
+            ],
+            fontFamily: "'Space Mono', monospace",
+            gridColor: 'rgba(240, 230, 205, 0.2)',
+            angleLineColor: 'rgba(240, 230, 205, 0.2)',
+            pointLabelColor: '#F0E6CD',
+            pointLabelFontSize: 12,
+            legendFontSize: 14,
+            legendPosition: 'top',
+            showTicks: true,
+            tickColor: '#F0E6CD',
+            datasets: [
+                {
                     label: 'Carcarah!',
                     data: [8, 9, 10, 9, 8],
                     backgroundColor: 'rgba(0, 234, 255, 0.35)',
                     borderColor: 'rgba(0, 234, 255, 1)',
                     pointBackgroundColor: 'rgba(0, 234, 255, 1)',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(0, 234, 255, 1)',
                     borderWidth: 4,
-                    pointRadius: 6,
-                    pointHoverRadius: 9,
-                }, {
+                    pointRadius: 6
+                },
+                {
                     label: 'Returnal',
+                    comparison: 'A estrutura de repetição procedural e a narrativa fragmentada de Returnal foram guias vitais para a nossa visão cíclica e punitiva.',
                     data: [9, 7, 7, 10, 10],
                     backgroundColor: 'rgba(137, 0, 165, 0.2)',
                     borderColor: 'rgba(137, 0, 165, 1)',
                     pointBackgroundColor: 'rgba(137, 0, 165, 1)',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(137, 0, 165, 1)'
-                }, {
+                    borderWidth: 2,
+                    pointRadius: 4
+                },
+                {
                     label: 'Hellblade',
+                    comparison: 'Assim como Hellblade, a nossa representação do sertão é totalmente mediada pelo delírio, paranóia e um profundo tormento psicológico.',
                     data: [9, 10, 8, 2, 1],
                     backgroundColor: 'rgba(135, 40, 25, 0.2)',
                     borderColor: 'rgba(135, 40, 25, 1)',
                     pointBackgroundColor: 'rgba(135, 40, 25, 1)',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(135, 40, 25, 1)'
-                }, {
+                    borderWidth: 2,
+                    pointRadius: 4
+                },
+                {
                     label: 'Hyper Light Drifter',
+                    comparison: 'Buscamos o mesmo sentimento de isolamento melancólico e a mesma abordagem narrativa puramente audiovisual sem palavras diretas.',
                     data: [6, 8, 9, 4, 3],
                     backgroundColor: 'rgba(183, 99, 62, 0.2)',
                     borderColor: 'rgba(183, 99, 62, 1)',
                     pointBackgroundColor: 'rgba(183, 99, 62, 1)',
                     pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(183, 99, 62, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: { color: 'rgba(240, 230, 205, 0.2)' },
-                        grid: { color: 'rgba(240, 230, 205, 0.2)' },
-                        pointLabels: {
-                            color: '#F0E6CD',
-                            font: { family: "'Space Mono', monospace", size: 12 }
-                        },
-                        ticks: {
-                            color: '#F0E6CD',
-                            backdropColor: 'rgba(15, 14, 18, 0.7)',
-                            stepSize: 2
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#F0E6CD',
-                            font: { family: "'Montserrat', sans-serif", size: 14 }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: (tooltipItems) => {
-                                const item = tooltipItems[0];
-                                let label = item.chart.data.labels[item.dataIndex];
-                                return Array.isArray(label) ? label.join(' ') : label;
-                            }
-                        }
-                    }
+                    borderWidth: 2,
+                    pointRadius: 4
                 }
-            }
+            ]
         });
     </script>
 

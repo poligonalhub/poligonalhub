@@ -1,0 +1,140 @@
+/**
+ * Poligonal Hub - Footer Base Layout & Design Tokens
+ * Layout semântico unificado com suporte a personalização estética por página.
+ * Suporta herança via variáveis CSS (--theme-accent, --theme-border, --theme-font, etc.)
+ */
+
+:root {
+  --footer-max-width: 1024px;
+  --footer-accent: var(--theme-accent, #FF6127);
+  --footer-bg: var(--theme-surface, transparent);
+  --footer-border: var(--theme-border, rgba(255, 255, 255, 0.08));
+  --footer-text: var(--theme-text-muted, #94a3b8);
+  --footer-text-heading: var(--theme-text, #f8fafc);
+  --footer-font: var(--theme-font, var(--theme-font-body, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif));
+  --footer-font-heading: var(--theme-font-heading, var(--theme-font-title, inherit));
+}
+
+.poligonal-footer {
+  width: 100%;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+  font-family: var(--footer-font);
+  color: var(--footer-text);
+  box-sizing: border-box;
+}
+
+.poligonal-footer-container {
+  max-width: var(--footer-max-width);
+  margin: 0 auto;
+  padding: 4rem 1.5rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.poligonal-footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2.5rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--footer-border);
+}
+
+.poligonal-footer-brand-col {
+  max-width: 450px;
+  flex: 1 1 300px;
+}
+
+.poligonal-footer-title {
+  font-family: var(--footer-font-heading);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--footer-text-heading);
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.poligonal-footer-desc {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+  color: var(--footer-text);
+  opacity: 0.85;
+}
+
+.poligonal-footer-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--footer-accent) !important;
+  text-decoration: none;
+  transition: color 0.2s ease, filter 0.2s ease;
+}
+
+.poligonal-footer-email:hover {
+  filter: brightness(1.25);
+  text-decoration: underline;
+}
+
+.poligonal-footer-links-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+
+.poligonal-footer-col {
+  min-width: 120px;
+}
+
+.poligonal-footer-heading {
+  font-family: var(--footer-font-heading);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--footer-text-heading);
+  margin: 0 0 1rem 0;
+}
+
+.poligonal-footer-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.poligonal-footer-nav li a {
+  font-size: 0.875rem;
+  color: var(--footer-text);
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.poligonal-footer-nav li a:hover {
+  color: var(--footer-accent) !important;
+  transform: translateX(2px);
+}
+
+.poligonal-footer-nav li a.poligonal-footer-accent {
+  color: var(--footer-accent) !important;
+  font-weight: 700;
+}
+
+.poligonal-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 2rem;
+  font-size: 0.8125rem;
+  color: var(--footer-text);
+  opacity: 0.75;
+}
