@@ -15,7 +15,6 @@ poligonalhub/
 ├── contato.html                   # Canal de contato direto e parcerias
 │
 ├── shared/                        # Componentes globais compartilhados
-│   ├── hub-bar.js                 # Barra de navegação universal superior injetável
 │   ├── hub-footer.js              # Loader de include dinâmico e Web Component do rodapé
 │   ├── footer.html                # Include HTML semântico estático do rodapé institucional
 │   ├── footer.css                 # Layout base e design tokens do rodapé (variáveis CSS)
@@ -43,17 +42,16 @@ poligonalhub/
 
 ## 📐 Padrão Arquitetural para Páginas de Projetos
 
-Todas as páginas de projetos e GDDs seguem a **Estrutura Unificada em 9 Blocos**:
+Todas as páginas de projetos e GDDs seguem a **Estrutura Unificada em 8 Blocos**:
 
-1. **Hub Bar Superior (`shared/hub-bar.js`)**: Breadcrumb, link para o Hub e menu de acesso rápido a todos os projetos.
-2. **Hero / Pitch**: Logline de impacto, título, gênero e badges de classificação/plataforma.
-3. **Visão Geral**: Sinopse narrativa e premissa central.
-4. **Características & Loop**: Sistemas mecânicos principais e dinâmicas de jogo.
-5. **Diferenciais de Mercado (USPs)**: 3 a 4 cartões com os pilares exclusivos.
-6. **Módulos / Roster / Universo**: Deep dive visual (galeria de personagens, cards 3D ou abas).
-7. **Posicionamento de Mercado**: Radar Chart padronizado comparando com referências do gênero.
-8. **Ficha Técnica & Parcerias**: Engine, escopo, plataformas e call-to-action.
-9. **Footer Institucional (`shared/footer.html` / `shared/hub-footer.js`)**: Rodapé unificado como include, com layout semântico e dados institucionais idênticos, permitindo que cada página resolva sua própria estética via design tokens CSS.
+1. **Hero / Pitch**: Logline de impacto, título, gênero e badges de classificação/plataforma.
+2. **Visão Geral**: Sinopse narrativa e premissa central.
+3. **Características & Loop**: Sistemas mecânicos principais e dinâmicas de jogo.
+4. **Diferenciais de Mercado (USPs)**: 3 a 4 cartões com os pilares exclusivos.
+5. **Módulos / Roster / Universo**: Deep dive visual (galeria de personagens, cards 3D ou abas).
+6. **Posicionamento de Mercado**: Radar Chart padronizado comparando com referências do gênero.
+7. **Ficha Técnica & Parcerias**: Engine, escopo, plataformas e call-to-action.
+8. **Footer Institucional (`shared/footer.html` / `shared/hub-footer.js`)**: Rodapé unificado como include, com layout semântico e dados institucionais idênticos, permitindo que cada página resolva sua própria estética via design tokens CSS.
 
 ### Como usar o Rodapé Unificado (Include):
 
@@ -99,20 +97,12 @@ O rodapé herda automaticamente as variáveis do tema da página ou aceita perso
 ### Como adicionar um novo projeto ao Hub:
 
 1. Crie uma pasta para o projeto com seu `index.html` (ex: `meuprojeto/index.html`).
-2. No `<head>`, defina o nome do projeto para a Hub Bar:
-   ```html
-   <meta name="poligonal-project-name" content="Meu Projeto">
-   ```
-3. Logo após a abertura da tag `<body>`, inclua a Hub Bar:
-   ```html
-   <script src="../shared/hub-bar.js"></script>
-   ```
-4. No final do `<body>`, adicione a ancoragem do rodapé:
+2. No final do `<body>`, adicione a ancoragem do rodapé unificado:
    ```html
    <footer data-poligonal-footer></footer>
    <script src="../shared/hub-footer.js"></script>
    ```
-5. Registre o novo projeto na lista `PROJECTS` em `shared/hub-bar.js` e no grid do `index.html`.
+3. Registre o novo projeto no grid do `index.html` (caso seja público).
 
 ---
 
