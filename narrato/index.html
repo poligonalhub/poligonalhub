@@ -316,9 +316,11 @@
       transition: opacity 0.2s ease;
     }
 
+    .site-header.docked .brand-group,
     .brand-group.visible {
-      opacity: 1;
-      pointer-events: auto;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      cursor: pointer;
     }
 
     .brand-logo {
@@ -2219,7 +2221,7 @@
   <header class="site-header hero-docked" id="siteHeader">
     <div class="hazard-stripe"></div>
     <div class="header-inner">
-      <a href="#" class="brand-group" id="headerBrandGroup" title="NarrATO — Cimento, tijolos e vigas de aço para construtores de histórias!">
+      <a href="#heroTrack" class="brand-group" id="headerBrandGroup" onclick="rolarParaTopo(event)" title="NarrATO — Início do Canteiro" aria-label="Voltar ao início da página">
         <img src="assets/logo-narrato-white.svg" id="brandLogo" alt="NarrATO" class="brand-logo">
         <div class="header-slogan-badge" id="headerSloganBadge">
           <span class="slogan-line">
@@ -3675,7 +3677,7 @@
         <span class="dock-tooltip">Cap. 10: Laboratório / Mãos à massa</span>
       </a>
       <div class="dock-divider"></div>
-      <a href="#" class="dock-btn btn-top" title="Voltar ao Topo">
+      <a href="#heroTrack" class="dock-btn btn-top" onclick="rolarParaTopo(event)" title="Voltar ao Topo" aria-label="Voltar ao topo da página">
         <span>↑</span>
         <span class="dock-tooltip">Topo da Página</span>
       </a>
@@ -4014,6 +4016,17 @@
       showToast(`Filtrando matérias por ${topicoAtivo.eixo_icone || ''} ${topicoAtivo.eixo || ''}`);
     }
 
+    // Navegação suave de volta ao topo (Início do Canteiro / Hero)
+    function rolarParaTopo(e) {
+      if (e) e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      try {
+        if (window.location.hash) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      } catch (err) {}
+    }
+
     // Navegação suave a partir do prompt do Hero
     function rolarParaConteudo(e) {
       if (e) e.preventDefault();
@@ -4100,6 +4113,7 @@
         }
         if (headerBrand) {
           headerBrand.style.opacity = '0';
+          headerBrand.classList.remove('visible');
         }
       } else {
         // FASE 4 (0.42 -> 0.96): VOO E ENCAIXE LITERAL DO LETREIRO E DO SUBTÍTULO NO MENU SUPERIOR
@@ -4182,14 +4196,20 @@
         // FASE 6: Encaixe Final / Transição de Custódia para o Header
         if (dockProgress >= 0.96) {
           if (siteHeader) siteHeader.classList.add('docked');
-          if (headerBrand) headerBrand.style.opacity = '1';
+          if (headerBrand) {
+            headerBrand.style.opacity = '1';
+            headerBrand.classList.add('visible');
+          }
           if (heroBlock) {
             heroBlock.style.opacity = '0';
             heroBlock.style.visibility = 'hidden';
           }
         } else {
           if (siteHeader) siteHeader.classList.remove('docked');
-          if (headerBrand) headerBrand.style.opacity = '0';
+          if (headerBrand) {
+            headerBrand.style.opacity = '0';
+            headerBrand.classList.remove('visible');
+          }
           if (heroBlock) {
             heroBlock.style.opacity = '1';
             heroBlock.style.visibility = 'visible';
@@ -4212,7 +4232,10 @@
       // TOOLBELT & PERSISTÊNCIA APÓS SAÍDA DO TRACK HERO
       if (window.scrollY >= track.offsetHeight - 80) {
         if (siteHeader) siteHeader.classList.add('docked');
-        if (headerBrand) headerBrand.style.opacity = '1';
+        if (headerBrand) {
+          headerBrand.style.opacity = '1';
+          headerBrand.classList.add('visible');
+        }
         if (heroBlock) {
           heroBlock.style.opacity = '0';
           heroBlock.style.visibility = 'hidden';
