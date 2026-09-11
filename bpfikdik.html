@@ -38,6 +38,40 @@
             --node-flow: #cfcfcf;
             --node-shortcut: #71717a;
             --pin-class: #6e44ff;
+
+            /* Tokens de Tema para o Rodapé Poligonal - Unreal Blueprints */
+            --theme-surface: #0a0a0b;
+            --theme-border: #34383d;
+            --theme-accent: #3b82f6; /* Unreal Blue */
+            --theme-accent-alt: #2563eb;
+            --theme-text: #e5e7eb;
+            --theme-text-muted: #8b929a;
+            --theme-font-title: 'Inter', sans-serif;
+            --theme-font-body: 'Inter', sans-serif;
+        }
+
+        /* Customização Estética do Rodapé Poligonal para Unreal FIKDIKs */
+        .poligonal-footer {
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-base);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-muted);
+        }
+        .poligonal-footer-title,
+        .poligonal-footer-heading {
+            color: var(--text-main) !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700;
+        }
+        .poligonal-footer-desc,
+        .poligonal-footer-nav li a,
+        .poligonal-footer-bottom {
+            color: var(--text-muted) !important;
+        }
+        .poligonal-footer-email,
+        .poligonal-footer-accent,
+        .poligonal-footer-nav li a:hover {
+            color: var(--ue-blue-hover) !important; /* #3b82f6 Unreal Blue */
         }
 
         /* Estilos base da página */
