@@ -62,7 +62,6 @@
                         <ul class="poligonal-footer-nav">
                             <li><a href="${rootPath}">Home</a></li>
                             <li><a href="${rootPath}#servicos">Serviços</a></li>
-                            <li><a href="${rootPath}narrato/">NarrATO (Caderno de Encargos)</a></li>
                             <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
                             <li><a href="${rootPath}contato.html">Contato &amp; Parcerias</a></li>
                         </ul>
