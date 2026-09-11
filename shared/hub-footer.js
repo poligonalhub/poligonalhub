@@ -1,8 +1,7 @@
 /**
  * Poligonal Hub - Componente e Include Universal de Rodapé
- * Injeta o layout semântico e as informações unificadas do C.C.C. Poligonal.
- * Deixa a estética 100% personalizável por página via variáveis CSS (--footer-accent, --theme-accent, --theme-font, etc.)
- * ou via seletores CSS (.poligonal-footer, .poligonal-footer-title, etc.) sem estilos inline rígidos.
+ * Carrega dinamicamente o HTML de shared/footer.html para refletir alterações em tempo real.
+ * Mantém fallback embutido resiliente para execução local via file:// e conexões offline.
  */
 (function() {
     const currentYear = new Date().getFullYear();
@@ -19,10 +18,15 @@
             if (src.startsWith('shared/')) return './';
         }
         if (window.location.protocol === 'file:') {
-            const depth = (window.location.pathname.split('/').length - 1) - (window.location.pathname.split('poligonalhub')[1]?.split('/').length || 1);
-            return depth > 0 ? '../'.repeat(depth) : './';
+            const pathname = window.location.pathname.replace(/\\/g, '/');
+            const parts = pathname.split('poligonalhub');
+            if (parts.length > 1) {
+                const subPath = parts[1].replace(/^\//, '');
+                const depth = subPath.split('/').length - 1;
+                return depth > 0 ? '../'.repeat(depth) : './';
+            }
         }
-        return '/';
+        return './';
     };
 
     const rootPath = getRootPath();
@@ -37,14 +41,15 @@
         document.head.appendChild(link);
     }
 
-    // 3. Template HTML unificado do rodapé (sem estilos inline invasivos)
-    const generateFooterMarkup = () => `
+    // 3. Template HTML de fallback integrado (sincronizado com shared/footer.html)
+    const getFallbackMarkup = () => `
         <div class="poligonal-footer-container">
             <div class="poligonal-footer-top">
                 <div class="poligonal-footer-brand-col">
                     <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
                     <p class="poligonal-footer-desc">
-                        Vários ângulos, todos anti-imperialistas. <p>Desenvolvedores de audiovisual, jogos e soluções web.</p>
+                        Vários ângulos, todos anti-imperialistas.<br>
+                        Desenvolvedores de audiovisual, jogos e soluções web.
                     </p>
                     <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
                         poligonalhub@gmail.com ↗
@@ -57,6 +62,7 @@
                         <ul class="poligonal-footer-nav">
                             <li><a href="${rootPath}">Home</a></li>
                             <li><a href="${rootPath}#servicos">Serviços</a></li>
+                            <li><a href="${rootPath}narrato/">NarrATO (Caderno de Encargos)</a></li>
                             <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
                             <li><a href="${rootPath}contato.html">Contato &amp; Parcerias</a></li>
                         </ul>
@@ -85,31 +91,93 @@
         </div>
     `;
 
-    // 4. Injeção nos elementos marcados com [data-poligonal-footer]
-    const renderFooters = () => {
-        const mounts = document.querySelectorAll('[data-poligonal-footer]:not([data-poligonal-rendered])');
+    // Processa o HTML bruto de shared/footer.html ajustando links e tags
+    const processIncludeHTML = (rawHtml) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rawHtml, 'text/html');
+        const container = doc.querySelector('.poligonal-footer-container');
+        if (!container) return null;
+
+        // Ajusta links com data-root-link para o caminho relativo correto
+        container.querySelectorAll('[data-root-link]').forEach(a => {
+            const rel = a.getAttribute('data-root-link') || '';
+            if (rel === '/' || rel === '') {
+                a.setAttribute('href', rootPath);
+            } else if (rel.startsWith('#')) {
+                a.setAttribute('href', `${rootPath}${rel}`);
+            } else {
+                a.setAttribute('href', `${rootPath}${rel}`);
+            }
+        });
+
+        // Atualiza o ano de copyright dinamicamente
+        container.querySelectorAll('[data-poligonal-year]').forEach(span => {
+            span.textContent = currentYear;
+        });
+
+        return container.outerHTML;
+    };
+
+    // Aplica o HTML nos pontos de montagem
+    const applyToMounts = (contentHtml) => {
+        const mounts = document.querySelectorAll('[data-poligonal-footer], poligonal-footer');
         mounts.forEach(el => {
             el.classList.add('poligonal-footer');
             el.setAttribute('data-poligonal-rendered', 'true');
-            el.innerHTML = generateFooterMarkup();
+            el.innerHTML = contentHtml;
         });
     };
 
-    // 5. Suporte a Web Component nativo (<poligonal-footer>)
+    // 4. Renderização imediata com fallback (sem flash/layout shift)
+    let hasLoadedRemote = false;
+    const initialRender = () => {
+        if (!hasLoadedRemote) {
+            applyToMounts(getFallbackMarkup());
+        }
+    };
+
+    // 5. Busca dinâmica do arquivo shared/footer.html ("o original") com cache-busting
+    const fetchOriginalInclude = () => {
+        const includeUrl = `${rootPath}shared/footer.html?v=${Date.now()}`;
+        fetch(includeUrl)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.text();
+            })
+            .then(html => {
+                const processed = processIncludeHTML(html);
+                if (processed) {
+                    hasLoadedRemote = true;
+                    applyToMounts(processed);
+                }
+            })
+            .catch(() => {
+                // Em caso de restrição local de fetch (ex.: protocolo file:/// no Chrome),
+                // o fallback integrado síncrono permanece ativo.
+            });
+    };
+
+    // 6. Suporte a Web Component nativo (<poligonal-footer>)
     if (typeof customElements !== 'undefined' && !customElements.get('poligonal-footer')) {
         class PoligonalFooterElement extends HTMLElement {
             connectedCallback() {
                 this.classList.add('poligonal-footer');
                 this.setAttribute('data-poligonal-rendered', 'true');
-                this.innerHTML = generateFooterMarkup();
+                if (!this.innerHTML.trim()) {
+                    this.innerHTML = getFallbackMarkup();
+                }
             }
         }
         customElements.define('poligonal-footer', PoligonalFooterElement);
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', renderFooters);
+        document.addEventListener('DOMContentLoaded', () => {
+            initialRender();
+            fetchOriginalInclude();
+        });
     } else {
-        renderFooters();
+        initialRender();
+        fetchOriginalInclude();
     }
 })();
