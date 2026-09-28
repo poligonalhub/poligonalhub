@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bibliografia Canônica & Acervo de Fontes | NarrATO</title>
+  
+  <meta name="description" content="Acervo de fontes, livros de cabeceira e fundamentação teórica do Caderno de Encargos do NarrATO. Links oficiais da Amazon e referências cruzadas de tópicos.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#141416">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Poligonal Hub • NarrATO">
+  <meta property="og:title" content="Bibliografia Canônica & Acervo de Fontes | NarrATO">
+  <meta property="og:description" content="Acervo de fontes bibliográficas e dramatúrgicas do Canteiro NarrATO.">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/logo-poligonal.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Compartilhados e Canônicos -->
+  <link rel="stylesheet" href="../../shared/footer.css">
+  <link rel="stylesheet" href="../assets/css/narrato.css">
+</head>
+<body>
+
+  <!-- TOPO: FAIXA DE SEGURANÇA E BRAND -->
+  <header class="site-header hero-docked" style="position: sticky; top:0; z-index: 100;">
+    <div class="hazard-stripe"></div>
+    <div class="header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+      <a href="../index.html" class="brand-group" style="text-decoration:none;" title="Voltar ao Caderno de Encargos">
+        <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
+      </a>
+      <nav style="display:flex; gap:0.75rem; align-items:center;">
+        <a href="../index.html" class="pill-btn"><span>🏗️</span> Matérias</a>
+        <a href="index.html" class="pill-btn active"><span>📚</span> Fontes</a>
+        <a href="../glossario/index.html" class="pill-btn"><span>📖</span> Glossário</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="view-container">
+
+    <div class="page-header">
+      <div class="breadcrumb-row">
+        <a href="../index.html">Canteiro</a> &gt; <span>Bibliografia Unificada</span>
+      </div>
+      <h1 class="page-title">Acervo de Fontes & Bibliografia Canônica</h1>
+      <p class="page-subtitle">Cada obra do canteiro possui sua ficha técnica, foco narratológico, links diretos de afiliados e o inventário de matérias do Caderno de Encargos onde é aplicada.</p>
+    </div>
+
+    <!-- BARRA DE FILTROS DAS FONTES -->
+    <div class="filter-bar">
+      <div class="pills-wrap">
+        <button class="pill-btn active" onclick="filtrarFontes('all', this)">Todas as Obras (30)</button>
+        <button class="pill-btn" onclick="filtrarFontes('basilar', this)">🧱 Pedras Basilares (4)</button>
+        <button class="pill-btn" onclick="filtrarFontes('roteiro', this)">📓 Caderno de Encargos (25)</button>
+        <button class="pill-btn" onclick="filtrarFontes('ppp', this)">📔 Argamassa Pedagógica (1)</button>
+      </div>
+      <input type="text" id="buscaFontes" class="search-input" placeholder="Filtrar por autor ou título..." oninput="pesquisarFontes()">
+    </div>
+
+    <!-- GRID DAS FONTES -->
+    <div class="grid-cards" id="gridFontes">
+            <article class="preview-card" onclick="abrirModalFonte('MCK-ST')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">MCK-ST · 1997</span>
+            <span class="card-badge badge-basilar">Pedra Basilar</span>
+          </div>
+          <h3 class="card-title">"Story: Substância, Estrutura, Estilo e os Princípios da Escrita de Roteiro"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Robert McKee</p>
+          <p class="card-prose">Forma arquetípica viva contra fórmulas mecânicas enrijecidas; o conflito em três níveis; a Ideia Governante que ancora o clímax sob máxima pressão moral.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 26 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('CMP-CR')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">CMP-CR · 1983</span>
+            <span class="card-badge badge-basilar">Pedra Basilar</span>
+          </div>
+          <h3 class="card-title">"Da Criação ao Roteiro"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Doc Comparato</p>
+          <p class="card-prose">A dramaturgia como ofício de carpintaria e marretadas conscientes na bancada; a trindade prática de ideia matriz, conflito e ação dramática no canteiro.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 32 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('FLD-MR')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">FLD-MR · 1979</span>
+            <span class="card-badge badge-basilar">Pedra Basilar</span>
+          </div>
+          <h3 class="card-title">"Manual do Roteiro / Screenplay"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Syd Field</p>
+          <p class="card-prose">O paradigma clássico em três atos, incidentes incitantes e pontos de virada como esqueleto de sustentação do edifício cinematográfico.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 20 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('TRU-AH')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">TRU-AH · 2007</span>
+            <span class="card-badge badge-basilar">Pedra Basilar</span>
+          </div>
+          <h3 class="card-title">"Anatomia da História: 22 Passos Para se Tornar um Mestre"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">John Truby</p>
+          <p class="card-prose">Crescimento orgânico da trama que rompe esquemas geométricos mecânicos; a linha moral que vincula falha do personagem a cada batida do enredo.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 7 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('FRE-PA')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">FRE-PA · 1996</span>
+            <span class="card-badge badge-ppp">Argamassa (PPP)</span>
+          </div>
+          <h3 class="card-title">"Pedagogia da Autonomia: Saberes Necessários à Prática Educativa"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Paulo Freire</p>
+          <p class="card-prose">A destruição da educação bancária; curiosidade epistemológica e a práxis libertadora que transforma a realidade concreta de cada Operari.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 2 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('KNG-SE')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">KNG-SE · 2000</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Sobre a Escrita: A Arte em Memórias"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Stephen King</p>
+          <p class="card-prose">A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 12 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('LGN-BF')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">LGN-BF · 1986</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"A Teoria da Bolsa da Ficção"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Ursula K. Le Guin</p>
+          <p class="card-prose">A superação do fetiche heroico de flecha/extermínio em favor do saco/cesto que acolhe a multiplicidade, relações e a vida comunitária.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 50 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('CRB-AC')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">CRB-AC · 2013</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"The Art of Character"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">David Corbett</p>
+          <p class="card-prose">O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 22 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('BTH-RF')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">BTH-RF · 1961</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"A Retórica da Ficção"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Wayne C. Booth</p>
+          <p class="card-prose">O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 50 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('CST-AP')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">CST-AP · 2016</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"The Art of Perspective: Who Tells the Story"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Christopher Castellani</p>
+          <p class="card-prose">Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 22 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('SNY-SG')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">SNY-SG · 2005</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Salve o Gato! (Save the Cat!)"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Blake Snyder</p>
+          <p class="card-prose">Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 9 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('SNY-SB')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">SNY-SB · 2009</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Salve o Gato! Strikes Back"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Blake Snyder</p>
+          <p class="card-prose">Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 9 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('FLD-PS')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">FLD-PS · 1998</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"The Screenwriter's Problem Solver"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Syd Field</p>
+          <p class="card-prose">Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 35 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('MCK-CH')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">MCK-CH · 2020</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Character: The Art of Role and Cast Design"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Robert McKee</p>
+          <p class="card-prose">Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 28 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('MCK-DL')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">MCK-DL · 2016</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Diálogo: A Arte da Ação Verbal"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Robert McKee</p>
+          <p class="card-prose">Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 26 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('BEL-DD')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">BEL-DD · 2014</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"How to Write Dazzling Dialogue"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">James Scott Bell</p>
+          <p class="card-prose">Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 4 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-ON')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-ON · 2011</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Outlining Your Novel"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-CA')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-CA · 2016</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Creating Character Arcs"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('TRU-AG')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">TRU-AG · 2022</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"The Anatomy of Genres"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">John Truby</p>
+          <p class="card-prose">Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 25 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-SN')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-SN · 2013</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Structuring Your Novel"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('LIT-WW')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">LIT-WW · 2017</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Write Worlds Your Readers Won't Forget"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Stant Litore</p>
+          <p class="card-prose">Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 14 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('SLB-AT')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">SLB-AT · 2009</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"The Art of Time in Fiction"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Joan Silber</p>
+          <p class="card-prose">Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 22 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('LEI-FN')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">LEI-FN · 1985</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"O Foco Narrativo"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Ligia Chiappini Moraes Leite</p>
+          <p class="card-prose">Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 50 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('SMT-PW')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">SMT-PW · 2015</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Psychology Workbook for Writers"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Darian Smith</p>
+          <p class="card-prose">Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 2 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-WT')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-WT · 2020</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Writing Your Story's Theme"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('CHN-TM')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">CHN-TM · 1978</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Transparent Minds"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">Dorrit Claire Cohn</p>
+          <p class="card-prose">Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 2 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-OW')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-OW · 2014</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Outlining Your Novel Workbook"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-CB')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-CB · 2018</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Conquering Writer's Block and Summoning Inspiration"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-CW')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-CW · 2017</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Creating Character Arcs Workbook"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" onclick="abrirModalFonte('WEI-SW')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">WEI-SW · 2014</span>
+            <span class="card-badge badge-roteiro">Caderno de Encargos</span>
+          </div>
+          <h3 class="card-title">"Structuring Your Novel Workbook"</h3>
+          <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">K. M. Weiland</p>
+          <p class="card-prose">Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax.</p>
+        </div>
+        <div class="card-footer">
+          <span>📚 16 matérias vinculadas</span>
+          <span class="card-action-btn">Ver Ficha ↗</span>
+        </div>
+      </article>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE DETALHES DA FONTE / LIVRO -->
+  <div id="detailOverlay" class="detail-overlay" onclick="fecharModal(event)">
+    <div class="detail-modal" onclick="event.stopPropagation()">
+      <button class="close-modal-btn" onclick="fecharModal()" title="Fechar (Esc)">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- BANCO DE DADOS CLIENT-SIDE DAS FONTES -->
+  <script>
+    window.FONTES_DB = [{"id": "MCK-ST", "slug": "story-robert-mckee", "autor": "Robert McKee", "obra": "Story: Substância, Estrutura, Estilo e os Princípios da Escrita de Roteiro", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1997, "link": "https://amzn.to/4jZhFVa", "foco": "Forma arquetípica viva contra fórmulas mecânicas enrijecidas; o conflito em três níveis; a Ideia Governante que ancora o clímax sob máxima pressão moral.", "topicos": ["T01", "T02", "T03", "T05", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T14", "T15", "T17", "T18", "T19", "T22", "T23", "T31", "T32", "T33", "T35", "T41", "T47", "T48", "T50"], "citacoesQtd": 52}, {"id": "CMP-CR", "slug": "da-criacao-ao-roteiro-doc-comparato", "autor": "Doc Comparato", "obra": "Da Criação ao Roteiro", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1983, "link": "https://amzn.to/4m7WNwA", "foco": "A dramaturgia como ofício de carpintaria e marretadas conscientes na bancada; a trindade prática de ideia matriz, conflito e ação dramática no canteiro.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T11", "T14", "T19", "T21", "T22", "T23", "T24", "T25", "T26", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T37", "T39", "T41", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 64}, {"id": "FLD-MR", "slug": "manual-do-roteiro-syd-field", "autor": "Syd Field", "obra": "Manual do Roteiro / Screenplay", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1979, "link": "https://amzn.to/3IprKNz", "foco": "O paradigma clássico em três atos, incidentes incitantes e pontos de virada como esqueleto de sustentação do edifício cinematográfico.", "topicos": ["T01", "T02", "T08", "T14", "T16", "T17", "T18", "T19", "T20", "T24", "T35", "T38", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T49"], "citacoesQtd": 40}, {"id": "TRU-AH", "slug": "anatomia-da-historia-john-truby", "autor": "John Truby", "obra": "Anatomia da História: 22 Passos Para se Tornar um Mestre", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 2007, "link": "https://amzn.to/3KVEBZc", "foco": "Crescimento orgânico da trama que rompe esquemas geométricos mecânicos; a linha moral que vincula falha do personagem a cada batida do enredo.", "topicos": ["T02", "T03", "T04", "T11", "T12", "T13", "T21"], "citacoesQtd": 14}, {"id": "FRE-PA", "slug": "pedagogia-da-autonomia-paulo-freire", "autor": "Paulo Freire", "obra": "Pedagogia da Autonomia: Saberes Necessários à Prática Educativa", "categoria": "ppp", "catNome": "Argamassa (PPP)", "ano": 1996, "link": "https://link.amazon/B07DdyZ90", "foco": "A destruição da educação bancária; curiosidade epistemológica e a práxis libertadora que transforma a realidade concreta de cada Operari.", "topicos": ["T48", "T50"], "citacoesQtd": 4}, {"id": "KNG-SE", "slug": "sobre-a-escrita-stephen-king", "autor": "Stephen King", "obra": "Sobre a Escrita: A Arte em Memórias", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2000, "link": "https://amzn.to/4rZ8b0D", "foco": "A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto.", "topicos": ["T13", "T15", "T32", "T33", "T34", "T37", "T39", "T42", "T43", "T44", "T45", "T49"], "citacoesQtd": 24}, {"id": "LGN-BF", "slug": "bolsa-da-ficcao-ursula-le-guin", "autor": "Ursula K. Le Guin", "obra": "A Teoria da Bolsa da Ficção", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 1986, "link": "https://amzn.to/4fIk4nW", "foco": "A superação do fetiche heroico de flecha/extermínio em favor do saco/cesto que acolhe a multiplicidade, relações e a vida comunitária.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T22", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T36", "T37", "T38", "T39", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 100}, {"id": "CRB-AC", "slug": "the-art-of-character-david-corbett", "autor": "David Corbett", "obra": "The Art of Character", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2013, "link": "https://amzn.to/4iWfeBB", "foco": "O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio.", "topicos": ["T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 44}, {"id": "BTH-RF", "slug": "retorica-da-ficcao-wayne-booth", "autor": "Wayne C. Booth", "obra": "A Retórica da Ficção", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 1961, "link": "https://amzn.to/4aNlfA2", "foco": "O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T22", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T36", "T37", "T38", "T39", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 100}, {"id": "CST-AP", "slug": "the-art-of-perspective-christopher-castellani", "autor": "Christopher Castellani", "obra": "The Art of Perspective: Who Tells the Story", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2016, "link": "https://amzn.to/4t38Hdj", "foco": "Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal.", "topicos": ["T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 44}, {"id": "SNY-SG", "slug": "salve-o-gato-blake-snyder", "autor": "Blake Snyder", "obra": "Salve o Gato! (Save the Cat!)", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2005, "link": "https://amzn.to/3F7bzTy", "foco": "Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial.", "topicos": ["T04", "T12", "T16", "T20", "T36", "T38", "T40", "T46", "T47"], "citacoesQtd": 18}, {"id": "SNY-SB", "slug": "salve-o-gato-strikes-back-blake-snyder", "autor": "Blake Snyder", "obra": "Salve o Gato! Strikes Back", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2009, "link": "https://amzn.to/468B8yX", "foco": "Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática.", "topicos": ["T04", "T12", "T16", "T20", "T36", "T38", "T40", "T46", "T47"], "citacoesQtd": 18}, {"id": "FLD-PS", "slug": "screenwriters-problem-solver-syd-field", "autor": "Syd Field", "obra": "The Screenwriter's Problem Solver", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 1998, "link": "https://amzn.to/44RFvvZ", "foco": "Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados.", "topicos": ["T01", "T02", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T35", "T38", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T49"], "citacoesQtd": 70}, {"id": "MCK-CH", "slug": "character-robert-mckee", "autor": "Robert McKee", "obra": "Character: The Art of Role and Cast Design", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2020, "link": "https://amzn.to/4odOYHa", "foco": "Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica.", "topicos": ["T01", "T02", "T03", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T17", "T18", "T19", "T22", "T23", "T27", "T31", "T32", "T33", "T35", "T41", "T47", "T48", "T50"], "citacoesQtd": 56}, {"id": "MCK-DL", "slug": "dialogo-robert-mckee", "autor": "Robert McKee", "obra": "Diálogo: A Arte da Ação Verbal", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2016, "link": "https://amzn.to/3GPuMcZ", "foco": "Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas.", "topicos": ["T01", "T02", "T03", "T05", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T14", "T15", "T17", "T18", "T19", "T22", "T23", "T31", "T32", "T33", "T35", "T41", "T47", "T48", "T50"], "citacoesQtd": 52}, {"id": "BEL-DD", "slug": "how-to-write-dazzling-dialogue-james-scott-bell", "autor": "James Scott Bell", "obra": "How to Write Dazzling Dialogue", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2014, "link": "https://link.amazon/B0c07yauk", "foco": "Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.", "topicos": ["T31", "T32", "T33", "T34"], "citacoesQtd": 8}, {"id": "WEI-ON", "slug": "outlining-your-novel-km-weiland", "autor": "K. M. Weiland", "obra": "Outlining Your Novel", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2011, "link": "https://amzn.to/4535rG0", "foco": "Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "WEI-CA", "slug": "creating-character-arcs-km-weiland", "autor": "K. M. Weiland", "obra": "Creating Character Arcs", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2016, "link": "https://amzn.to/3SsoBy3", "foco": "A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "TRU-AG", "slug": "the-anatomy-of-genres-john-truby", "autor": "John Truby", "obra": "The Anatomy of Genres", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2022, "link": "https://amzn.to/3TAicl9", "foco": "Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra.", "topicos": ["T02", "T03", "T04", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 50}, {"id": "WEI-SN", "slug": "structuring-your-novel-km-weiland", "autor": "K. M. Weiland", "obra": "Structuring Your Novel", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2013, "link": "https://amzn.to/4kG7cxA", "foco": "A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "LIT-WW", "slug": "write-worlds-stant-litore", "autor": "Stant Litore", "obra": "Write Worlds Your Readers Won't Forget", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2017, "link": "https://link.amazon/B0bJd8gQf", "foco": "Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista.", "topicos": ["T09", "T10", "T21", "T22", "T25", "T31", "T32", "T33", "T34", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 28}, {"id": "SLB-AT", "slug": "the-art-of-time-in-fiction-joan-silber", "autor": "Joan Silber", "obra": "The Art of Time in Fiction", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2009, "link": "https://amzn.to/4w6gFVN", "foco": "Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor.", "topicos": ["T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 44}, {"id": "LEI-FN", "slug": "o-foco-narrativo-ligia-chiappini", "autor": "Ligia Chiappini Moraes Leite", "obra": "O Foco Narrativo", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 1985, "link": "https://link.amazon/B0fFW0BIn", "foco": "Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T22", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T36", "T37", "T38", "T39", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 100}, {"id": "SMT-PW", "slug": "psychology-workbook-for-writers-darian-smith", "autor": "Darian Smith", "obra": "Psychology Workbook for Writers", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2015, "link": "https://amzn.to/4dhesy2", "foco": "Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas.", "topicos": ["T09", "T10"], "citacoesQtd": 4}, {"id": "WEI-WT", "slug": "writing-your-storys-theme-km-weiland", "autor": "K. M. Weiland", "obra": "Writing Your Story's Theme", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2020, "link": "https://amzn.to/44K6Qjr", "foco": "Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "CHN-TM", "slug": "transparent-minds-dorrit-cohn", "autor": "Dorrit Claire Cohn", "obra": "Transparent Minds", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 1978, "link": "https://link.amazon/B0cUIhn5P", "foco": "Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese.", "topicos": ["T27", "T29"], "citacoesQtd": 4}, {"id": "WEI-OW", "slug": "outlining-your-novel-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Outlining Your Novel Workbook", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2014, "link": "https://amzn.to/4nO2Uag", "foco": "Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "WEI-CB", "slug": "conquering-writers-block-km-weiland", "autor": "K. M. Weiland", "obra": "Conquering Writer's Block and Summoning Inspiration", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2018, "link": "https://amzn.to/4eLxIUS", "foco": "Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "WEI-CW", "slug": "creating-character-arcs-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Creating Character Arcs Workbook", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2017, "link": "https://amzn.to/4lVDh5G", "foco": "Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}, {"id": "WEI-SW", "slug": "structuring-your-novel-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Structuring Your Novel Workbook", "categoria": "roteiro", "catNome": "Caderno de Encargos", "ano": 2014, "link": "https://amzn.to/46DCCBh", "foco": "Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32}];
+    window.TOPICOS_SLUGS = {"T01": "t01-forma-vs-formula", "T02": "t02-trindade-indissociavel", "T03": "t03-conflito-como-motor", "T04": "t04-pre-moldado-vs-organico", "T05": "t05-substancia-estilo-e-tatica", "T06": "t06-caracterizacao-vs-carater", "T07": "t07-desejo-vs-prioridade", "T08": "t08-acao-e-personagem", "T09": "t09-fios-desencapados", "T10": "t10-aterramento", "T11": "t11-tema-vs-assunto", "T12": "t12-genero-e-tom", "T13": "t13-natureza-do-genero", "T14": "t14-ideia-governante-vs-argumento-moral", "T15": "t15-guerra-de-crencas", "T16": "t16-estrutura-do-enredo", "T17": "t17-causa-e-efeito", "T18": "t18-tres-atos-industriais", "T19": "t19-trenas-e-tramas", "T20": "t20-entre-a-prancheta-e-a-picareta", "T21": "t21-topografia-narrativa", "T22": "t22-tempo-dramatico", "T23": "t23-geografia-civilizatoria", "T24": "t24-cronogramas-e-outras-gramas", "T25": "t25-niveis-espiralados", "T26": "t26-pontos-de-vista", "T27": "t27-entre-agencia-e-urgencia", "T28": "t28-voos-em-vaos", "T29": "t29-voz-ativa", "T30": "t30-fina-fachada-espelhada", "T31": "t31-acao-verbal", "T32": "t32-nenhum-outdoor-e-transparente", "T33": "t33-rubricas-e-incisos", "T34": "t34-sinfonia-das-britadeiras", "T35": "t35-betoneira-engessada-e-outros-vicios-de-dialogo", "T36": "t36-obras-diferentes-demandam-ferramentas-diferentes", "T37": "t37-tripe-da-regua-de-nivel", "T38": "t38-sem-mapa-nao-ha-recalculo-de-rota", "T39": "t39-prancheta-tablet-ou-quadro-camurca", "T40": "t40-canteiro-cercado-ou-mutirao", "T41": "t41-so-se-esculpe-tendo-algo-concreto", "T42": "t42-distanciamento", "T43": "t43-use-a-motosserra-sem-se-machucar", "T44": "t44-retrofit-narrativo", "T45": "t45-engenheiro-de-obra-pronta-aponta-voce-decide-o-reparo", "T46": "t46-canteiro-colaborativo", "T47": "t47-pa-de-prata", "T48": "t48-martelinho-de-ouro", "T49": "t49-chave-de-diamante", "T50": "t50-alvara-narrato-certificacao-em-engenharia-narratologica"};
+
+    let filtroFontesAtivo = 'all';
+
+    function renderFontes(lista) {
+      const container = document.getElementById('gridFontes');
+      if (!container) return;
+      
+      if (lista.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1; padding:2rem; text-align:center; color:var(--tinta-fraca);">Nenhuma obra encontrada no acervo.</div>';
+        return;
+      }
+
+      container.innerHTML = lista.map(item => `
+        <article class="preview-card" onclick="abrirModalFonte('${item.id}')">
+          <div>
+            <div class="card-meta-row">
+              <span class="card-tag">${item.id} · ${item.ano}</span>
+              <span class="card-badge badge-${item.categoria}">${item.catNome}</span>
+            </div>
+            <h3 class="card-title">"${item.obra}"</h3>
+            <p style="font-size:0.8rem; color:var(--ouro); margin-bottom:0.4rem; font-weight:600;">${item.autor}</p>
+            <p class="card-prose">${item.foco}</p>
+          </div>
+          <div class="card-footer">
+            <span>📚 ${item.topicos.length} matérias vinculadas</span>
+            <span class="card-action-btn">Ver Ficha ↗</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function filtrarFontes(cat, btn) {
+      filtroFontesAtivo = cat;
+      document.querySelectorAll('.filter-bar .pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      pesquisarFontes();
+    }
+
+    function pesquisarFontes() {
+      const termo = document.getElementById('buscaFontes').value.toLowerCase().trim();
+      let res = window.FONTES_DB;
+
+      if (filtroFontesAtivo !== 'all') {
+        res = res.filter(item => item.categoria === filtroFontesAtivo);
+      }
+
+      if (termo) {
+        res = res.filter(item => 
+          item.autor.toLowerCase().includes(termo) ||
+          item.obra.toLowerCase().includes(termo) ||
+          item.foco.toLowerCase().includes(termo)
+        );
+      }
+
+      renderFontes(res);
+    }
+
+    function abrirModalFonte(id) {
+      const item = window.FONTES_DB.find(f => f.id === id);
+      if (!item) return;
+
+      const modal = document.getElementById('detailOverlay');
+      const content = document.getElementById('modalContent');
+      
+      const topicosLinks = item.topicos.map(tId => {
+        const slug = window.TOPICOS_SLUGS[tId] || '';
+        const href = slug ? `../topicos/${slug}.html` : `../index.html#${tId.toLowerCase()}`;
+        return `<a href="${href}" class="card-tag" style="text-decoration:none; display:inline-block; margin:0.2rem 0.2rem 0.2rem 0;">${tId} ↗</a>`;
+      }).join(' ');
+
+      content.innerHTML = `
+        <div class="card-meta-row" style="margin-bottom:0.8rem;">
+          <span class="card-tag">${item.id} · ${item.ano}</span>
+          <span class="card-badge badge-${item.categoria}">${item.catNome}</span>
+        </div>
+        <h2 style="font-size:1.35rem; color:var(--tinta); margin-bottom:0.4rem; line-height:1.3;">"${item.obra}"</h2>
+        <p style="color:var(--ouro); font-weight:700; font-size:0.9rem; margin-bottom:1.2rem;">${item.autor}</p>
+
+        <div style="background:#141416; border:1px solid var(--borda); border-radius:8px; padding:1.1rem; margin-bottom:1.25rem;">
+          <span style="font-size:0.72rem; color:var(--ouro); text-transform:uppercase; font-weight:700; display:block; margin-bottom:0.5rem;">Foco Narratológico & Contribuição</span>
+          <p style="font-size:0.88rem; color:var(--tinta-suave); line-height:1.6;">${item.foco}</p>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+          <span style="font-size:0.72rem; color:var(--tinta-fraca); text-transform:uppercase; font-weight:700; display:block; margin-bottom:0.6rem;">Matérias do Caderno de Encargos Vinculadas (${item.topicos.length})</span>
+          <div>${topicosLinks}</div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--borda-fina); padding-top:1rem;">
+          <span style="font-size:0.75rem; color:var(--tinta-fraca);">Adquira no link oficial para apoiar o Canteiro:</span>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn-amazon" style="font-size:0.82rem; padding:0.5rem 1rem;">
+            Comprar na Amazon ↗
+          </a>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    function fecharModal(e) {
+      if (!e || e.target.id === 'detailOverlay' || e.target.classList.contains('close-modal-btn')) {
+        document.getElementById('detailOverlay').classList.remove('active');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fecharModal();
+    });
+  </script>
+
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
+  <!-- ============================================================== -->
+<!-- POLIGONAL HUB - INCLUDE DE RODAPÉ INSTITUCIONAL UNIFICADO      -->
+<!-- Layout e informações padronizados; estilização via CSS/classes -->
+<!-- ============================================================== -->
+<footer class="poligonal-footer" data-poligonal-footer>
+  <div class="poligonal-footer-container">
+    <div class="poligonal-footer-top">
+      
+      <!-- Bloco de Marca e Manifesto -->
+      <div class="poligonal-footer-brand-col">
+        <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
+        <p class="poligonal-footer-desc">
+          Vários ângulos, todos anti-imperialistas.<br>
+          Desenvolvedores de audiovisual, jogos e soluções web.
+        </p>
+        <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
+          poligonalhub@gmail.com ↗
+        </a>
+      </div>
+
+      <!-- Grupos de Links -->
+      <div class="poligonal-footer-links-group">
+        <!-- Navegação Principal -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Navegação</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="/" data-root-link>Home</a></li>
+            <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Comunitários -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Comunidade</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Barra de Rodapé / Direitos -->
+    <div class="poligonal-footer-bottom">
+      <span class="poligonal-footer-copy">
+        &copy; <span data-poligonal-year>2026</span> Centro Comunitário-Criativo Poligonal. Todos os direitos reservados.
+      </span>
+      <span class="poligonal-footer-origin">
+        Nordestinamente orgulhosos 🌵
+      </span>
+    </div>
+  </div>
+</footer>
+
+  <script src="../../shared/hub-footer.js"></script>
+</body>
+</html>

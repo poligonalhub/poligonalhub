@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glossário Canônico & Jargão do Canteiro | NarrATO</title>
+  
+  <meta name="description" content="Banco de dados de termos canônicos, conceitos universais de dramaturgia e jargões internos do ecossistema NarrATO. Filtro duplo e âncoras padronizadas em ASCII.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#141416">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Poligonal Hub • NarrATO">
+  <meta property="og:title" content="Glossário Canônico & Jargão do Canteiro | NarrATO">
+  <meta property="og:description" content="Dicionário de conceitos dramáticos e diretrizes de canteiro do NarrATO.">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/logo-poligonal.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Compartilhados e Canônicos -->
+  <link rel="stylesheet" href="../../shared/footer.css">
+  <link rel="stylesheet" href="../assets/css/narrato.css">
+</head>
+<body>
+
+  <!-- TOPO: FAIXA DE SEGURANÇA E BRAND -->
+  <header class="site-header hero-docked" style="position: sticky; top:0; z-index: 100;">
+    <div class="hazard-stripe"></div>
+    <div class="header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+      <a href="../index.html" class="brand-group" style="text-decoration:none;" title="Voltar ao Caderno de Encargos">
+        <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
+      </a>
+      <nav style="display:flex; gap:0.75rem; align-items:center;">
+        <a href="../index.html" class="pill-btn"><span>🏗️</span> Matérias</a>
+        <a href="../fontes/index.html" class="pill-btn"><span>📚</span> Fontes</a>
+        <a href="index.html" class="pill-btn active"><span>📖</span> Glossário</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="view-container">
+
+    <div class="page-header">
+      <div class="breadcrumb-row">
+        <a href="../index.html">Canteiro</a> &gt; <span>Glossário Canônico</span>
+      </div>
+      <h1 class="page-title">Glossário de Termos, Jargão & Verbetes</h1>
+      <p class="page-subtitle">Filtro duplo com curadoria estrita: separe conceitos universais de dramaturgia dos jargões internos, metáforas de engenharia civil e diretrizes pedagógicas do NarrATO.</p>
+    </div>
+
+    <!-- BARRA DE FILTRO DUPLO -->
+    <div class="filter-bar">
+      <div class="pills-wrap">
+        <button class="pill-btn active" onclick="filtrarGlossario('all', this)">Todos os Verbetes (28)</button>
+        <button class="pill-btn" onclick="filtrarGlossario('narratologia', this)">🎭 Dramaturgia & Narratologia (9)</button>
+        <button class="pill-btn" onclick="filtrarGlossario('interno', this)">🏗️ Jargão do Canteiro & NarrATO (19)</button>
+      </div>
+      <input type="text" id="buscaGlossario" class="search-input" placeholder="Filtrar verbetes (ex: Operari, Subtexto, Alvará)..." oninput="pesquisarGlossario()">
+    </div>
+
+    <!-- GRID DO GLOSSÁRIO -->
+    <div class="grid-cards" id="gridGlossario">
+            <article class="preview-card" id="operari" onclick="abrirModalVerbete('operari')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#operari</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Operari</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo de gênero neutro, invariável em número</p>
+          <p class="card-prose">O construtor ou construtora de histórias formado no Canteiro do NarrATO. Aquele que maneja ferramentas de engenharia narratológica para edificar obras com solidez.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: PROIBIDO usar 'Operaris'. O termo serve tanto...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="praxis" onclick="abrirModalVerbete('praxis')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#praxis</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Práxis</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo feminino</p>
+          <p class="card-prose">A unidade dialética entre teoria dramatúrgica e a prática da escrita. Escrever não é exercício abstrato, mas intervenção concreta no mundo.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Slug em ASCII puro (#praxis). Princípio freir...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="caderno-de-encargos" onclick="abrirModalVerbete('caderno-de-encargos')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#caderno-de-encargos</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Caderno de Encargos</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva masculina</p>
+          <p class="card-prose">O memorial técnico de engenharia narrativa que cataloga os 10 capítulos, 50 tópicos, diretrizes de bancada e matrizes do curso.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Representa o currículo narratológico da Apost...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="folha-milimetrada" onclick="abrirModalVerbete('folha-milimetrada')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#folha-milimetrada</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Folha Milimetrada</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Instrumento de autoteste e métrica objetiva onde o Operari afere a resistência mecânica de seu roteiro antes de fixar o cimento definitivo.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #folha-milimetrada. Ferram...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="diario-de-obra" onclick="abrirModalVerbete('diario-de-obra')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#diario-de-obra</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Diário de Obra</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva masculina</p>
+          <p class="card-prose">Registro cronológico contínuo mantido pelo escritor durante a gestação do roteiro, documentando impasses, soluções de engenharia e decisões descartadas.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #diario-de-obra.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="canteiro" onclick="abrirModalVerbete('canteiro')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#canteiro</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Canteiro</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo masculino</p>
+          <p class="card-prose">O espaço de trabalho coletivo e horizontal onde as narrativas são forjadas sob rigor técnico, colaboração mútua e ferramentas manuais.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Metáfora fundacional do ecossistema NarrATO.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="laboratorio" onclick="abrirModalVerbete('laboratorio')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#laboratorio</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Laboratório</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo masculino</p>
+          <p class="card-prose">O módulo prático (Capítulo 10) onde cada projeto passa por testes de estresse, leituras dramáticas e provas de carga antes do lançamento.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #laboratorio.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="curadoria-dialetica" onclick="abrirModalVerbete('curadoria-dialetica')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#curadoria-dialetica</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Curadoria Dialética</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">O método de confrontar teses opostas de diferentes mestres de roteiro (ex: Snyder vs. Le Guin, McKee vs. Comparato) para forjar sínteses operacionais.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #curadoria-dialetica.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="licitacao" onclick="abrirModalVerbete('licitacao')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#licitacao</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Licitação</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo feminino</p>
+          <p class="card-prose">Etapa do laboratório onde projetos competem por recursos simbólicos ou avaliação da banca através de pitches e memoriais descritivos bem fundamentados.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora em ASCII puro (#licitacao).</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="alvara" onclick="abrirModalVerbete('alvara-narrato')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#alvara</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Alvará NarrATO</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva masculina</p>
+          <p class="card-prose">A certificação final de conformidade dramática expedida após o projeto passar por vistoria de alvenaria, prova de carga e bancada comunitária.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: PROIBIDO o termo 'Habite-se' no universo Narr...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="art" onclick="abrirModalVerbete('art')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#art</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Anotação de Responsabilidade Técnica (ART)</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Documento em que o autor assume o compromisso ético e formal com as premissas, consistência e voz de sua obra.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #art.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="autonomia" onclick="abrirModalVerbete('pedagogia-autonomia')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#autonomia</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Pedagogia da Autonomia</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Matriz pedagógica freireana que fundamenta o ensino no NarrATO, assentando que ensinar não é transferir conhecimento, mas criar as possibilidades para sua produção.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #autonomia ou #pedagogia-a...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="ensino-bancario" onclick="abrirModalVerbete('ensino-bancario')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#ensino-bancario</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Ensino Bancário</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva masculina</p>
+          <p class="card-prose">Conceito freireano que descreve a educação tradicional como ato de depositar informações em mentes passivas tidas como vazias.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #ensino-bancario.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="curiosidade-epistemologica" onclick="abrirModalVerbete('curiosidade-epistemologica')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#curiosidade-epistemologica</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Curiosidade Epistemológica</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">O salto consciente da curiosidade ingênua do senso comum para a curiosidade crítica e investigativa sobre como os mecanismos dramáticos operam.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #curiosidade-epistemologic...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="dialogicidade" onclick="abrirModalVerbete('dialogicidade')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#dialogicidade</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Dialogicidade</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo feminino</p>
+          <p class="card-prose">Princípio da comunicação horizontal onde a troca de saberes entre educador e educando é base para a construção do conhecimento coletivo.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #dialogicidade.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="metodologias-ativas" onclick="abrirModalVerbete('metodologias-ativas')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#metodologias-ativas</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Metodologias Ativas</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Modelos pedagógicos que posicionam o aprendiz no centro do processo de construção do conhecimento, privilegiando a ação prática direta.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora padronizada #metodologias-ativas.</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="pbl" onclick="abrirModalVerbete('pbl')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#pbl</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Aprendizagem Baseada em Projetos (PBL)</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Estratégia educacional onde o aprendizado ocorre através da criação de um produto real e concreto ao longo do percurso.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Priorizar a sigla concisa #pbl como âncora of...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="dua" onclick="abrirModalVerbete('dua')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#dua</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Design Universal de Aprendizagem (DUA)</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva masculina</p>
+          <p class="card-prose">Abordagem pedagógica que busca eliminar barreiras de aprendizagem oferecendo múltiplos meios de representação, engajamento e expressão.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Priorizar a sigla concisa #dua como âncora of...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="inovacao-cognitiva" onclick="abrirModalVerbete('inovacao-cognitiva')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#inovacao-cognitiva</span>
+            <span class="card-badge badge-interno">🏗️ Jargão do Canteiro & NarrATO</span>
+          </div>
+          <h3 class="card-title">Estratégias de Inovação Cognitiva</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Mecanismos didáticos que provocam desacomodação epistêmica, forçando o escritor a abandonar atalhos mentais confortáveis.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Âncora em ASCII puro (#inovacao-cognitiva).</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="incidente-incitante" onclick="abrirModalVerbete('incidente-incitante')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#incidente-incitante</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Incidente Incitante</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo composto masculino</p>
+          <p class="card-prose">O evento sísmico que rompe o equilíbrio do protagonista, instala a Pergunta Dramática Central e o arremessa à ação.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Deve ocorrer no início do Primeiro Ato, rompe...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="ideia-governante" onclick="abrirModalVerbete('ideia-governante')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#ideia-governante</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Ideia Governante</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">A proposição moral ativa que governa a arquitetura da história. Não é conselho moralista, mas a verdade provada pelo clímax.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Formulada em uma única frase de causa e efeit...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="subtexto" onclick="abrirModalVerbete('subtexto')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#subtexto</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Subtexto</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo masculino</p>
+          <p class="card-prose">A corrente de alta voltagem que corre submersa nas falas. Manifesta-se nos silêncios, nas evasivas, na tensão muscular e na contradição corporal.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: O texto é o que o personagem fala; o subtexto...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="midpoint" onclick="abrirModalVerbete('midpoint')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#midpoint</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Ponto Médio (Midpoint)</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Substantivo masculino</p>
+          <p class="card-prose">O divisor de águas onde as apostas são elevadas. Frequentemente surge como Falsa Vitória ou Falsa Derrota que transforma a missão.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Localizado no centro do Segundo Ato (aproxima...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="conflito-tres-niveis" onclick="abrirModalVerbete('conflito-tres-niveis')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#conflito-tres-niveis</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Conflito em Três Níveis</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva masculina</p>
+          <p class="card-prose">A matriz integral de atrito dramático. Uma história rica opera nas três frequências simultâneas para prevenir monotonia e fadiga da ação.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Estruturado em Conflito Interno (psique/corpo...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="ironia-dramatica" onclick="abrirModalVerbete('ironia-dramatica')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#ironia-dramatica</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Ironia Dramática</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Orquestração de informação onde o espectador sabe da bomba sob a mesa enquanto os personagens conversam banalidades, gerando suspense extremo.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: A plateia sabe algo determinante que o person...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="caracterizacao-vs-carater" onclick="abrirModalVerbete('caracterizacao-vs-carater')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#caracterizacao-vs-carater</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Caracterização vs. Caráter</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva</p>
+          <p class="card-prose">A distinção entre as propriedades externas de um indivíduo (idade, profissão, maneirismos) e quem ele é quando obrigado a pagar o preço de sua decisão.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Caracterização é superfície; caráter é o núcl...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="pergunta-dramatica-central" onclick="abrirModalVerbete('pergunta-dramatica-central')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#pergunta-dramatica-central</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Pergunta Dramática Central</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">A grande interrogação que move a curiosidade do espectador do início ao fim (ex: 'O detetive capturará o assassino antes da próxima lua cheia?').</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Formulada pelo Incidente Incitante; respondid...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+      <article class="preview-card" id="bolsa-da-ficcao" onclick="abrirModalVerbete('bolsa-da-ficcao')">
+        <div>
+          <div class="card-meta-row">
+            <span class="card-tag">#bolsa-da-ficcao</span>
+            <span class="card-badge badge-narratologia">🎭 Dramaturgia & Narratologia</span>
+          </div>
+          <h3 class="card-title">Teoria da Bolsa da Ficção</h3>
+          <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">Locução substantiva feminina</p>
+          <p class="card-prose">Proposta estética onde a narrativa atua como recipiente coletor de coisas, pessoas, conflitos e afetos, em vez de arma de caça heroica unidirecional.</p>
+        </div>
+        <div class="card-footer">
+          <span style="color:var(--ouro); font-weight:600;">Regra: Proposta por Ursula K. Le Guin contra o model...</span>
+          <span class="card-action-btn">Ver Verbete ↗</span>
+        </div>
+      </article>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE DETALHES DO VERBETE -->
+  <div id="detailOverlay" class="detail-overlay" onclick="fecharModal(event)">
+    <div class="detail-modal" onclick="event.stopPropagation()">
+      <button class="close-modal-btn" onclick="fecharModal()" title="Fechar (Esc)">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- BANCO DE DADOS CLIENT-SIDE DO GLOSSÁRIO -->
+  <script>
+    window.GLOSSARIO_DB = [{"id": "operari", "termo": "Operari", "slug": "operari", "ancora": "operari", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Substantivo de gênero neutro, invariável em número", "regra": "PROIBIDO usar 'Operaris'. O termo serve tanto para o singular quanto para o plural.", "definicao": "O construtor ou construtora de histórias formado no Canteiro do NarrATO. Aquele que maneja ferramentas de engenharia narratológica para edificar obras com solidez.", "aplicacao": "No NarrATO, quem escreve não é um receptor passivo de fórmulas prontas, mas sim um artífice que sobe nos andaimes e assenta tijolos na alvenaria dramática.", "topicos": ["T01", "T46", "T50"]}, {"id": "praxis", "termo": "Práxis", "slug": "praxis", "ancora": "praxis", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Substantivo feminino", "regra": "Slug em ASCII puro (#praxis). Princípio freireano de ação e reflexão indissociáveis.", "definicao": "A unidade dialética entre teoria dramatúrgica e a prática da escrita. Escrever não é exercício abstrato, mas intervenção concreta no mundo.", "aplicacao": "No NarrATO, o Operari aprende teoria assentando blocos reais no laboratório prático, e não memorizando apostilas de forma burocrática.", "topicos": ["T01", "T46", "T50"]}, {"id": "caderno-de-encargos", "termo": "Caderno de Encargos", "slug": "caderno-de-encargos", "ancora": "caderno-de-encargos", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva masculina", "regra": "Representa o currículo narratológico da Apostila (Capítulos 1 a 10). Não confundir com o PPP (Argamassa).", "definicao": "O memorial técnico de engenharia narrativa que cataloga os 10 capítulos, 50 tópicos, diretrizes de bancada e matrizes do curso.", "aplicacao": "Funciona como a especificação executiva da obra dramática, detalhando materiais, alvenaria, fiação e vistoria fina.", "topicos": ["T01 a T50"]}, {"id": "folha-milimetrada", "termo": "Folha Milimetrada", "slug": "folha-milimetrada", "ancora": "folha-milimetrada", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora padronizada #folha-milimetrada. Ferramenta de combate ao Efeito Forer.", "definicao": "Instrumento de autoteste e métrica objetiva onde o Operari afere a resistência mecânica de seu roteiro antes de fixar o cimento definitivo.", "aplicacao": "Obriga o escritor a comprovar dados verificáveis na página (quantidade de viradas, atritos ativos) em vez de confiar em impressões subjetivas vagas.", "topicos": ["T48", "T49"]}, {"id": "diario-de-obra", "termo": "Diário de Obra", "slug": "diario-de-obra", "ancora": "diario-de-obra", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva masculina", "regra": "Âncora padronizada #diario-de-obra.", "definicao": "Registro cronológico contínuo mantido pelo escritor durante a gestação do roteiro, documentando impasses, soluções de engenharia e decisões descartadas.", "aplicacao": "Permite auditar a evolução do manuscrito e resgatar ideias que foram temporariamente soterradas por reformas de estrutura.", "topicos": ["T46", "T47"]}, {"id": "canteiro", "termo": "Canteiro", "slug": "canteiro", "ancora": "canteiro", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Substantivo masculino", "regra": "Metáfora fundacional do ecossistema NarrATO.", "definicao": "O espaço de trabalho coletivo e horizontal onde as narrativas são forjadas sob rigor técnico, colaboração mútua e ferramentas manuais.", "aplicacao": "Substitui a ideia burguesa do 'gênio isolado na torre de marfim' pela comunidade solidária de artesãos da palavra.", "topicos": ["T01", "T46", "T50"]}, {"id": "laboratorio", "termo": "Laboratório", "slug": "laboratorio", "ancora": "laboratorio", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Substantivo masculino", "regra": "Âncora padronizada #laboratorio.", "definicao": "O módulo prático (Capítulo 10) onde cada projeto passa por testes de estresse, leituras dramáticas e provas de carga antes do lançamento.", "aplicacao": "Ambiente controlado de experimentação onde errar e refazer são etapas necessárias de depuração do texto.", "topicos": ["T46", "T47", "T48", "T49", "T50"]}, {"id": "curadoria-dialetica", "termo": "Curadoria Dialética", "slug": "curadoria-dialetica", "ancora": "curadoria-dialetica", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora padronizada #curadoria-dialetica.", "definicao": "O método de confrontar teses opostas de diferentes mestres de roteiro (ex: Snyder vs. Le Guin, McKee vs. Comparato) para forjar sínteses operacionais.", "aplicacao": "Evita o dogmatismo de adotar um único manual como verdade sagrada, encorajando o Operari a escolher a ferramenta certa para cada obra.", "topicos": ["T04", "T05", "T14", "T20"]}, {"id": "licitacao", "termo": "Licitação", "slug": "licitacao", "ancora": "licitacao", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Substantivo feminino", "regra": "Âncora em ASCII puro (#licitacao).", "definicao": "Etapa do laboratório onde projetos competem por recursos simbólicos ou avaliação da banca através de pitches e memoriais descritivos bem fundamentados.", "aplicacao": "Treina o Operari para a realidade do mercado audiovisual, editais públicos e defesa oral de argumentos.", "topicos": ["T46", "T50"]}, {"id": "alvara-narrato", "termo": "Alvará NarrATO", "slug": "alvara-narrato", "ancora": "alvara", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva masculina", "regra": "PROIBIDO o termo 'Habite-se' no universo NarrATO. A âncora canônica é #alvara.", "definicao": "A certificação final de conformidade dramática expedida após o projeto passar por vistoria de alvenaria, prova de carga e bancada comunitária.", "aplicacao": "Atesta que a narrativa está pronta para circular publicamente sem desmoronar por fragilidade de personagens ou furos estruturais.", "topicos": ["T46", "T50"]}, {"id": "art", "termo": "Anotação de Responsabilidade Técnica (ART)", "slug": "art", "ancora": "art", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora padronizada #art.", "definicao": "Documento em que o autor assume o compromisso ético e formal com as premissas, consistência e voz de sua obra.", "aplicacao": "Responsabiliza o escritor pela integridade moral do texto e pela rejeição de soluções fáceis de plágio ou clichês vazios.", "topicos": ["T46", "T50"]}, {"id": "pedagogia-autonomia", "termo": "Pedagogia da Autonomia", "slug": "pedagogia-autonomia", "ancora": "autonomia", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora padronizada #autonomia ou #pedagogia-autonomia.", "definicao": "Matriz pedagógica freireana que fundamenta o ensino no NarrATO, assentando que ensinar não é transferir conhecimento, mas criar as possibilidades para sua produção.", "aplicacao": "Rejeita a infantilização do autor, promovendo pensamento crítico, responsabilidade técnica e liberdade criativa autêntica.", "topicos": ["Argamassa PPP", "T46"]}, {"id": "ensino-bancario", "termo": "Ensino Bancário", "slug": "ensino-bancario", "ancora": "ensino-bancario", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva masculina", "regra": "Âncora padronizada #ensino-bancario.", "definicao": "Conceito freireano que descreve a educação tradicional como ato de depositar informações em mentes passivas tidas como vazias.", "aplicacao": "Prática terminantemente banida no NarrATO: manuais dogmáticos que ditam regras invioláveis são tratados como violência metodológica.", "topicos": ["Argamassa PPP", "T01"]}, {"id": "curiosidade-epistemologica", "termo": "Curiosidade Epistemológica", "slug": "curiosidade-epistemologica", "ancora": "curiosidade-epistemologica", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora padronizada #curiosidade-epistemologica.", "definicao": "O salto consciente da curiosidade ingênua do senso comum para a curiosidade crítica e investigativa sobre como os mecanismos dramáticos operam.", "aplicacao": "Leva o Operari a desossar obras alheias para aprender como foram montadas, compreendendo os parafusos invisíveis da carpintaria cênica.", "topicos": ["Argamassa PPP", "T36"]}, {"id": "dialogicidade", "termo": "Dialogicidade", "slug": "dialogicidade", "ancora": "dialogicidade", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Substantivo feminino", "regra": "Âncora padronizada #dialogicidade.", "definicao": "Princípio da comunicação horizontal onde a troca de saberes entre educador e educando é base para a construção do conhecimento coletivo.", "aplicacao": "Estrutura as salas de roteiro e oficinas do canteiro, assegurando escuta respeitosa e crítica construtiva.", "topicos": ["Argamassa PPP", "T46"]}, {"id": "metodologias-ativas", "termo": "Metodologias Ativas", "slug": "metodologias-ativas", "ancora": "metodologias-ativas", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora padronizada #metodologias-ativas.", "definicao": "Modelos pedagógicos que posicionam o aprendiz no centro do processo de construção do conhecimento, privilegiando a ação prática direta.", "aplicacao": "Em vez de assistir aulas teóricas expositivas, os Operari solucionam desafios de trama e escrevem cenas desde o primeiro dia.", "topicos": ["Argamassa PPP", "T36"]}, {"id": "pbl", "termo": "Aprendizagem Baseada em Projetos (PBL)", "slug": "pbl", "ancora": "pbl", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Priorizar a sigla concisa #pbl como âncora oficial.", "definicao": "Estratégia educacional onde o aprendizado ocorre através da criação de um produto real e concreto ao longo do percurso.", "aplicacao": "No NarrATO, todo o estudo converge para a confecção de um projeto dramatúrgico autoral pronto para submissão.", "topicos": ["Argamassa PPP", "T46"]}, {"id": "dua", "termo": "Design Universal de Aprendizagem (DUA)", "slug": "dua", "ancora": "dua", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva masculina", "regra": "Priorizar a sigla concisa #dua como âncora oficial.", "definicao": "Abordagem pedagógica que busca eliminar barreiras de aprendizagem oferecendo múltiplos meios de representação, engajamento e expressão.", "aplicacao": "Orienta o design acessível da Apostila (OpenDyslexic, SLB, alto contraste, áudio) para atender a todas as mentes e corpos.", "topicos": ["Argamassa PPP"]}, {"id": "inovacao-cognitiva", "termo": "Estratégias de Inovação Cognitiva", "slug": "inovacao-cognitiva", "ancora": "inovacao-cognitiva", "dominio": "interno", "dominioNome": "🏗️ Jargão do Canteiro & NarrATO", "classeGramatical": "Locução substantiva feminina", "regra": "Âncora em ASCII puro (#inovacao-cognitiva).", "definicao": "Mecanismos didáticos que provocam desacomodação epistêmica, forçando o escritor a abandonar atalhos mentais confortáveis.", "aplicacao": "Exercícios com restrições severas de carpintaria que estimulam saídas dramáticas inéditas e originais.", "topicos": ["Argamassa PPP", "T36"]}, {"id": "incidente-incitante", "termo": "Incidente Incitante", "slug": "incidente-incitante", "ancora": "incidente-incitante", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Substantivo composto masculino", "regra": "Deve ocorrer no início do Primeiro Ato, rompendo irrevogavelmente a estabilidade da vida cotidiana.", "definicao": "O evento sísmico que rompe o equilíbrio do protagonista, instala a Pergunta Dramática Central e o arremessa à ação.", "aplicacao": "Sem o Incidente Incitante, o herói não tem necessidade física de cruzar o limiar. Na metáfora da obra, é o tremor que destrói a escora de repouso.", "topicos": ["T16", "T17", "T18"]}, {"id": "ideia-governante", "termo": "Ideia Governante", "slug": "ideia-governante", "ancora": "ideia-governante", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Locução substantiva feminina", "regra": "Formulada em uma única frase de causa e efeito: [Causa] triunfa/perece porque [Razão Moral].", "definicao": "A proposição moral ativa que governa a arquitetura da história. Não é conselho moralista, mas a verdade provada pelo clímax.", "aplicacao": "Robert McKee sustenta que a narrativa só possui integridade estética quando todas as subtramas convergem para a mesma tese governante.", "topicos": ["T11", "T14", "T15"]}, {"id": "subtexto", "termo": "Subtexto", "slug": "subtexto", "ancora": "subtexto", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Substantivo masculino", "regra": "O texto é o que o personagem fala; o subtexto é o que ele de fato deseja, oculta ou sente debaixo da fala.", "definicao": "A corrente de alta voltagem que corre submersa nas falas. Manifesta-se nos silêncios, nas evasivas, na tensão muscular e na contradição corporal.", "aplicacao": "Personagens maduros raramente comunicam suas intenções reais de peito aberto. No diálogo como cimento, a verdadeira adesão reside no subtexto.", "topicos": ["T31", "T32", "T34"]}, {"id": "midpoint", "termo": "Ponto Médio (Midpoint)", "slug": "midpoint", "ancora": "midpoint", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Substantivo masculino", "regra": "Localizado no centro do Segundo Ato (aproximadamente aos 50% da metragem da história).", "definicao": "O divisor de águas onde as apostas são elevadas. Frequentemente surge como Falsa Vitória ou Falsa Derrota que transforma a missão.", "aplicacao": "Transfere o protagonista de uma atitude reativa para uma postura proativa e agressiva de confronto.", "topicos": ["T16", "T20"]}, {"id": "conflito-tres-niveis", "termo": "Conflito em Três Níveis", "slug": "conflito-tres-niveis", "ancora": "conflito-tres-niveis", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Locução substantiva masculina", "regra": "Estruturado em Conflito Interno (psique/corpo), Interpessoal (pares/família) e Extrapessoal (instituições/natureza).", "definicao": "A matriz integral de atrito dramático. Uma história rica opera nas três frequências simultâneas para prevenir monotonia e fadiga da ação.", "aplicacao": "Se o herói apenas combate ameaças exteriores sem carregar fraturas internas, o enredo soa oco e bidimensional.", "topicos": ["T03", "T07", "T10"]}, {"id": "ironia-dramatica", "termo": "Ironia Dramática", "slug": "ironia-dramatica", "ancora": "ironia-dramatica", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Locução substantiva feminina", "regra": "A plateia sabe algo determinante que o personagem em cena ignora por completo.", "definicao": "Orquestração de informação onde o espectador sabe da bomba sob a mesa enquanto os personagens conversam banalidades, gerando suspense extremo.", "aplicacao": "Transforma cenas triviais em instantes de tensão insuportável, pois a audiência torce desesperadamente para que a verdade venha à tona.", "topicos": ["T14", "T26", "T28"]}, {"id": "caracterizacao-vs-carater", "termo": "Caracterização vs. Caráter", "slug": "caracterizacao-vs-carater", "ancora": "caracterizacao-vs-carater", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Locução substantiva", "regra": "Caracterização é superfície; caráter é o núcleo ético revelado exclusivamente sob pressão de escolha extrema.", "definicao": "A distinção entre as propriedades externas de um indivíduo (idade, profissão, maneirismos) e quem ele é quando obrigado a pagar o preço de sua decisão.", "aplicacao": "David Corbett e Robert McKee ensinam que o público se conecta com a máscara da caracterização, mas só é tocado pelo caráter profundo desnudado no fogo.", "topicos": ["T06", "T07", "T08"]}, {"id": "pergunta-dramatica-central", "termo": "Pergunta Dramática Central", "slug": "pergunta-dramatica-central", "ancora": "pergunta-dramatica-central", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Locução substantiva feminina", "regra": "Formulada pelo Incidente Incitante; respondida impreterivelmente no Clímax com Sim ou Não.", "definicao": "A grande interrogação que move a curiosidade do espectador do início ao fim (ex: 'O detetive capturará o assassino antes da próxima lua cheia?').", "aplicacao": "Mantém o foco da narrativa afiado, impedindo desvios para tramas secundárias desconectadas da espinha dorsal do projeto.", "topicos": ["T02", "T16", "T18"]}, {"id": "bolsa-da-ficcao", "termo": "Teoria da Bolsa da Ficção", "slug": "bolsa-da-ficcao", "ancora": "bolsa-da-ficcao", "dominio": "narratologia", "dominioNome": "🎭 Dramaturgia & Narratologia", "classeGramatical": "Locução substantiva feminina", "regra": "Proposta por Ursula K. Le Guin contra o modelo da lança/flecha bélica.", "definicao": "Proposta estética onde a narrativa atua como recipiente coletor de coisas, pessoas, conflitos e afetos, em vez de arma de caça heroica unidirecional.", "aplicacao": "Permite criar obras multifocais, corais e comunitárias que recusam o imperativo do herói messiânico solitário.", "topicos": ["T04", "T05", "T21", "T30"]}];
+    window.TOPICOS_SLUGS = {"T01": "t01-forma-vs-formula", "T02": "t02-trindade-indissociavel", "T03": "t03-conflito-como-motor", "T04": "t04-pre-moldado-vs-organico", "T05": "t05-substancia-estilo-e-tatica", "T06": "t06-caracterizacao-vs-carater", "T07": "t07-desejo-vs-prioridade", "T08": "t08-acao-e-personagem", "T09": "t09-fios-desencapados", "T10": "t10-aterramento", "T11": "t11-tema-vs-assunto", "T12": "t12-genero-e-tom", "T13": "t13-natureza-do-genero", "T14": "t14-ideia-governante-vs-argumento-moral", "T15": "t15-guerra-de-crencas", "T16": "t16-estrutura-do-enredo", "T17": "t17-causa-e-efeito", "T18": "t18-tres-atos-industriais", "T19": "t19-trenas-e-tramas", "T20": "t20-entre-a-prancheta-e-a-picareta", "T21": "t21-topografia-narrativa", "T22": "t22-tempo-dramatico", "T23": "t23-geografia-civilizatoria", "T24": "t24-cronogramas-e-outras-gramas", "T25": "t25-niveis-espiralados", "T26": "t26-pontos-de-vista", "T27": "t27-entre-agencia-e-urgencia", "T28": "t28-voos-em-vaos", "T29": "t29-voz-ativa", "T30": "t30-fina-fachada-espelhada", "T31": "t31-acao-verbal", "T32": "t32-nenhum-outdoor-e-transparente", "T33": "t33-rubricas-e-incisos", "T34": "t34-sinfonia-das-britadeiras", "T35": "t35-betoneira-engessada-e-outros-vicios-de-dialogo", "T36": "t36-obras-diferentes-demandam-ferramentas-diferentes", "T37": "t37-tripe-da-regua-de-nivel", "T38": "t38-sem-mapa-nao-ha-recalculo-de-rota", "T39": "t39-prancheta-tablet-ou-quadro-camurca", "T40": "t40-canteiro-cercado-ou-mutirao", "T41": "t41-so-se-esculpe-tendo-algo-concreto", "T42": "t42-distanciamento", "T43": "t43-use-a-motosserra-sem-se-machucar", "T44": "t44-retrofit-narrativo", "T45": "t45-engenheiro-de-obra-pronta-aponta-voce-decide-o-reparo", "T46": "t46-canteiro-colaborativo", "T47": "t47-pa-de-prata", "T48": "t48-martelinho-de-ouro", "T49": "t49-chave-de-diamante", "T50": "t50-alvara-narrato-certificacao-em-engenharia-narratologica"};
+
+    let filtroGlossarioAtivo = 'all';
+
+    function renderGlossario(lista) {
+      const container = document.getElementById('gridGlossario');
+      if (!container) return;
+      
+      if (lista.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1; padding:2rem; text-align:center; color:var(--tinta-fraca);">Nenhum verbete encontrado no glossário.</div>';
+        return;
+      }
+
+      container.innerHTML = lista.map(item => `
+        <article class="preview-card" id="${item.ancora}" onclick="abrirModalVerbete('${item.id}')">
+          <div>
+            <div class="card-meta-row">
+              <span class="card-tag">#${item.ancora}</span>
+              <span class="card-badge badge-${item.dominio}">${item.dominioNome}</span>
+            </div>
+            <h3 class="card-title">${item.termo}</h3>
+            <p style="font-size:0.75rem; color:var(--tinta-fraca); margin-bottom:0.6rem; font-style:italic;">${item.classeGramatical}</p>
+            <p class="card-prose">${item.definicao}</p>
+          </div>
+          <div class="card-footer">
+            <span style="color:var(--ouro); font-weight:600;">Regra: ${item.regra.substring(0, 42)}...</span>
+            <span class="card-action-btn">Ver Verbete ↗</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function filtrarGlossario(dom, btn) {
+      filtroGlossarioAtivo = dom;
+      document.querySelectorAll('.filter-bar .pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      pesquisarGlossario();
+    }
+
+    function pesquisarGlossario() {
+      const termo = document.getElementById('buscaGlossario').value.toLowerCase().trim();
+      let res = window.GLOSSARIO_DB;
+
+      if (filtroGlossarioAtivo !== 'all') {
+        res = res.filter(item => item.dominio === filtroGlossarioAtivo);
+      }
+
+      if (termo) {
+        res = res.filter(item => 
+          item.termo.toLowerCase().includes(termo) ||
+          item.definicao.toLowerCase().includes(termo) ||
+          item.ancora.toLowerCase().includes(termo) ||
+          item.regra.toLowerCase().includes(termo)
+        );
+      }
+
+      renderGlossario(res);
+    }
+
+    function abrirModalVerbete(id) {
+      const item = window.GLOSSARIO_DB.find(g => g.id === id);
+      if (!item) return;
+
+      const modal = document.getElementById('detailOverlay');
+      const content = document.getElementById('modalContent');
+
+      const topicosLinks = (item.topicos || []).map(tId => {
+        const slug = window.TOPICOS_SLUGS[tId] || '';
+        const href = slug ? `../topicos/${slug}.html` : `../index.html#${tId.toLowerCase()}`;
+        return `<a href="${href}" class="card-tag" style="text-decoration:none; display:inline-block; margin:0.2rem 0.2rem 0.2rem 0;">${tId} ↗</a>`;
+      }).join(' ');
+
+      content.innerHTML = `
+        <div class="card-meta-row" style="margin-bottom:0.8rem;">
+          <span class="card-tag">#${item.ancora}</span>
+          <span class="card-badge badge-${item.dominio}">${item.dominioNome}</span>
+        </div>
+        <h2 style="font-size:1.6rem; color:var(--tinta); margin-bottom:0.2rem;">${item.termo}</h2>
+        <p style="color:var(--tinta-fraca); font-size:0.8rem; margin-bottom:1.2rem;">${item.classeGramatical}</p>
+
+        <div style="background:#141416; border:1px solid var(--borda); border-radius:8px; padding:1.1rem; margin-bottom:1rem;">
+          <span style="font-size:0.72rem; color:var(--ouro); text-transform:uppercase; font-weight:700; display:block; margin-bottom:0.5rem;">Definição Canônica</span>
+          <p style="font-size:0.88rem; color:var(--tinta); line-height:1.6;">${item.definicao}</p>
+        </div>
+
+        <div style="background:#18171A; border-left:4px solid var(--ouro); border-radius:0 8px 8px 0; padding:1rem 1.25rem; margin-bottom:1rem;">
+          <span style="font-size:0.72rem; color:var(--ouro); text-transform:uppercase; font-weight:700; display:block; margin-bottom:0.35rem;">Regra Normativa NarrATO</span>
+          <p style="font-size:0.85rem; color:var(--tinta-suave);">${item.regra}</p>
+        </div>
+
+        <div style="background:#141416; border:1px solid var(--borda); border-radius:8px; padding:1.1rem; margin-bottom:1.25rem;">
+          <span style="font-size:0.72rem; color:var(--ouro); text-transform:uppercase; font-weight:700; display:block; margin-bottom:0.5rem;">Aplicação Prática no Canteiro</span>
+          <p style="font-size:0.85rem; color:var(--tinta-suave); line-height:1.6;">${item.aplicacao}</p>
+        </div>
+
+        ${topicosLinks ? `
+          <div style="margin-bottom:1.25rem;">
+            <span style="font-size:0.72rem; color:var(--tinta-fraca); text-transform:uppercase; font-weight:700; display:block; margin-bottom:0.5rem;">Matérias do Caderno de Encargos Relacionadas</span>
+            <div>${topicosLinks}</div>
+          </div>
+        ` : ''}
+
+        <div style="border-top:1px solid var(--borda-fina); padding-top:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.75rem; color:var(--tinta-fraca);">Identificador de Âncora (ASCII puro):</span>
+          <code style="background:#09090b; padding:0.3rem 0.6rem; border-radius:4px; color:var(--ouro); font-size:0.8rem; border:1px solid var(--borda);">#${item.ancora}</code>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    function fecharModal(e) {
+      if (!e || e.target.id === 'detailOverlay' || e.target.classList.contains('close-modal-btn')) {
+        document.getElementById('detailOverlay').classList.remove('active');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fecharModal();
+    });
+
+    // Deep link via hash na URL (ex: #operari ou #praxis)
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (hash) {
+        const item = window.GLOSSARIO_DB.find(g => g.ancora.toLowerCase() === hash || g.slug.toLowerCase() === hash);
+        if (item) {
+          abrirModalVerbete(item.id);
+        }
+      }
+    });
+  </script>
+
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
+  <!-- ============================================================== -->
+<!-- POLIGONAL HUB - INCLUDE DE RODAPÉ INSTITUCIONAL UNIFICADO      -->
+<!-- Layout e informações padronizados; estilização via CSS/classes -->
+<!-- ============================================================== -->
+<footer class="poligonal-footer" data-poligonal-footer>
+  <div class="poligonal-footer-container">
+    <div class="poligonal-footer-top">
+      
+      <!-- Bloco de Marca e Manifesto -->
+      <div class="poligonal-footer-brand-col">
+        <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
+        <p class="poligonal-footer-desc">
+          Vários ângulos, todos anti-imperialistas.<br>
+          Desenvolvedores de audiovisual, jogos e soluções web.
+        </p>
+        <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
+          poligonalhub@gmail.com ↗
+        </a>
+      </div>
+
+      <!-- Grupos de Links -->
+      <div class="poligonal-footer-links-group">
+        <!-- Navegação Principal -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Navegação</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="/" data-root-link>Home</a></li>
+            <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Comunitários -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Comunidade</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Barra de Rodapé / Direitos -->
+    <div class="poligonal-footer-bottom">
+      <span class="poligonal-footer-copy">
+        &copy; <span data-poligonal-year>2026</span> Centro Comunitário-Criativo Poligonal. Todos os direitos reservados.
+      </span>
+      <span class="poligonal-footer-origin">
+        Nordestinamente orgulhosos 🌵
+      </span>
+    </div>
+  </div>
+</footer>
+
+  <script src="../../shared/hub-footer.js"></script>
+</body>
+</html>

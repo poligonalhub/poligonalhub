@@ -643,6 +643,16 @@
         drawerDiretriz.textContent = item.diretriz || "Aplique a metodologia com atenção à coerência dramática e integridade do canteiro.";
       }
 
+      const slug = item.slug || ('t' + item.numero.toString().padStart(2, '0'));
+      const drawerMemorialLink = document.getElementById('drawerMemorialLink');
+      if (drawerMemorialLink) {
+        drawerMemorialLink.href = `topicos/${slug}.html`;
+      }
+      const drawerMemorialTopLink = document.getElementById('drawerMemorialTopLink');
+      if (drawerMemorialTopLink) {
+        drawerMemorialTopLink.href = `topicos/${slug}.html`;
+      }
+
       // Atualização dos controles de navegação
       const total = TOPICOS_DB.length;
       const numDisplay = item.numero.toString().padStart(2, '0');
