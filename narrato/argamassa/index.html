@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📔 Argamassa • Plano Político Pedagógico | NarrATO</title>
+  
+  <meta name="description" content="Plano Político Pedagógico do NarrATO: A Metáfora da Engenharia Narratológica, Fundamentação Teórica e os 5 Pilares de Ensino.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#141416">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Poligonal Hub • NarrATO">
+  <meta property="og:title" content="📔 Argamassa • Plano Político Pedagógico">
+  <meta property="og:description" content="A filosofia educacional e a sustentação metodológica interna do NarrATO.">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/logo-poligonal.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Compartilhados e do Canteiro -->
+  <link rel="stylesheet" href="../../shared/footer.css">
+  <link rel="stylesheet" href="../assets/css/narrato.css">
+</head>
+<body class="argamassa-page">
+
+  <!-- HEADER DOCKADO COM OMNI-SEARCH -->
+  <header class="narrato-header" style="position: sticky; top:0; z-index: 100;">
+    <a href="../index.html" class="header-brand" title="Voltar ao Início do Canteiro">
+      <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
+      <div class="header-title-box">
+        <span class="header-title">NARRATO</span>
+        <span class="header-subtitle">Argamassa PPP</span>
+      </div>
+    </a>
+
+    <!-- UNIVERSAL OMNI-SEARCH (INCLUDE DESACOPLADO) -->
+    <!-- ============================================================== -->
+<!-- UNIVERSAL OMNI-SEARCH • PESQUISA CENTRAL DESACOPLADA NARRATO   -->
+<!-- Pesquisa unificada em tempo real: Matérias, Livros e Glossário -->
+<!-- ============================================================== -->
+<div class="omni-search-wrapper" data-omni-search>
+  <div class="omni-search-box">
+    <span class="omni-search-icon">🔍</span>
+    <input type="text" id="omniSearchInput" class="omni-search-input" placeholder="Pesquisar matérias, livros, glossário... [Ctrl+K]" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()">
+    <button id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca">✕</button>
+    <span class="omni-search-kbd">Ctrl+K</span>
+  </div>
+
+  <!-- DROPDOWN DINÂMICO DE RESULTADOS -->
+  <div id="omniDropdown" class="omni-dropdown">
+    <div class="omni-tabs">
+      <button class="omni-tab active" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('topico')">🏗️ Matérias (<span id="countTopicos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('livro')">📚 Livros (<span id="countLivros">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('verbete')">📖 Glossário (<span id="countVerbetes">0</span>)</button>
+    </div>
+    <div id="omniResultsBody"></div>
+  </div>
+</div>
+
+    <nav class="header-nav">
+      <a href="../index.html" class="header-nav-link"><span>📓</span> Caderno</a>
+      <a href="../argamassa/index.html" class="header-nav-link active"><span>📔</span> Argamassa</a>
+      <a href="../fontes/index.html" class="header-nav-link"><span>📚</span> Bibliografia</a>
+      <a href="../glossario/index.html" class="header-nav-link"><span>📖</span> Glossário</a>
+      <a href="#licitacao" class="header-nav-link" style="color:var(--ouro); font-weight:700;"><span>📄</span> Licitação</a>
+      <button type="button" class="header-icon-btn btn-onboarding-trigger" onclick="abrirOnboarding()" title="Entenda o NarrATO (Onboarding)" aria-label="Entenda o NarrATO" style="width:30px; height:30px; border-radius:50%; background:#2A231C; border:1px solid #FFB201; color:#FFB201; font-weight:700; font-size:0.85rem; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+        ?
+      </button>
+    </nav>
+  </header>
+
+  <div class="hazard-stripe"></div>
+
+  <main class="main-wrap" style="max-width:1100px; margin:0 auto; padding:2rem 1.25rem 4rem;">
+
+    <!-- CABEÇALHO HERO LIMPO -->
+    <section class="page-title-banner" style="margin-bottom:2.5rem;">
+      <div class="hero-content">
+        <h1 class="hero-title">📔 Argamassa</h1>
+        <div class="hero-subtitle">Plano Político Pedagógico</div>
+      </div>
+    </section>
+
+    <!-- CONTAINER 1: A METÁFORA DA ENGENHARIA NARRATOLÓGICA -->
+    <section class="argamassa-card" id="metafora" style="background:#1B1A1E; border:1px solid rgba(255,178,1,0.25); border-radius:12px; padding:2rem 2.25rem; margin-bottom:2rem;">
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem;">
+        <span style="font-size:1.8rem;">🏗️</span>
+        <h2 style="font-size:1.4rem; color:#FFB201; margin:0; font-family:'JetBrains Mono', monospace;">A Metáfora da Engenharia Narratológica</h2>
+      </div>
+
+      <div class="argamassa-prose" style="font-size:0.98rem; line-height:1.75; color:#E0DDD5;">
+        <p style="margin-bottom:1rem;">
+          Em sua concepção, o NarrATO foi projetado para resolver dois desafios fundamentais:
+        </p>
+        <ul style="list-style:none; padding-left:0; margin-bottom:1.25rem; display:flex; flex-direction:column; gap:0.75rem;">
+          <li style="padding-left:1.5rem; position:relative;">
+            <span style="position:absolute; left:0; color:#FFB201; font-weight:700;">1.</span>
+            <strong>Materialização da Criatividade</strong>: Desmistificar a escrita como um ato puramente "mágico" e situá-la como um ofício estrutural rigoroso — uma engenharia que exige raciocínio, lógica e tomada de decisão autônoma.
+          </li>
+          <li style="padding-left:1.5rem; position:relative;">
+            <span style="position:absolute; left:0; color:#FFB201; font-weight:700;">2.</span>
+            <strong>Integração Multidisciplinar</strong>: Conectar estudantes e criadores de diversas áreas (roteiro audiovisual, literatura, game design, publicidade e música) sob um mesmo vocabulário técnico comum.
+          </li>
+        </ul>
+        <p style="margin-bottom:0;">
+          Utilizando como norte o slogan oficial de 2016 — <em>"cimento, tijolos e vigas de aço para construtores de histórias"</em> —, o NarrATO aproxima a criação dramática do canteiro de obras da construção civil: o participante atua como <strong>Operari</strong> no chão de fábrica da narrativa, manipulando a terminologia técnica compartilhada (ART, Planta Baixa, Canteiro, Vistoria e Obra) para erguer edifícios narrativos estáveis.
+        </p>
+      </div>
+    </section>
+
+    <!-- CONTAINER MAIOR: FUNDAMENTAÇÃO TEÓRICA -->
+    <section class="argamassa-card" id="fundamentacao-teorica" style="background:#1B1A1E; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2rem 2.25rem; margin-bottom:2.5rem;">
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem;">
+        <span style="font-size:1.8rem;">📐</span>
+        <h2 style="font-size:1.4rem; color:#FFB201; margin:0; font-family:'JetBrains Mono', monospace;">Fundamentação Teórica</h2>
+      </div>
+
+      <div class="argamassa-prose" style="font-size:0.98rem; line-height:1.75; color:#E0DDD5;">
+        <p style="margin-bottom:1rem;">
+          A dinâmica de ensino do <strong>NarrATO</strong> recusa terminantemente o modelo de <em>Ensino Bancário</em> que trata estudantes como receptáculos passivos de fórmulas prontas de sucesso em 10 passos. Em vez disso, nossa sustentação teórico-metodológica é alicerçada em cinco pilares interligados da pedagogia crítica contemporânea e das ciências cognitivas.
+        </p>
+        <p style="margin-bottom:0;">
+          Cada pilar abaixo atua como um contraforte estrutural no Canteiro, articulando livros-fonte da educação transformadora com as práticas diárias da Folha Milimetrada, do Diário de Obra e da Curadoria Dialética.
+        </p>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DOS 5 PILARES MENORES (PREVIEW CARDS EM GRADE) -->
+    <section class="pilares-section" style="margin-bottom:3rem;">
+      <h3 style="font-size:1.15rem; color:#FFF; margin-bottom:1.25rem; font-family:'JetBrains Mono', monospace; display:flex; align-items:center; gap:0.5rem;">
+        <span>🏛️</span>
+        <span>Os 5 Pilares Pedagógicos do NarrATO</span>
+      </h3>
+
+      <div class="pilares-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+
+        <!-- PILAR 1: PEDAGOGIA DA AUTONOMIA -->
+        <article class="pilar-card" id="autonomia" style="background:#17161A; border:1px solid rgba(255,178,1,0.2); border-radius:10px; padding:1.5rem; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:1.8rem;">🌱</span>
+              <span style="font-size:0.7rem; font-family:'JetBrains Mono', monospace; color:#FFB201; background:rgba(255,178,1,0.12); padding:0.2rem 0.5rem; border-radius:4px;">PILAR 01</span>
+            </div>
+            <h4 style="font-size:1.15rem; color:#FFF; margin-bottom:0.6rem; font-family:'JetBrains Mono', monospace;">Pedagogia da Autonomia</h4>
+            <p style="font-size:0.88rem; line-height:1.6; color:#B0ADA5; margin-bottom:1rem;">
+              Rompimento com o ensino bancário: ensinar não é transferir conhecimento, mas criar as condições para a sua própria produção autônoma através da Curiosidade Epistemológica, Práxis e Dialogicidade.
+            </p>
+            <div style="background:#111113; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:1rem; font-size:0.8rem; color:#D0CDC5;">
+              <span style="color:#A09D95; display:block; font-size:0.72rem; text-transform:uppercase;">Livro-Fonte Principal:</span>
+              <strong>Paulo Freire</strong> • <em>Pedagogia da Autonomia</em> (2014)
+            </div>
+          </div>
+          <button type="button" class="btn-inspect" onclick="abrirPilarPedagogico('autonomia')" style="width:100%; justify-content:center;">
+            <span>Ver Pilar Pedagógico ↗</span>
+          </button>
+        </article>
+
+        <!-- PILAR 2: METODOLOGIAS ATIVAS -->
+        <article class="pilar-card" id="metodologias-ativas" style="background:#17161A; border:1px solid rgba(255,178,1,0.2); border-radius:10px; padding:1.5rem; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:1.8rem;">⚡</span>
+              <span style="font-size:0.7rem; font-family:'JetBrains Mono', monospace; color:#FFB201; background:rgba(255,178,1,0.12); padding:0.2rem 0.5rem; border-radius:4px;">PILAR 02</span>
+            </div>
+            <h4 style="font-size:1.15rem; color:#FFF; margin-bottom:0.6rem; font-family:'JetBrains Mono', monospace;">Metodologias Ativas</h4>
+            <p style="font-size:0.88rem; line-height:1.6; color:#B0ADA5; margin-bottom:1rem;">
+              Transferência do protagonismo para quem estuda: resolução ativa de problemas dramáticos reais, validação colaborativa de hipóteses na bancada e transformação da teoria em ação imediata.
+            </p>
+            <div style="background:#111113; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:1rem; font-size:0.8rem; color:#D0CDC5;">
+              <span style="color:#A09D95; display:block; font-size:0.72rem; text-transform:uppercase;">Livro-Fonte Principal:</span>
+              <strong>Lilian Bacich & José Moran</strong> • <em>Metodologias Ativas</em> (2018)
+            </div>
+          </div>
+          <button type="button" class="btn-inspect" onclick="abrirPilarPedagogico('metodologias-ativas')" style="width:100%; justify-content:center;">
+            <span>Ver Pilar Pedagógico ↗</span>
+          </button>
+        </article>
+
+        <!-- PILAR 3: PBL -->
+        <article class="pilar-card" id="pbl" style="background:#17161A; border:1px solid rgba(255,178,1,0.2); border-radius:10px; padding:1.5rem; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:1.8rem;">🗂️</span>
+              <span style="font-size:0.7rem; font-family:'JetBrains Mono', monospace; color:#FFB201; background:rgba(255,178,1,0.12); padding:0.2rem 0.5rem; border-radius:4px;">PILAR 03</span>
+            </div>
+            <h4 style="font-size:1.15rem; color:#FFF; margin-bottom:0.6rem; font-family:'JetBrains Mono', monospace;">Aprendizagem Baseada em Projetos</h4>
+            <p style="font-size:0.88rem; line-height:1.6; color:#B0ADA5; margin-bottom:1rem;">
+              Toda a jornada converge para um artefato tangível: a construção da obra autoral do Operari. Obstáculos de enredo tornam-se desafios diretos de aprendizagem resolvidos no Diário de Obra.
+            </p>
+            <div style="background:#111113; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:1rem; font-size:0.8rem; color:#D0CDC5;">
+              <span style="color:#A09D95; display:block; font-size:0.72rem; text-transform:uppercase;">Livro-Fonte Principal:</span>
+              <strong>William N. Bender</strong> • <em>Aprendizagem Baseada em Projetos</em> (2014)
+            </div>
+          </div>
+          <button type="button" class="btn-inspect" onclick="abrirPilarPedagogico('pbl')" style="width:100%; justify-content:center;">
+            <span>Ver Pilar Pedagógico ↗</span>
+          </button>
+        </article>
+
+        <!-- PILAR 4: DUA -->
+        <article class="pilar-card" id="dua" style="background:#17161A; border:1px solid rgba(255,178,1,0.2); border-radius:10px; padding:1.5rem; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:1.8rem;">🧑🏾‍🏫</span>
+              <span style="font-size:0.7rem; font-family:'JetBrains Mono', monospace; color:#FFB201; background:rgba(255,178,1,0.12); padding:0.2rem 0.5rem; border-radius:4px;">PILAR 04</span>
+            </div>
+            <h4 style="font-size:1.15rem; color:#FFF; margin-bottom:0.6rem; font-family:'JetBrains Mono', monospace;">Design Universal de Aprendizagem</h4>
+            <p style="font-size:0.88rem; line-height:1.6; color:#B0ADA5; margin-bottom:1rem;">
+              Eliminação sistemática de barreiras cognitivas: múltiplos meios de engajamento, representação (PDF com OpenDyslexic, legendas LSE) e expressão processual para acolher a neurodiversidade.
+            </p>
+            <div style="background:#111113; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:1rem; font-size:0.8rem; color:#D0CDC5;">
+              <span style="color:#A09D95; display:block; font-size:0.72rem; text-transform:uppercase;">Livro-Fonte Principal:</span>
+              <strong>Anne Meyer, David Rose / CAST</strong> • <em>Universal Design for Learning</em> (2014)
+            </div>
+          </div>
+          <button type="button" class="btn-inspect" onclick="abrirPilarPedagogico('dua')" style="width:100%; justify-content:center;">
+            <span>Ver Pilar Pedagógico ↗</span>
+          </button>
+        </article>
+
+        <!-- PILAR 5: INOVAÇÃO COGNITIVA -->
+        <article class="pilar-card" id="inovacao-cognitiva" style="background:#17161A; border:1px solid rgba(255,178,1,0.2); border-radius:10px; padding:1.5rem; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:1.8rem;">🧠</span>
+              <span style="font-size:0.7rem; font-family:'JetBrains Mono', monospace; color:#FFB201; background:rgba(255,178,1,0.12); padding:0.2rem 0.5rem; border-radius:4px;">PILAR 05</span>
+            </div>
+            <h4 style="font-size:1.15rem; color:#FFF; margin-bottom:0.6rem; font-family:'JetBrains Mono', monospace;">Estratégias de Inovação Cognitiva</h4>
+            <p style="font-size:0.88rem; line-height:1.6; color:#B0ADA5; margin-bottom:1rem;">
+              Decodificação da densidade teórica via modelos mentais de engenharia civil, prática espaçada, recuperação ativa na Folha Milimetrada e esquemas conceituais de alta retenção.
+            </p>
+            <div style="background:#111113; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:1rem; font-size:0.8rem; color:#D0CDC5;">
+              <span style="color:#A09D95; display:block; font-size:0.72rem; text-transform:uppercase;">Livro-Fonte Principal:</span>
+              <strong>Peter C. Brown et al.</strong> • <em>Fixe o Conhecimento</em> (2018)
+            </div>
+          </div>
+          <button type="button" class="btn-inspect" onclick="abrirPilarPedagogico('inovacao-cognitiva')" style="width:100%; justify-content:center;">
+            <span>Ver Pilar Pedagógico ↗</span>
+          </button>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOMENTO PÚBLICO -->
+  <!-- ============================================================== -->
+<!-- NARRATO V1.0 - PRODUZIDO E FINANCIADO POR (POLIGONAL + SELOS)  -->
+<!-- Include Desacoplado para uso em todas as páginas do Canteiro  -->
+<!-- ============================================================== -->
+<section class="fomento-section">
+  <div class="fomento-inner">
+    <span class="fomento-label">NarrATO V1.0 - Produzido e Financiado por</span>
+    <div class="fomento-logos">
+      <!-- 1º Selo: Centro Comunitário-Criativo Poligonal -->
+      <img src="../assets/logo-poligonal.svg" alt="Centro Comunitário-Criativo Poligonal" class="fomento-seal fomento-seal-lead" title="Centro Comunitário-Criativo Poligonal">
+      <!-- Selos Institucionais de Fomento -->
+      <img src="../assets/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal" title="PNAB - Política Nacional Aldir Blanc">
+      <img src="../assets/FUNJOPE.svg" alt="FUNJOPE" class="fomento-seal" title="Fundação Cultural de João Pessoa">
+      <img src="../assets/PMJP.svg" alt="Prefeitura Municipal de João Pessoa" class="fomento-seal" title="Prefeitura Municipal de João Pessoa">
+      <img src="../assets/FMC.svg" alt="Fundo Municipal de Cultura" class="fomento-seal" title="FMC - Fundo Municipal de Cultura">
+      <img src="../assets/MINC.svg" alt="Ministério da Cultura" class="fomento-seal" title="Ministério da Cultura">
+      <img src="../assets/GOV.svg" alt="Governo Federal" class="fomento-seal" title="Governo Federal - Brasil União e Reconstrução">
+    </div>
+  </div>
+</section>
+
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
+  <!-- ============================================================== -->
+<!-- POLIGONAL HUB - INCLUDE DE RODAPÉ INSTITUCIONAL UNIFICADO      -->
+<!-- Layout e informações padronizados; estilização via CSS/classes -->
+<!-- ============================================================== -->
+<footer class="poligonal-footer" data-poligonal-footer>
+  <div class="poligonal-footer-container">
+    <div class="poligonal-footer-top">
+      
+      <!-- Bloco de Marca e Manifesto -->
+      <div class="poligonal-footer-brand-col">
+        <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
+        <p class="poligonal-footer-desc">
+          Vários ângulos, todos anti-imperialistas.<br>
+          Desenvolvedores de audiovisual, jogos e soluções web.
+        </p>
+        <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
+          poligonalhub@gmail.com ↗
+        </a>
+      </div>
+
+      <!-- Grupos de Links -->
+      <div class="poligonal-footer-links-group">
+        <!-- Navegação Principal -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Navegação</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="/" data-root-link>Home</a></li>
+            <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Comunitários -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Comunidade</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Barra de Rodapé / Direitos -->
+    <div class="poligonal-footer-bottom">
+      <span class="poligonal-footer-copy">
+        &copy; <span data-poligonal-year>2026</span> Centro Comunitário-Criativo Poligonal. Todos os direitos reservados.
+      </span>
+      <span class="poligonal-footer-origin">
+        Nordestinamente orgulhosos 🌵
+      </span>
+    </div>
+  </div>
+</footer>
+
+  <script src="../assets/js/omni-index.js"></script>
+  <script src="../assets/js/narrato.js"></script>
+  <script src="../../shared/hub-footer.js"></script>
+</body>
+</html>

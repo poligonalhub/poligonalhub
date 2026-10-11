@@ -592,7 +592,7 @@
     // Modal Logic & Renderização
     function renderBiblioItems(livros) {
       if (!livros || livros.length === 0) {
-        return '<p class="biblio-detail">Bibliografia canônica em catalogação sob as diretrizes do Caderno de Encargos.</p>';
+        return '<p class="biblio-detail">Bibliografia oficial em catalogação sob as diretrizes do Caderno de Encargos.</p>';
       }
       return livros.map(l => `
         <div class="biblio-item">
@@ -782,3 +782,320 @@
         setTimeout(() => { abrirDrawer(hash); }, 300);
       }
     });
+
+// =============================================================================
+// UNIVERSAL OMNI-SEARCH ENGINE (CLIENT-SIDE PESQUISA CENTRALIZADA)
+// =============================================================================
+let currentOmniFilter = 'todos';
+
+function getPathPrefix() {
+  const p = window.location.pathname;
+  if (p.includes('/topicos/') || p.includes('/fontes/') || p.includes('/glossario/')) {
+    return '../';
+  }
+  return '';
+}
+
+function handleOmniFocus() {
+  const input = document.getElementById('omniSearchInput');
+  if (input && input.value.trim().length > 0) {
+    const dropdown = document.getElementById('omniDropdown');
+    if (dropdown) dropdown.classList.add('active');
+  }
+}
+
+function closeOmniDropdown() {
+  const dropdown = document.getElementById('omniDropdown');
+  if (dropdown) dropdown.classList.remove('active');
+}
+
+function clearOmniSearch() {
+  const input = document.getElementById('omniSearchInput');
+  const clearBtn = document.getElementById('omniClearBtn');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  if (clearBtn) clearBtn.style.display = 'none';
+  closeOmniDropdown();
+}
+
+function setOmniFilter(filterType) {
+  currentOmniFilter = filterType;
+  document.querySelectorAll('.omni-tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('onclick') && t.getAttribute('onclick').includes(filterType));
+  });
+  const input = document.getElementById('omniSearchInput');
+  if (input) handleOmniSearch(input.value);
+}
+
+function navigateToOmniItem(type, id, slug) {
+  const prefix = getPathPrefix();
+  closeOmniDropdown();
+
+  if (type === 'topico') {
+    window.location.href = prefix + 'topicos/' + slug + '.html';
+  } else if (type === 'livro') {
+    if (window.location.pathname.includes('/fontes/')) {
+      if (typeof abrirModalFonte === 'function') {
+        abrirModalFonte(id);
+        return;
+      }
+    }
+    window.location.href = prefix + 'fontes/index.html#' + id;
+  } else if (type === 'verbete') {
+    if (window.location.pathname.includes('/glossario/')) {
+      if (typeof abrirModalVerbete === 'function') {
+        abrirModalVerbete(id);
+        return;
+      }
+    }
+    window.location.href = prefix + 'glossario/index.html#' + id;
+  }
+}
+
+function handleOmniSearch(query) {
+  const q = (query || '').trim().toLowerCase();
+  const clearBtn = document.getElementById('omniClearBtn');
+  const dropdown = document.getElementById('omniDropdown');
+  const resultsBody = document.getElementById('omniResultsBody');
+
+  if (!dropdown || !resultsBody) return;
+
+  if (!q) {
+    if (clearBtn) clearBtn.style.display = 'none';
+    closeOmniDropdown();
+    return;
+  }
+
+  if (clearBtn) clearBtn.style.display = 'block';
+  dropdown.classList.add('active');
+
+  const index = window.OMNI_INDEX || [];
+  let matches = index.filter(item => (item.keywords || '').includes(q));
+
+  const totalMat = matches.filter(m => m.type === 'topico').length;
+  const totalLiv = matches.filter(m => m.type === 'livro').length;
+  const totalVer = matches.filter(m => m.type === 'verbete').length;
+
+  const countTodos = document.getElementById('countTodos');
+  const countTopicos = document.getElementById('countTopicos');
+  const countLivros = document.getElementById('countLivros');
+  const countVerbetes = document.getElementById('countVerbetes');
+
+  if (countTodos) countTodos.innerText = matches.length;
+  if (countTopicos) countTopicos.innerText = totalMat;
+  if (countLivros) countLivros.innerText = totalLiv;
+  if (countVerbetes) countVerbetes.innerText = totalVer;
+
+  if (currentOmniFilter !== 'todos') {
+    matches = matches.filter(m => m.type === currentOmniFilter);
+  }
+
+  if (matches.length === 0) {
+    resultsBody.innerHTML = `<div class="omni-empty">Nenhum tijolo ou termo encontrado para "${query}".</div>`;
+    return;
+  }
+
+  let html = '';
+  const topicosList = matches.filter(m => m.type === 'topico');
+  const livrosList = matches.filter(m => m.type === 'livro');
+  const verbetesList = matches.filter(m => m.type === 'verbete');
+
+  if (topicosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'topico')) {
+    html += `<div class="omni-group-title">🏗️ Matérias do Caderno (${topicosList.length})</div>`;
+    topicosList.slice(0, 5).forEach(item => {
+      html += `
+        <div class="omni-item" onclick="navigateToOmniItem('topico', '${item.id}', '${item.slug}')">
+          <span class="omni-item-badge badge-mat">${item.id}</span>
+          <div class="omni-item-content">
+            <div class="omni-item-title">${item.title}</div>
+            <div class="omni-item-sub">${item.sub}</div>
+            <div class="omni-item-desc">${item.desc}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  if (livrosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'livro')) {
+    html += `<div class="omni-group-title">📚 Obras & Bibliografia (${livrosList.length})</div>`;
+    livrosList.slice(0, 5).forEach(item => {
+      html += `
+        <div class="omni-item" onclick="navigateToOmniItem('livro', '${item.id}', '${item.slug}')">
+          <span class="omni-item-badge badge-liv">Livro</span>
+          <div class="omni-item-content">
+            <div class="omni-item-title">${item.title}</div>
+            <div class="omni-item-sub">${item.sub}</div>
+            <div class="omni-item-desc">${item.desc}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  if (verbetesList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'verbete')) {
+    html += `<div class="omni-group-title">📖 Glossário & Tags (${verbetesList.length})</div>`;
+    verbetesList.slice(0, 5).forEach(item => {
+      const rawSlug = item.ancora || (item.title.split('•')[0].replace('#', '').trim());
+      html += `
+        <div class="omni-item" onclick="navigateToOmniItem('verbete', '${rawSlug}', '${rawSlug}')">
+          <span class="omni-item-badge badge-ver">Verbete</span>
+          <div class="omni-item-content">
+            <div class="omni-item-title">${item.title}</div>
+            <div class="omni-item-sub">${item.sub}</div>
+            <div class="omni-item-desc">${item.desc}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  resultsBody.innerHTML = html;
+}
+
+// Atalho global Ctrl+K e Escape
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const input = document.getElementById('omniSearchInput');
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  } else if (e.key === 'Escape') {
+    closeOmniDropdown();
+  }
+});
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-omni-search]') && !e.target.closest('.omni-search-wrapper')) {
+    closeOmniDropdown();
+  }
+});
+
+// =========================================================================
+// GESTÃO DE ESTADO DO CADERNO DE ENCARGOS: LIDO & RECOLHIDO (LOCALSTORAGE)
+// =========================================================================
+function getCapitulosLidos() {
+  try {
+    return JSON.parse(localStorage.getItem('narrato_capitulos_lidos')) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function setCapitulosLidos(arr) {
+  try {
+    localStorage.setItem('narrato_capitulos_lidos', JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function getCapitulosColapsados() {
+  try {
+    return JSON.parse(localStorage.getItem('narrato_capitulos_colapsados')) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function setCapitulosColapsados(arr) {
+  try {
+    localStorage.setItem('narrato_capitulos_colapsados', JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function toggleCapLido(capNum) {
+  const lidos = getCapitulosLidos();
+  const idx = lidos.indexOf(capNum);
+  const block = document.querySelector(`.chapter-block[data-cap="${capNum}"]`);
+  const btn = document.querySelector(`.btn-cap-read[data-cap="${capNum}"]`);
+
+  if (idx > -1) {
+    lidos.splice(idx, 1);
+    if (block) block.classList.remove('cap-lido');
+    if (btn) btn.classList.remove('active');
+    if (typeof mostrarToast === 'function') mostrarToast(`Capítulo ${capNum} desmarcado como lido.`);
+  } else {
+    lidos.push(capNum);
+    if (block) block.classList.add('cap-lido');
+    if (btn) btn.classList.add('active');
+    if (typeof mostrarToast === 'function') mostrarToast(`✓ Capítulo ${capNum} marcado como lido!`);
+  }
+  setCapitulosLidos(lidos);
+}
+
+function toggleCapColapso(capNum) {
+  const colapsados = getCapitulosColapsados();
+  const idx = colapsados.indexOf(capNum);
+  const body = document.getElementById(`cap-body-${capNum}`);
+  const btn = document.querySelector(`.btn-cap-toggle[data-cap="${capNum}"]`);
+  const toggleIcon = btn ? btn.querySelector('.toggle-icon') : null;
+
+  if (idx > -1) {
+    // Está colapsado -> expandir
+    colapsados.splice(idx, 1);
+    if (body) body.style.display = '';
+    if (btn) btn.classList.remove('collapsed');
+    if (toggleIcon) toggleIcon.textContent = '−';
+  } else {
+    // Está expandido -> colapsar
+    colapsados.push(capNum);
+    if (body) body.style.display = 'none';
+    if (btn) btn.classList.add('collapsed');
+    if (toggleIcon) toggleIcon.textContent = '+';
+  }
+  setCapitulosColapsados(colapsados);
+}
+
+function restaurarProgressoCapitulos() {
+  const lidos = getCapitulosLidos();
+  lidos.forEach(num => {
+    const block = document.querySelector(`.chapter-block[data-cap="${num}"]`);
+    const btn = document.querySelector(`.btn-cap-read[data-cap="${num}"]`);
+    if (block) block.classList.add('cap-lido');
+    if (btn) btn.classList.add('active');
+  });
+
+  const colapsados = getCapitulosColapsados();
+  colapsados.forEach(num => {
+    const body = document.getElementById(`cap-body-${num}`);
+    const btn = document.querySelector(`.btn-cap-toggle[data-cap="${num}"]`);
+    const toggleIcon = btn ? btn.querySelector('.toggle-icon') : null;
+    if (body) body.style.display = 'none';
+    if (btn) btn.classList.add('collapsed');
+    if (toggleIcon) toggleIcon.textContent = '+';
+  });
+}
+
+function resetarProgressoUsuario() {
+  if (confirm("Deseja realmente resetar o progresso de leitura e dados locais do NarrATO?")) {
+    try {
+      localStorage.removeItem('narrato_capitulos_lidos');
+      localStorage.removeItem('narrato_capitulos_colapsados');
+      localStorage.removeItem('narrato_onboarding_dismissed');
+    } catch (e) {}
+
+    document.querySelectorAll('.chapter-block').forEach(b => b.classList.remove('cap-lido'));
+    document.querySelectorAll('.btn-cap-read').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.chapter-content-body').forEach(b => b.style.display = '');
+    document.querySelectorAll('.btn-cap-toggle').forEach(b => {
+      b.classList.remove('collapsed');
+      const icon = b.querySelector('.toggle-icon');
+      if (icon) icon.textContent = '−';
+    });
+
+    if (typeof mostrarToast === 'function') mostrarToast("🔄 Dados locais e progresso resetados com sucesso.");
+  }
+}
+
+// Onboarding Navigation
+function abrirOnboarding() {
+  window.location.href = 'entenda/index.html';
+}
+
+// Inicializar restauração ao carregar página
+document.addEventListener('DOMContentLoaded', function() {
+  restaurarProgressoCapitulos();
+});

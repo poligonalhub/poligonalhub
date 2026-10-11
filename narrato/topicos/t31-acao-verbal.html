@@ -25,49 +25,98 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Estilos Compartilhados e Canônicos -->
+  <!-- Estilos Compartilhados e do Canteiro -->
   <link rel="stylesheet" href="../../shared/footer.css">
   <link rel="stylesheet" href="../assets/css/narrato.css">
 </head>
 <body>
 
-  <!-- TOPO: FAIXA DE SEGURANÇA E BRAND -->
-  <header class="site-header hero-docked" style="position: sticky; top:0; z-index: 100;">
-    <div class="hazard-stripe"></div>
-    <div class="header-inner" style="display:flex; justify-content:space-between; align-items:center;">
-      <a href="../index.html" class="brand-group" style="text-decoration:none;" title="Voltar ao Caderno de Encargos">
-        <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
-      </a>
-      <nav style="display:flex; gap:0.75rem; align-items:center;">
-        <a href="../index.html" class="pill-btn"><span>🏗️</span> Matérias</a>
-        <a href="../fontes/index.html" class="pill-btn"><span>📚</span> Fontes</a>
-        <a href="../glossario/index.html" class="pill-btn"><span>📖</span> Glossário</a>
-      </nav>
+  <!-- TOPO: HEADER REAL NARRATO COM OMNI-SEARCH -->
+  <header class="narrato-header" style="position: sticky; top:0; z-index: 100;">
+    <a href="../index.html" class="header-brand" title="Voltar ao Caderno de Encargos">
+      <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
+      <div class="header-title-box">
+        <span class="header-title">NARRATO</span>
+        <span class="header-subtitle">Caderno de Encargos</span>
+      </div>
+    </a>
+
+    <!-- UNIVERSAL OMNI-SEARCH (INCLUDE DESACOPLADO) -->
+    <!-- ============================================================== -->
+<!-- UNIVERSAL OMNI-SEARCH • PESQUISA CENTRAL DESACOPLADA NARRATO   -->
+<!-- Pesquisa unificada em tempo real: Matérias, Livros e Glossário -->
+<!-- ============================================================== -->
+<div class="omni-search-wrapper" data-omni-search>
+  <div class="omni-search-box">
+    <span class="omni-search-icon">🔍</span>
+    <input type="text" id="omniSearchInput" class="omni-search-input" placeholder="Pesquisar matérias, livros, glossário... [Ctrl+K]" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()">
+    <button id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca">✕</button>
+    <span class="omni-search-kbd">Ctrl+K</span>
+  </div>
+
+  <!-- DROPDOWN DINÂMICO DE RESULTADOS -->
+  <div id="omniDropdown" class="omni-dropdown">
+    <div class="omni-tabs">
+      <button class="omni-tab active" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('topico')">🏗️ Matérias (<span id="countTopicos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('livro')">📚 Livros (<span id="countLivros">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('verbete')">📖 Glossário (<span id="countVerbetes">0</span>)</button>
     </div>
+    <div id="omniResultsBody"></div>
+  </div>
+</div>
+
+
+    <nav class="header-nav">
+      <a href="../index.html" class="header-nav-link active"><span>📓</span> Caderno</a>
+      <a href="../argamassa/index.html" class="header-nav-link"><span>📔</span> Argamassa</a>
+      <a href="../fontes/index.html" class="header-nav-link"><span>📚</span> Bibliografia</a>
+      <a href="../glossario/index.html" class="header-nav-link"><span>📖</span> Glossário</a>
+    </nav>
   </header>
 
-  <main class="view-container">
+  <div class="hazard-stripe"></div>
 
-    <!-- HEADER DO MEMORIAL DIDÁTICO -->
-    <div class="page-header">
-      <div class="breadcrumb-row">
-        <a href="../index.html">Canteiro</a> &gt;
-        <a href="../index.html#capitulo-7-cimento">Capítulo 7 • Diálogo é Ação / Cimento</a> &gt;
-        <span>Tópico 31</span>
-      </div>
-      <div style="display:flex; gap:0.5rem; margin-bottom:0.6rem; align-items:center;">
-        <span class="card-tag">TÓPICO 31 • CAP. 7</span>
-        <span class="card-badge badge-consenso">⚖️ Consenso</span>
-      </div>
-      <h1 class="page-title">Ação Verbal: Palavra Falada, Martelo Batido, Prego virado.</h1>
-      <p class="page-subtitle">O diálogo dramático não serve para fofoca ou bate-papo desocupado; ele é uma força física de transformação. Cada réplica é uma martelada precisa que finca um prego ou entorta uma barra de ferro.</p>
+  <main class="main-wrap">
+
+    <!-- BREADCRUMB REFINADO -->
+    <div class="breadcrumb-nav">
+      <a href="../index.html" class="breadcrumb-link">Caderno de Encargos</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#capitulo-7-cimento" class="breadcrumb-link">Capítulo 7 (Diálogo é Ação / Cimento 🎭)</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">T31</span>
     </div>
 
-    <!-- GRADE DO MEMORIAL: CONTEÚDO À ESQUERDA + SIDEBAR TÉCNICA À DIREITA -->
-    <div class="topico-layout">
+    <!-- CABEÇALHO DO ASSUNTO -->
+    <div class="topico-header">
+      <div class="topico-header-row">
+        <div class="topico-header-main">
+          <div class="topico-num-badge">
+            <span>🏗️ ASSUNTO 31</span>
+            <span>•</span>
+            <span>CAPÍTULO 7 • Diálogo é Ação / Cimento</span>
+          </div>
+          <h1 class="topico-page-title">Ação Verbal: Palavra Falada, Martelo Batido, Prego virado.</h1>
+          <p class="page-subtitle" style="margin-top:0.5rem; color:var(--tinta-suave); font-size:0.92rem; line-height:1.6;">O diálogo dramático não serve para fofoca ou bate-papo desocupado; ele é uma força física de transformação. Cada réplica é uma martelada precisa que finca um prego ou entorta uma barra de ferro.</p>
+        </div>
+
+        <!-- EIXO APENAS ÍCONE CLICÁVEL (SEM TEXTO) DIRECIONADO AO ARGAMASSA -->
+        <a href="../argamassa/index.html#curadoria-dialetica" class="eixo-icon-box" title="Consenso Teórico: Alinhamento conceitual entre as principais fontes dramatúrgicas. • Ver fundamentação no Argamassa PPP ↗">
+          <span>⚖️</span>
+          <div class="eixo-tooltip">
+            Consenso<br>
+            <span style="color:var(--ouro); font-weight:700;">Ver no Argamassa PPP ↗</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- GRADE DO ASSUNTO: CONTEÚDO À ESQUERDA + SIDEBAR TÉCNICA À DIREITA -->
+    <div class="topico-view-wrap">
       
       <!-- ARTIGO DIDÁTICO COMPILADO DO MARKDOWN -->
-      <article class="article-body">
+      <article class="topico-body">
         <h2>Fundamentos de Canteiro</h2>
 <p>A edificação dramática exige clareza absoluta sobre as forças que atuam na estrutura.
 No universo do NarrATO, repudiamos fórmulas pré-fabricadas e soluções mágicas de prateleira.
@@ -89,42 +138,70 @@ Uma cena só se justifica na prancheta se for indispensável para a estabilidade
 
       <!-- SIDEBAR TÉCNICA DO CANTEIRO -->
       <aside class="topico-sidebar">
-        <div class="tech-box">
-          <span class="tech-box-label">🧱 Fundamento Dramatúrgico</span>
-          <p class="tech-box-content">O diálogo dramático não serve para fofoca ou bate-papo desocupado; ele é uma força física de transformação. Cada réplica é uma martelada precisa que finca um prego ou entorta uma barra de ferro.</p>
+        <!-- BOX 1: RESUMO -->
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">
+            <span>RESUMO 📄</span>
+          </div>
+          <div class="sidebar-box-content">O diálogo dramático não serve para fofoca ou bate-papo desocupado; ele é uma força física de transformação. Cada réplica é uma martelada precisa que finca um prego ou entorta uma barra de ferro.</div>
         </div>
 
-        <div class="tech-box">
-          <span class="tech-box-label">🏗️ Diretriz de Canteiro</span>
-          <p class="tech-box-content">No canteiro, falar é empurrar: cada réplica deve ser um golpe, uma esquiva ou uma chave de braço verbal para arrancar concessões do oponente.</p>
+        <!-- BOX 2: APLICAÇÃO -->
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">
+            <span>APLICAÇÃO 🔨</span>
+          </div>
+          <div class="sidebar-box-content">No canteiro, falar é empurrar: cada réplica deve ser um golpe, uma esquiva ou uma chave de braço verbal para arrancar concessões do oponente.</div>
         </div>
 
-        <div class="tech-box">
-          <span class="tech-box-label">📚 Bibliografia Recomendada</span>
-                    <div class="amazon-book-card">
-            <div class="amazon-author">Robert McKee</div>
-            <div class="amazon-title">"Diálogo"</div>
-            <div class="amazon-focus">O diálogo como manobra tática de ação verbal: ninguém fala de graça, toda fala busca um objetivo.</div>
-            <a href="https://amzn.to/3GPuMcZ" target="_blank" rel="noopener noreferrer" class="btn-amazon">Comprar na Amazon ↗</a>
+        <!-- BOX 3: MENÇÕES (COM CAPAS, RESUMO E ADQUIRIR) -->
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">
+            <span>📚 MENÇÕES</span>
           </div>
-          <div class="amazon-book-card">
-            <div class="amazon-author">James Scott Bell</div>
-            <div class="amazon-title">"How to Write Dazzling Dialogue"</div>
-            <div class="amazon-focus">Diálogo com tração, agilidade e conflito ininterrupto na página e na tela.</div>
-            <a href="https://link.amazon/B0c07yauk" target="_blank" rel="noopener noreferrer" class="btn-amazon">Comprar na Amazon ↗</a>
+          <div class="sidebar-box-content">
+                      <div class="mencao-card">
+            <img src="../assets/capas/story-robert-mckee.jpg" alt="Diálogo" class="mencao-cover" onerror="this.style.display='none'">
+            <div class="mencao-info">
+              <div class="mencao-title">"Diálogo"</div>
+              <div class="mencao-author">Robert McKee (1997)</div>
+              <div class="mencao-btns">
+                <a href="../fontes/index.html#MCK-ST" class="btn-resumo">Resumo ↗</a>
+                <a href="https://amzn.to/3GPuMcZ" target="_blank" rel="noopener noreferrer" class="btn-adquirir">Adquirir →</a>
+              </div>
+            </div>
           </div>
-          <div class="amazon-book-card">
-            <div class="amazon-author">Doc Comparato</div>
-            <div class="amazon-title">"Da Criação ao Roteiro"</div>
-            <div class="amazon-focus">A fala dramatúrgica como motor de ação, eliminando réplicas sem peso na bancada.</div>
-            <a href="https://amzn.to/4m7WNwA" target="_blank" rel="noopener noreferrer" class="btn-amazon">Comprar na Amazon ↗</a>
+          <div class="mencao-card">
+            <img src="../assets/capas/how-to-write-dazzling-dialogue-james-scott-bell.jpg" alt="How to Write Dazzling Dialogue" class="mencao-cover" onerror="this.style.display='none'">
+            <div class="mencao-info">
+              <div class="mencao-title">"How to Write Dazzling Dialogue"</div>
+              <div class="mencao-author">James Scott Bell (2014)</div>
+              <div class="mencao-btns">
+                <a href="../fontes/index.html#BEL-DD" class="btn-resumo">Resumo ↗</a>
+                <a href="https://link.amazon/B0c07yauk" target="_blank" rel="noopener noreferrer" class="btn-adquirir">Adquirir →</a>
+              </div>
+            </div>
+          </div>
+          <div class="mencao-card">
+            <img src="../assets/capas/da-criacao-ao-roteiro-doc-comparato.jpg" alt="Da Criação ao Roteiro" class="mencao-cover" onerror="this.style.display='none'">
+            <div class="mencao-info">
+              <div class="mencao-title">"Da Criação ao Roteiro"</div>
+              <div class="mencao-author">Doc Comparato (1983)</div>
+              <div class="mencao-btns">
+                <a href="../fontes/index.html#CMP-CR" class="btn-resumo">Resumo ↗</a>
+                <a href="https://amzn.to/4m7WNwA" target="_blank" rel="noopener noreferrer" class="btn-adquirir">Adquirir →</a>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
       </aside>
 
-      <!-- NAVEGAÇÃO SEQUENCIAL INFERIOR -->
-      <nav class="topic-nav-bar">
-                <a href="t30-fina-fachada-espelhada.html" class="topic-nav-btn" style="text-align:left;">
+    </div>
+
+    <!-- NAVEGAÇÃO SEQUENCIAL INFERIOR -->
+    <nav class="topic-nav-bar" style="margin-top:2.5rem;">
+              <a href="t30-fina-fachada-espelhada.html" class="topic-nav-btn" style="text-align:left;">
           <span class="nav-hint">← Tópico Anterior</span>
           <span class="nav-target-title">T30 • Fina Fachada Espelhada: Ação Verbal e Subtexto</span>
         </a>
@@ -132,11 +209,32 @@ Uma cena só se justifica na prancheta se for indispensável para a estabilidade
           <span class="nav-hint">Próximo Tópico →</span>
           <span class="nav-target-title">T32 • Nenhum Outdoor é Transparente</span>
         </a>
-      </nav>
-
-    </div>
+    </nav>
 
   </main>
+
+  <!-- INCLUDE: FOMENTO OFICIAL -->
+  <!-- ============================================================== -->
+<!-- NARRATO V1.0 - PRODUZIDO E FINANCIADO POR (POLIGONAL + SELOS)  -->
+<!-- Include Desacoplado para uso em todas as páginas do Canteiro  -->
+<!-- ============================================================== -->
+<section class="fomento-section">
+  <div class="fomento-inner">
+    <span class="fomento-label">NarrATO V1.0 - Produzido e Financiado por</span>
+    <div class="fomento-logos">
+      <!-- 1º Selo: Centro Comunitário-Criativo Poligonal -->
+      <img src="../assets/logo-poligonal.svg" alt="Centro Comunitário-Criativo Poligonal" class="fomento-seal fomento-seal-lead" title="Centro Comunitário-Criativo Poligonal">
+      <!-- Selos Institucionais de Fomento -->
+      <img src="../assets/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal" title="PNAB - Política Nacional Aldir Blanc">
+      <img src="../assets/FUNJOPE.svg" alt="FUNJOPE" class="fomento-seal" title="Fundação Cultural de João Pessoa">
+      <img src="../assets/PMJP.svg" alt="Prefeitura Municipal de João Pessoa" class="fomento-seal" title="Prefeitura Municipal de João Pessoa">
+      <img src="../assets/FMC.svg" alt="Fundo Municipal de Cultura" class="fomento-seal" title="FMC - Fundo Municipal de Cultura">
+      <img src="../assets/MINC.svg" alt="Ministério da Cultura" class="fomento-seal" title="Ministério da Cultura">
+      <img src="../assets/GOV.svg" alt="Governo Federal" class="fomento-seal" title="Governo Federal - Brasil União e Reconstrução">
+    </div>
+  </div>
+</section>
+
 
   <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
   <!-- ============================================================== -->
@@ -198,6 +296,8 @@ Uma cena só se justifica na prancheta se for indispensável para a estabilidade
   </div>
 </footer>
 
+  <script src="../assets/js/omni-index.js"></script>
+  <script src="../assets/js/narrato.js"></script>
   <script src="../../shared/hub-footer.js"></script>
 </body>
 </html>
