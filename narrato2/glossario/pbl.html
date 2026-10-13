@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>#pbl • Aprendizagem Baseada em Projetos (PBL) | Glossário NarrATO</title>
+  
+  <meta name="description" content="Estratégia educacional onde o aprendizado ocorre através da criação de um produto real e concreto ao longo do percurso.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#141416">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Poligonal Hub • NarrATO">
+  <meta property="og:title" content="#pbl • Aprendizagem Baseada em Projetos (PBL)">
+  <meta property="og:description" content="Estratégia educacional onde o aprendizado ocorre através da criação de um produto real e concreto ao longo do percurso.">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/logo-poligonal.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Compartilhados e do Canteiro -->
+  <link rel="stylesheet" href="../../shared/footer.css">
+  <link rel="stylesheet" href="../assets/css/narrato.css">
+</head>
+<body>
+
+  <!-- TOPO: HEADER REAL NARRATO COM OMNI-SEARCH -->
+  <header class="narrato-header" style="position: sticky; top:0; z-index: 100;">
+    <a href="../index.html" class="header-brand" title="Voltar ao Caderno de Encargos">
+      <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
+      <div class="header-title-box">
+        <span class="header-title">NARRATO</span>
+        <span class="header-subtitle">Caderno de Encargos</span>
+      </div>
+    </a>
+
+    <!-- UNIVERSAL OMNI-SEARCH -->
+    <!-- ============================================================== -->
+<!-- UNIVERSAL OMNI-SEARCH • PESQUISA CENTRAL DESACOPLADA NARRATO   -->
+<!-- Pesquisa unificada em tempo real: Matérias, Livros e Glossário -->
+<!-- ============================================================== -->
+<div class="omni-search-wrapper" data-omni-search>
+  <div class="omni-search-box">
+    <span class="omni-search-icon">🔍</span>
+    <input type="text" id="omniSearchInput" class="omni-search-input" placeholder="Pesquisar matérias, livros, glossário... [Ctrl+K]" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()">
+    <button id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca">✕</button>
+    <span class="omni-search-kbd">Ctrl+K</span>
+  </div>
+
+  <!-- DROPDOWN DINÂMICO DE RESULTADOS -->
+  <div id="omniDropdown" class="omni-dropdown">
+    <div class="omni-tabs">
+      <button class="omni-tab active" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('topico')">🏗️ Matérias (<span id="countTopicos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('livro')">📚 Livros (<span id="countLivros">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('verbete')">📖 Glossário (<span id="countVerbetes">0</span>)</button>
+    </div>
+    <div id="omniResultsBody"></div>
+  </div>
+</div>
+
+
+    <nav class="header-nav">
+      <a href="../index.html" class="header-nav-link"><span>🏗️</span> Matérias</a>
+      <a href="../fontes/index.html" class="header-nav-link"><span>📚</span> Fontes</a>
+      <a href="index.html" class="header-nav-link active"><span>📖</span> Glossário</a>
+    </nav>
+  </header>
+
+  <div class="hazard-stripe"></div>
+
+  <main class="main-wrap">
+
+    <div class="breadcrumb-nav">
+      <a href="../index.html" class="breadcrumb-link">Caderno de Encargos</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="index.html" class="breadcrumb-link">GLOSSÁRIO</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">#pbl</span>
+    </div>
+
+    <div class="verbete-wrap">
+      
+      <!-- HERO DO VERBETE -->
+      <div class="verbete-hero">
+        <span class="verbete-ancora-highlight">#pbl</span>
+        <h1 class="verbete-title">Aprendizagem Baseada em Projetos (PBL)</h1>
+        <div class="verbete-meta-row">
+          <span class="gloss-tag-item tag-narrato">NarrATO</span>
+          <span class="gloss-tag-item tag-gram">Locução substantiva feminina</span>
+        </div>
+      </div>
+
+      <!-- DEFINIÇÃO -->
+      <div class="single-section">
+        <h2 class="single-section-title">Definição</h2>
+        <div class="single-section-body">Estratégia educacional onde o aprendizado ocorre através da criação de um produto real e concreto ao longo do percurso.</div>
+      </div>
+
+      <!-- CONTAINER CONDICIONAL: ARGAMASSA PPP VS OBRAS DE REFERÊNCIA -->
+              <div class="verbete-conditional-box">
+          <div class="verbete-cond-title">🏛️ Diretriz Pedagógica no Argamassa PPP</div>
+          <p style="font-size:0.85rem; line-height:1.6; color:var(--tinta-suave); margin-bottom:1rem;">
+            O termo <strong>Aprendizagem Baseada em Projetos (PBL)</strong> integra a gramática interna do NarrATO, fundado na Pedagogia da Autonomia e no Desenho Universal de Aprendizagem.
+            Sua aplicação rege a postura ética e o alinhamento de conduta em todo o canteiro.
+          </p>
+          <a href="../../Argamassa.md#pbl" class="card-btn btn-buy" style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.55rem 1.1rem; text-decoration:none;">
+            Acessar seção correspondente em Argamassa.md ↗
+          </a>
+        </div>
+
+      <!-- MENCIONADO EM -->
+      <div class="single-section">
+        <h2 class="single-section-title">🔍 Mencionado em</h2>
+        <div class="badges-cloud"><a href="../index.html#argamassa ppp" class="topic-pill">Argamassa PPP ↗</a><a href="../topicos/t46-canteiro-colaborativo.html" class="topic-pill">T46 ↗</a></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- INCLUDE: FOMENTO OFICIAL -->
+  <!-- ============================================================== -->
+<!-- NARRATO V1.0 - PRODUZIDO E FINANCIADO POR (POLIGONAL + SELOS)  -->
+<!-- Include Desacoplado para uso em todas as páginas do Canteiro  -->
+<!-- ============================================================== -->
+<section class="fomento-section" id="fomento">
+  <div class="fomento-inner">
+    <div class="fomento-row">
+      <!-- Bloco da Poligonal -->
+      <div class="fomento-block fomento-obra">
+        <span class="fomento-sublabel">uma obra da</span>
+        <div class="fomento-logo-wrap">
+          <img src="../assets/logo-poligonal.svg" alt="Centro Comunitário-Criativo Poligonal" class="fomento-seal fomento-seal-lead" title="Centro Comunitário-Criativo Poligonal">
+        </div>
+      </div>
+
+      <div class="fomento-divider-v" aria-hidden="true"></div>
+
+      <!-- Bloco dos Financiadores Públicos -->
+      <div class="fomento-block fomento-financiamento">
+        <span class="fomento-sublabel">um financiamento de</span>
+        <div class="fomento-seals-grid">
+          <img src="../assets/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal" title="PNAB - Política Nacional Aldir Blanc">
+          <img src="../assets/FUNJOPE.svg" alt="FUNJOPE" class="fomento-seal" title="Fundação Cultural de João Pessoa">
+          <img src="../assets/PMJP.svg" alt="Prefeitura Municipal de João Pessoa" class="fomento-seal" title="Prefeitura Municipal de João Pessoa">
+          <img src="../assets/FMC.svg" alt="Fundo Municipal de Cultura" class="fomento-seal" title="FMC - Fundo Municipal de Cultura">
+          <img src="../assets/MINC.svg" alt="Ministério da Cultura" class="fomento-seal" title="Ministério da Cultura">
+          <img src="../assets/GOV.svg" alt="Governo Federal" class="fomento-seal" title="Governo Federal - Brasil União e Reconstrução">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
+  <!-- ============================================================== -->
+<!-- POLIGONAL HUB - INCLUDE DE RODAPÉ INSTITUCIONAL UNIFICADO      -->
+<!-- Layout e informações padronizados; estilização via CSS/classes -->
+<!-- ============================================================== -->
+<footer class="poligonal-footer" data-poligonal-footer>
+  <div class="poligonal-footer-container">
+    <div class="poligonal-footer-top">
+      
+      <!-- Bloco de Marca e Manifesto -->
+      <div class="poligonal-footer-brand-col">
+        <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
+        <p class="poligonal-footer-desc">
+          Vários ângulos, todos anti-imperialistas.<br>
+          Desenvolvedores de audiovisual, jogos e soluções web.
+        </p>
+        <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
+          poligonalhub@gmail.com ↗
+        </a>
+      </div>
+
+      <!-- Grupos de Links -->
+      <div class="poligonal-footer-links-group">
+        <!-- Navegação Principal -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Navegação</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="/" data-root-link>Home</a></li>
+            <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Comunitários -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Comunidade</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Barra de Rodapé / Direitos -->
+    <div class="poligonal-footer-bottom">
+      <span class="poligonal-footer-copy">
+        &copy; <span data-poligonal-year>2026</span> Centro Comunitário-Criativo Poligonal. Todos os direitos reservados.
+      </span>
+      <span class="poligonal-footer-origin">
+        Nordestinamente orgulhosos 🌵
+      </span>
+    </div>
+  </div>
+</footer>
+
+  <script src="../assets/js/omni-index.js"></script>
+  <script src="../assets/js/narrato.js"></script>
+  <script src="../../shared/hub-footer.js"></script>
+</body>
+</html>

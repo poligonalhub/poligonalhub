@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>"How to Write Dazzling Dialogue" • James Scott Bell | Bibliografia NarrATO</title>
+  
+  <meta name="description" content="Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#141416">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="book">
+  <meta property="og:site_name" content="Poligonal Hub • NarrATO">
+  <meta property="og:title" content="&quot;How to Write Dazzling Dialogue&quot; • James Scott Bell">
+  <meta property="og:description" content="Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/logo-poligonal.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Compartilhados e do Canteiro -->
+  <link rel="stylesheet" href="../../shared/footer.css">
+  <link rel="stylesheet" href="../assets/css/narrato.css">
+</head>
+<body>
+
+  <!-- TOPO: HEADER REAL NARRATO COM OMNI-SEARCH -->
+  <header class="narrato-header" style="position: sticky; top:0; z-index: 100;">
+    <a href="../index.html" class="header-brand" title="Voltar ao Caderno de Encargos">
+      <img src="../assets/logo-narrato-white.svg" alt="NarrATO" class="brand-logo" style="height:32px;">
+      <div class="header-title-box">
+        <span class="header-title">NarrATO</span>
+        <span class="header-subtitle">Caderno de Encargos</span>
+      </div>
+    </a>
+
+    <!-- UNIVERSAL OMNI-SEARCH -->
+    <!-- ============================================================== -->
+<!-- UNIVERSAL OMNI-SEARCH • PESQUISA CENTRAL DESACOPLADA NARRATO   -->
+<!-- Pesquisa unificada em tempo real: Matérias, Livros e Glossário -->
+<!-- ============================================================== -->
+<div class="omni-search-wrapper" data-omni-search>
+  <div class="omni-search-box">
+    <span class="omni-search-icon">🔍</span>
+    <input type="text" id="omniSearchInput" class="omni-search-input" placeholder="Pesquisar matérias, livros, glossário... [Ctrl+K]" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()">
+    <button id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca">✕</button>
+    <span class="omni-search-kbd">Ctrl+K</span>
+  </div>
+
+  <!-- DROPDOWN DINÂMICO DE RESULTADOS -->
+  <div id="omniDropdown" class="omni-dropdown">
+    <div class="omni-tabs">
+      <button class="omni-tab active" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('topico')">🏗️ Matérias (<span id="countTopicos">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('livro')">📚 Livros (<span id="countLivros">0</span>)</button>
+      <button class="omni-tab" onclick="setOmniFilter('verbete')">📖 Glossário (<span id="countVerbetes">0</span>)</button>
+    </div>
+    <div id="omniResultsBody"></div>
+  </div>
+</div>
+
+
+    <nav class="header-nav">
+      <a href="../index.html" class="header-nav-link"><span>🏗️</span> Matérias</a>
+      <a href="index.html" class="header-nav-link active"><span>📚</span> Fontes</a>
+      <a href="../glossario/index.html" class="header-nav-link"><span>📖</span> Glossário</a>
+    </nav>
+  </header>
+
+  <div class="hazard-stripe"></div>
+
+  <main class="main-wrap">
+
+    <div class="breadcrumb-nav">
+      <a href="../index.html" class="breadcrumb-link">Caderno de Encargos</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="index.html" class="breadcrumb-link">📚 Bibliografia</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">"How to Write Dazzling Dialogue"</span>
+    </div>
+
+    <!-- HERO DO LIVRO -->
+    <div class="single-book-hero">
+      <img src="../assets/capas/how-to-write-dazzling-dialogue-james-scott-bell.jpg" alt="How to Write Dazzling Dialogue" class="single-book-cover" onerror="this.style.background='#222'">
+      <div class="single-book-main">
+        <span class="single-book-tag">Caderno • Publicado em 2014</span>
+        <h1 class="single-book-title">"How to Write Dazzling Dialogue"</h1>
+        <div class="single-book-author">por James Scott Bell</div>
+        <div class="single-book-actions">
+          <a href="https://link.amazon/B0c07yauk" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" style="font-size:0.85rem; padding:0.6rem 1.25rem;">
+            Adquirir Exemplar Oficial →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÕES DA FICHA DA OBRA -->
+    <div class="single-section">
+      <h2 class="single-section-title">📄 Descrição Oficial</h2>
+      <div class="single-section-body">Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva. Uma obra nuclear para a fundamentação prática do canteiro narratológico.</div>
+    </div>
+
+    <div class="single-section">
+      <h2 class="single-section-title">🧭 Posicionamento no Canteiro</h2>
+      <div class="single-section-body">Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.</div>
+    </div>
+
+    <div class="single-section">
+      <h2 class="single-section-title">⚖️ Matriz Dialética entre Obras</h2>
+      <div class="dialogue-grid">
+        <div class="dialogue-box consenso">
+          <div class="dialogue-title consenso-title">🤝 Em Consenso com:</div>
+          <div><div class="dialogue-item"><a href="index.html" style="color:inherit; text-decoration:none;">🤝 <strong>"Story"</strong> (Robert McKee) ↗</a></div></div>
+        </div>
+        <div class="dialogue-box dissenso">
+          <div class="dialogue-title dissenso-title">🥊 Em Dissenso com:</div>
+          <div><div class="dialogue-item"><a href="index.html" style="color:inherit; text-decoration:none;">🥊 <strong>"Salve o Gato!"</strong> (Blake Snyder) ↗</a></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="single-section">
+      <h2 class="single-section-title">🔍 Mencionado em</h2>
+      <div class="badges-cloud"><a href="../topicos/t31-acao-verbal.html" class="topic-pill">T31 ↗</a><a href="../topicos/t32-nenhum-outdoor-e-transparente.html" class="topic-pill">T32 ↗</a><a href="../topicos/t33-rubricas-e-incisos.html" class="topic-pill">T33 ↗</a><a href="../topicos/t34-sinfonia-das-britadeiras.html" class="topic-pill">T34 ↗</a></div>
+    </div>
+
+    <div class="single-section">
+      <h2 class="single-section-title">🏷️ Tags Relacionadas</h2>
+      <div class="badges-cloud"><a href="../glossario/index.html#estrutura" class="topic-pill">#estrutura ↗</a><a href="../glossario/index.html#personagem" class="topic-pill">#personagem ↗</a><a href="../glossario/index.html#cena" class="topic-pill">#cena ↗</a><a href="../glossario/index.html#conflito" class="topic-pill">#conflito ↗</a></div>
+    </div>
+
+  </main>
+
+  <!-- INCLUDE: FOMENTO OFICIAL -->
+  <!-- ============================================================== -->
+<!-- NARRATO V1.0 - PRODUZIDO E FINANCIADO POR (POLIGONAL + SELOS)  -->
+<!-- Include Desacoplado para uso em todas as páginas do Canteiro  -->
+<!-- ============================================================== -->
+<section class="fomento-section" id="fomento">
+  <div class="fomento-inner">
+    <div class="fomento-row">
+      <!-- Bloco da Poligonal -->
+      <div class="fomento-block fomento-obra">
+        <span class="fomento-sublabel">uma obra da</span>
+        <div class="fomento-logo-wrap">
+          <img src="../assets/logo-poligonal.svg" alt="Centro Comunitário-Criativo Poligonal" class="fomento-seal fomento-seal-lead" title="Centro Comunitário-Criativo Poligonal">
+        </div>
+      </div>
+
+      <div class="fomento-divider-v" aria-hidden="true"></div>
+
+      <!-- Bloco dos Financiadores Públicos -->
+      <div class="fomento-block fomento-financiamento">
+        <span class="fomento-sublabel">um financiamento de</span>
+        <div class="fomento-seals-grid">
+          <img src="../assets/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal" title="PNAB - Política Nacional Aldir Blanc">
+          <img src="../assets/FUNJOPE.svg" alt="FUNJOPE" class="fomento-seal" title="Fundação Cultural de João Pessoa">
+          <img src="../assets/PMJP.svg" alt="Prefeitura Municipal de João Pessoa" class="fomento-seal" title="Prefeitura Municipal de João Pessoa">
+          <img src="../assets/FMC.svg" alt="Fundo Municipal de Cultura" class="fomento-seal" title="FMC - Fundo Municipal de Cultura">
+          <img src="../assets/MINC.svg" alt="Ministério da Cultura" class="fomento-seal" title="Ministério da Cultura">
+          <img src="../assets/GOV.svg" alt="Governo Federal" class="fomento-seal" title="Governo Federal - Brasil União e Reconstrução">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
+  <!-- ============================================================== -->
+<!-- POLIGONAL HUB - INCLUDE DE RODAPÉ INSTITUCIONAL UNIFICADO      -->
+<!-- Layout e informações padronizados; estilização via CSS/classes -->
+<!-- ============================================================== -->
+<footer class="poligonal-footer" data-poligonal-footer>
+  <div class="poligonal-footer-container">
+    <div class="poligonal-footer-top">
+      
+      <!-- Bloco de Marca e Manifesto -->
+      <div class="poligonal-footer-brand-col">
+        <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
+        <p class="poligonal-footer-desc">
+          Vários ângulos, todos anti-imperialistas.<br>
+          Desenvolvedores de audiovisual, jogos e soluções web.
+        </p>
+        <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
+          poligonalhub@gmail.com ↗
+        </a>
+      </div>
+
+      <!-- Grupos de Links -->
+      <div class="poligonal-footer-links-group">
+        <!-- Navegação Principal -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Navegação</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="/" data-root-link>Home</a></li>
+            <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Comunitários -->
+        <div class="poligonal-footer-col">
+          <h4 class="poligonal-footer-heading">Comunidade</h4>
+          <ul class="poligonal-footer-nav">
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Barra de Rodapé / Direitos -->
+    <div class="poligonal-footer-bottom">
+      <span class="poligonal-footer-copy">
+        &copy; <span data-poligonal-year>2026</span> Centro Comunitário-Criativo Poligonal. Todos os direitos reservados.
+      </span>
+      <span class="poligonal-footer-origin">
+        Nordestinamente orgulhosos 🌵
+      </span>
+    </div>
+  </div>
+</footer>
+
+  <script src="../assets/js/omni-index.js"></script>
+  <script src="../assets/js/narrato.js"></script>
+  <script src="../../shared/hub-footer.js"></script>
+</body>
+</html>
