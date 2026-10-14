@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T.R.A.U.M.A. • Sistema de Gestão & NDD Oficial • HEET | Poligonal Hub</title>
+
+  <!-- Metatags e Identidade -->
+  <meta name="description" content="NDD (Narrative Design Document) e Bíblia de Produção da Minissérie Dramática T.R.A.U.M.A. (9 episódios). Hospital Estadual de Emergência e Trauma (HEET) • Governo do Estado da Parahyba.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="theme-color" content="#0c326f">
+  <link rel="canonical" href="https://poligonalhub.com/trauma/">
+
+  <!-- Open Graph / Redes Sociais -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://poligonalhub.com/trauma/">
+  <meta property="og:title" content="T.R.A.U.M.A. • Sistema de Gestão & NDD Oficial • HEET">
+  <meta property="og:description" content="NDD e Bíblia de Produção da Minissérie T.R.A.U.M.A. (9 eps). Baseado em Dados Reais do HEET / UFPB.">
+  <meta property="og:image" content="https://poligonalhub.com/trauma/ID/social-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1376">
+  <meta property="og:image:height" content="768">
+  <meta property="og:image:alt" content="T.R.A.U.M.A. • Baseado em Dados Reais">
+  <meta property="og:site_name" content="Poligonal Hub">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="T.R.A.U.M.A. • Sistema de Gestão & NDD Oficial • HEET">
+  <meta name="twitter:description" content="NDD e Bíblia de Produção da Minissérie T.R.A.U.M.A. (9 eps). Baseado em Dados Reais do HEET / UFPB.">
+  <meta name="twitter:image" content="https://poligonalhub.com/trauma/ID/social-preview.jpg">
+
+  <!-- Favicon SVG Embutido -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230c326f'/%3E%3Cpath d='M16 6v20M6 16h20' stroke='%23ffeb3b' stroke-width='4' stroke-linecap='square'/%3E%3C/svg%3E">
+
+  <!-- Configuração Explícita do Tailwind ANTES do CDN: Garante Dark Mode apenas por classe 'modo-noturno' -->
+  <script>
+    tailwind = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0c326f',
+              red: '#ed1c24',
+              yellow: '#ffeb36',
+              green: '#00a859',
+              dark: '#020617'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- CDNs Essenciais: Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts: Inter, Roboto e JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- MÓDULO DE DADOS & ÍNDICE DO SISTEMA -->
+  <script src="js/trauma-data.js"></script>
+
+  <style>
+    /* ==========================================================================
+       FONTE OFICIAL T.R.A.U.M.A. (MEGO)
+       ========================================================================== */
+    @font-face {
+      font-family: 'MEGO';
+      src: url('ID/MEGO.otf') format('opentype'),
+           url('ID/MEGO.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    .font-trauma-title {
+      font-family: 'MEGO', 'Roboto', 'Inter', sans-serif !important;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       SISTEMA DE ALTO CONTRASTE E TIPOGRAFIA DE SISTEMA OPERACIONAL
+       ========================================================================== */
+    :root {
+      --os-bg: #f1f5f9;
+      --os-surface: #ffffff;
+      --os-surface-alt: #f8fafc;
+      --os-border: #cbd5e1;
+      --os-border-strong: #94a3b8;
+      --os-header-bg: #0c326f;
+      --os-header-text: #ffffff;
+      --os-text: #020617;
+      --os-text-muted: #1e293b;
+      --os-text-dim: #334155;
+      --os-alert-red: #b91c1c;
+      --os-alert-amber: #b45309;
+      --os-alert-emerald: #047857;
+      --os-alert-blue: #0369a1;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-title: 'Roboto', 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--os-bg);
+      color: var(--os-text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* CONTRASTE EXTREMO: Garante que NENHUM texto fique esmaecido no tema claro (restrito ao main) */
+    body:not(.modo-noturno) main p,
+    body:not(.modo-noturno) main li,
+    body:not(.modo-noturno) main td,
+    body:not(.modo-noturno) main th {
+      color: #0f172a;
+    }
+
+    body:not(.modo-noturno) main .text-slate-400,
+    body:not(.modo-noturno) main .text-slate-500 {
+      color: #334155 !important;
+      font-weight: 500;
+    }
+
+    body:not(.modo-noturno) main .text-slate-600 {
+      color: #1e293b !important;
+      font-weight: 500;
+    }
+
+    body:not(.modo-noturno) main .text-slate-700,
+    body:not(.modo-noturno) main .text-slate-800,
+    body:not(.modo-noturno) main .text-slate-900 {
+      color: #020617 !important;
+    }
+
+    body:not(.modo-noturno) main .text-blue-900 {
+      color: #0c326f !important;
+    }
+
+    body:not(.modo-noturno) main .text-blue-800,
+    body:not(.modo-noturno) main .text-blue-700 {
+      color: #0369a1 !important;
+    }
+
+    body:not(.modo-noturno) main .text-amber-900,
+    body:not(.modo-noturno) main .text-amber-800 {
+      color: #78350f !important;
+    }
+
+    body:not(.modo-noturno) main .text-red-900,
+    body:not(.modo-noturno) main .text-red-800,
+    body:not(.modo-noturno) main .text-red-700 {
+      color: #991b1b !important;
+    }
+
+    /* REGRAS DE ALTO CONTRASTE PARA O RODAPÉ INSTITUCIONAL */
+    footer {
+      background-color: #0c326f !important;
+      color: #ffffff !important;
+    }
+    footer p {
+      color: #e2e8f0 !important;
+    }
+    footer a {
+      color: #bae6fd !important;
+      transition: color 0.15s ease;
+    }
+    footer a:hover {
+      color: #ffffff !important;
+      text-decoration: underline;
+    }
+    footer li {
+      color: #f1f5f9 !important;
+    }
+    footer strong {
+      color: #ffffff !important;
+    }
+
+    /* FAIXA DAS 5 CORES DO GOVERNO DA PARAHYBA */
+    .divisoria-colorida-governo {
+      display: flex;
+      height: 4px;
+      width: 100%;
+    }
+    .cor-pb-1 { background-color: #ffeb36; }
+    .cor-pb-2 { background-color: #ed1c24; }
+    .cor-pb-3 { background-color: #0284c7; }
+    .cor-pb-4 { background-color: #00a859; }
+    .cor-pb-5 { background-color: #000000; }
+
+    /* CONTAINERS EM ESTILO SISTEMA OPERACIONAL / BOLETIM */
+    .os-window {
+      background-color: var(--os-surface);
+      border: 1px solid var(--os-border);
+      border-radius: 0px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .os-window-header {
+      background-color: var(--os-header-bg);
+      color: var(--os-header-text);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 7px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #ed1c24;
+      user-select: none;
+    }
+
+    /* CARDS DE BOLETIM E REGISTRO */
+    .bo-card {
+      background-color: var(--os-surface);
+      border: 1px solid var(--os-border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.15s ease;
+    }
+    .bo-card:hover {
+      border-color: var(--os-border-strong);
+    }
+
+    /* DRAWER / ÍNDICE MODULAR OS */
+    .os-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 360px;
+      max-width: 90vw;
+      background-color: #ffffff;
+      border-left: 2px solid #0c326f;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+      z-index: 100;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .os-drawer.open {
+      transform: translateX(0);
+    }
+    .os-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 99;
+      display: none;
+    }
+    .os-drawer-overlay.open {
+      display: block;
+    }
+
+    /* MODAL DE LAUDOS E RELATÓRIOS UFPB */
+    .pdf-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 110;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .pdf-modal.open {
+      display: flex;
+    }
+
+    /* TEMA ALTO CONTRASTE / MODO NOTURNO (ATIVADO VIA BOTÃO CONTRASTE) */
+    body.modo-noturno {
+      --os-bg: #070d18;
+      --os-surface: #0f172a;
+      --os-surface-alt: #1e293b;
+      --os-border: #334155;
+      --os-border-strong: #64748b;
+      --os-header-bg: #020617;
+      --os-text: #f8fafc;
+      --os-text-muted: #cbd5e1;
+      --os-text-dim: #94a3b8;
+      background-color: #070d18 !important;
+      color: #f8fafc !important;
+    }
+
+    body.modo-noturno .os-window {
+      background-color: #0f172a !important;
+      border-color: #334155 !important;
+    }
+    body.modo-noturno .os-window-header {
+      background-color: #020617 !important;
+      border-bottom-color: #ef4444 !important;
+      color: #f8fafc !important;
+    }
+    body.modo-noturno .bo-card {
+      background-color: #0f172a !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    body.modo-noturno .os-drawer {
+      background-color: #0f172a !important;
+      border-left-color: #38bdf8 !important;
+      color: #f8fafc !important;
+    }
+    body.modo-noturno .text-slate-400,
+    body.modo-noturno .text-slate-500,
+    body.modo-noturno .text-slate-600,
+    body.modo-noturno .text-slate-700,
+    body.modo-noturno .text-slate-800,
+    body.modo-noturno .text-slate-900 {
+      color: #f8fafc !important;
+    }
+    body.modo-noturno .bg-white {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+    }
+    body.modo-noturno .bg-slate-50 {
+      background-color: #1e293b !important;
+      color: #f8fafc !important;
+    }
+    body.modo-noturno .border-slate-200,
+    body.modo-noturno .border-slate-300 {
+      border-color: #334155 !important;
+    }
+    body.modo-noturno .text-blue-900,
+    body.modo-noturno .text-blue-800,
+    body.modo-noturno .text-blue-700 {
+      color: #38bdf8 !important;
+    }
+    body.modo-noturno .text-amber-900,
+    body.modo-noturno .text-amber-800 {
+      color: #fcd34d !important;
+    }
+    body.modo-noturno .text-red-900,
+    body.modo-noturno .text-red-800,
+    body.modo-noturno .text-red-700 {
+      color: #fca5a5 !important;
+    }
+
+    /* PISCADOR DE ALERTA */
+    @keyframes pulse-emergency {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .pulse-emergency {
+      animation: pulse-emergency 1.5s infinite;
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- ========================================================================
+       BARRA DE IDENTIDADE DO GOVERNO DA PARAHYBA (ORIGINAL AUTÊNTICO RESTAURADO)
+       ======================================================================== -->
+  <div class="bg-[#f0f2f5] border-b border-slate-300 text-[11px] font-sans text-slate-800 select-none">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2">
+      
+      <!-- Links Oficiais Redirecionando Conforme Diretriz Poligonal -->
+      <div class="flex items-center gap-3 overflow-x-auto text-[11px]">
+        <span class="font-extrabold text-slate-900 flex items-center gap-1.5 tracking-wider">
+          <span class="w-2.5 h-2.5 rounded-sm bg-[#ed1c24] inline-block"></span>
+          GOVERNO DA PARAHYBA
+        </span>
+        <span class="text-slate-300 hidden sm:inline">|</span>
+        <a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700 transition-colors font-medium">poligonalhub.com</a>
+        <a href="https://poligonalhub.com/contato" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700 transition-colors font-medium">Acesso à Informação</a>
+        <a href="https://poligonalhub.com/contato" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700 transition-colors font-medium">Ouvidoria SUS</a>
+        <a href="https://instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700 transition-colors font-medium">Portal da Transparência</a>
+        <a href="https://poligonal.substack.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700 transition-colors font-medium">Diário Oficial</a>
+        <a href="https://poligonalhub.com/index.html#servicos" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700 transition-colors font-medium">Carta de Serviços</a>
+      </div>
+
+      <!-- Atalhos de Acessibilidade & Modo Noturno do Portal -->
+      <div class="flex items-center gap-3 text-xs font-mono">
+        <span class="hidden sm:inline-block text-[10px] text-slate-600 font-semibold">SESP • HEET</span>
+        <div class="flex items-center gap-1.5 border-l border-slate-300 pl-2">
+          <button id="btnAltoContraste" onclick="toggleContraste()" title="Alternar Alto Contraste / Modo Noturno" class="px-1.5 py-0.5 rounded hover:bg-slate-200 text-slate-800 font-bold transition-colors">CONTRASTE</button>
+          <span class="text-slate-300">|</span>
+          <button onclick="ajustarFonte(-0.05)" title="Diminuir Fonte" class="px-1 hover:bg-slate-200 rounded font-bold">A-</button>
+          <button onclick="ajustarFonte(0.05)" title="Aumentar Fonte" class="px-1 hover:bg-slate-200 rounded font-bold">A+</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DIVISÓRIA COLORIDA DO GOVERNO DA PARAHYBA (As 5 Cores Oficiais) -->
+  <div class="divisoria-colorida-governo select-none" aria-hidden="true">
+    <div class="h-full flex-1 cor-pb-1" title="Amarelo Sol / Parahyba"></div>
+    <div class="h-full flex-1 cor-pb-2" title="Vermelho Nego / Parahyba"></div>
+    <div class="h-full flex-1 cor-pb-3" title="Azul Assistência"></div>
+    <div class="h-full flex-1 cor-pb-4" title="Verde Saúde"></div>
+    <div class="h-full flex-1 cor-pb-5" title="Preto Contraste"></div>
+  </div>
+
+  <!-- ========================================================================
+       CABEÇALHO OFICIAL DO HOSPITAL ESTADUAL DE EMERGÊNCIA E TRAUMA (HEET)
+       ======================================================================== -->
+  <div class="bg-white border-b border-slate-200 text-slate-800 py-3.5 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-3.5">
+        <!-- Brasão Estilizado & Identidade Visual -->
+        <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-lg bg-[#0c326f] text-white flex flex-col items-center justify-center font-bold text-xs shadow-md p-1">
+          <div class="text-[8px] font-mono tracking-widest text-[#ffeb36] font-bold">SESP</div>
+          <div class="text-base sm:text-lg font-black font-title leading-none tracking-tight">HEET</div>
+          <div class="text-[8px] font-mono tracking-wider text-red-400 font-bold">PB</div>
+        </div>
+
+        <div>
+          <div class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#0c326f] flex items-center gap-2">
+            <span>Governo do Estado da Parahyba</span>
+            <span class="text-slate-300">•</span>
+            <span>Secretaria de Estado da Saúde</span>
+          </div>
+          <h1 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+            Hospital Estadual de Emergência e Trauma <span class="text-[#0c326f]">(HEET)</span>
+          </h1>
+          <div class="text-[11px] text-slate-600 font-sans flex flex-wrap items-center gap-2 mt-0.5">
+            <span class="text-slate-800 font-semibold">Complexo Metropolitano • Senador Ricardo Cunha Lima</span>
+            <span class="text-slate-300">•</span>
+            <span class="text-red-700 font-bold">Rodovia Estadual BR-230, Km 18, Parahyba</span>
+            <span class="text-slate-300 hidden sm:inline">•</span>
+            <span class="px-2 py-0.5 rounded bg-blue-50 text-[#0c326f] border border-blue-300 font-bold text-[10px]">
+              PROCESSO PB-TRAUMA • NDD OFICIAL
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel de Regulação Hospitalar em Tempo Real & Busca Institucional -->
+      <div class="flex items-center gap-4 self-stretch md:self-auto justify-between md:justify-end">
+        <div class="text-right">
+          <div class="text-[10px] font-mono uppercase text-slate-600 font-semibold">Regulação de Leitos (NIR)</div>
+          <div class="text-xs font-black text-red-600 flex items-center gap-1.5 justify-end">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse shadow-sm"></span>
+            PORTA FECHADA • OCUPAÇÃO 180%
+          </div>
+        </div>
+
+        <!-- Campo de Busca Estilo Portal do Governo -->
+        <div class="relative w-48 sm:w-56 hidden sm:block">
+          <input type="text" placeholder="Buscar no acervo do HEET..." readonly onclick="document.getElementById('elenco').scrollIntoView({behavior:'smooth'})" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-slate-50 text-slate-800 focus:outline-none focus:border-blue-700 cursor-pointer shadow-inner font-medium">
+          <span class="absolute right-2.5 top-1.5 text-xs text-slate-500">🔍</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BARRA DE NAVEGAÇÃO DO COMPLEXO HOSPITALAR (AZUL MARINHO GOVERNAMENTAL) -->
+  <header class="sticky top-0 z-50 w-full bg-[#0c326f] border-b-2 border-red-600 shadow-md select-none">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-4">
+      
+      <!-- Marca & Sigla T.R.A.U.M.A. -->
+      <div class="flex items-center gap-3">
+        <a href="#hero" class="flex items-center gap-2 text-decoration-none group">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+          <span class="font-title text-base sm:text-lg font-black text-white group-hover:text-[#ffeb36] transition-colors">
+            T.R.A.U.M.A.
+          </span>
+        </a>
+        <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded font-mono border border-blue-800 text-blue-200 bg-blue-950/60 font-semibold">
+          NDD • 9 Episódios
+        </span>
+      </div>
+
+      <!-- Links Rápidos de Navegação Padronizados -->
+      <nav class="flex items-center gap-1 sm:gap-3 text-xs font-sans text-blue-100 overflow-x-auto py-1">
+        <a href="#hero" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors text-[#ffeb36] font-bold whitespace-nowrap">1. Início</a>
+        <a href="#mapa" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap font-medium">2. Complexo e Procedimentos</a>
+        <a href="#elenco" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap font-medium">3. Prontuários</a>
+        <a href="#arcos" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap font-medium">4. Boletins de Ocorrência</a>
+        <a href="#radar" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap hidden md:inline font-medium">5. Posicionamento</a>
+        <a href="#producao" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap hidden lg:inline font-medium">6. Ficha Técnica</a>
+        <a href="#evidencias" class="px-2 py-1 rounded hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap hidden xl:inline font-medium">7. Evidências UFPB</a>
+      </nav>
+
+      <!-- Indicador de Status + Botão de Acesso Rápido ao Painel de Índice OS -->
+      <div class="flex items-center gap-3">
+        <div class="hidden xl:flex items-center gap-2 text-[10px] font-mono text-blue-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>HEET • Universo Hipernormal</span>
+        </div>
+        <button onclick="toggleIndexDrawer()" title="Abrir Índice Modular do Sistema [Atalhos F1-F7]" class="px-2.5 py-1 rounded bg-blue-800 hover:bg-blue-700 text-[#ffeb36] font-mono text-xs font-bold border border-blue-600 flex items-center gap-1.5 transition-colors shadow-sm">
+          <span>📑</span>
+          <span>ÍNDICE OS</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CONTEÚDO PRINCIPAL (LAYOUT DO SISTEMA DE GESTÃO & BOLETINS)
+       ======================================================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ======================================================================
+         MÓDULO 01: REGISTRO DE ADMISSÃO // PREMISSA DRAMÁTICA (MOD-01)
+         ====================================================================== -->
+    <section id="hero" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-01] REGISTRO DE ADMISSÃO // PREMISSA DRAMÁTICA & NÚCLEO NARRATIVO
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          DIRETRIZ OFICIAL
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <!-- Banner Titular com Fonte MEGO Oficial -->
+        <div class="bg-white p-6 border border-slate-300 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-2 text-center md:text-left">
+            <div class="font-mono text-xs text-blue-900 font-bold tracking-wider uppercase">
+              GOVERNO DO ESTADO DA PARAHYBA • SECRETARIA DE ESTADO DA SAÚDE (SESP)
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black font-trauma-title text-slate-900 tracking-wider">
+              T.R.A.U.M.A.
+            </h1>
+            <div class="inline-block bg-[#ffeb36] text-slate-950 font-mono text-xs sm:text-sm font-black px-3 py-1 tracking-widest border border-amber-400 uppercase">
+              BASEADO EM DADOS REAIS
+            </div>
+            <p class="text-xs font-mono text-slate-700 pt-1 font-medium">
+              NDD (Narrative Design Document) • Minissérie Dramática de 9 Episódios • Hospital Estadual de Emergência e Trauma (HEET)
+            </p>
+          </div>
+
+          <!-- Dados do Arquivo no Sistema -->
+          <div class="bg-slate-50 border border-slate-300 p-4 font-mono text-xs space-y-1.5 min-w-[260px] text-slate-900">
+            <div class="text-[10px] text-slate-600 uppercase border-b border-slate-300 pb-1 font-bold">
+              REGISTRO SISTÊMICO
+            </div>
+            <div class="flex justify-between"><span>FORMATO:</span> <strong class="text-slate-950 font-bold">Procedural & Serializado</strong></div>
+            <div class="flex justify-between"><span>EXTENSÃO:</span> <strong class="text-slate-950 font-bold">9 Episódios (1 Temporada)</strong></div>
+            <div class="flex justify-between"><span>DURAÇÃO:</span> <strong class="text-slate-950 font-bold">45 a 52 minutos</strong></div>
+            <div class="flex justify-between"><span>AMBIENTAÇÃO:</span> <strong class="text-slate-950 font-bold">HEET (Parahyba)</strong></div>
+            <div class="flex justify-between"><span>STATUS:</span> <strong class="text-emerald-700 font-bold">Dossiê Homologado</strong></div>
+          </div>
+        </div>
+
+        <!-- Logline & Ideia Governante -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div class="bo-card p-4 space-y-2 border-l-4 border-l-blue-700">
+            <div class="flex items-center justify-between text-xs font-mono text-blue-900 border-b border-slate-200 pb-1.5 font-bold">
+              <span>LOGLINE OFICIAL</span>
+              <span>REG-01.1</span>
+            </div>
+            <p class="text-xs text-slate-900 leading-relaxed font-normal pt-1">
+              Confinados no maior complexo de trauma do Nordeste, uma cirurgiã clínica e uma equipe multidisciplinar à beira do esgotamento enfrentam três eras de colapso — do acidente pré-pandêmico à privatização algorítmica —, descobrindo que salvar vidas no SUS depende de uma rede clandestina de desobediência ética.
+            </p>
+          </div>
+
+          <div class="bo-card p-4 space-y-2 border-l-4 border-l-amber-600">
+            <div class="flex items-center justify-between text-xs font-mono text-amber-900 border-b border-slate-200 pb-1.5 font-bold">
+              <span>IDEIA GOVERNANTE (HIPERNORMAL)</span>
+              <span>REG-01.2</span>
+            </div>
+            <p class="text-xs text-slate-900 leading-relaxed font-normal pt-1">
+              A salvação da vida humana no serviço público sobrevive não pela engrenagem burocrática estatal ou privada, mas pela rebeldia ética e solidariedade clandestina dos seus trabalhadores contra a precarização neoliberal e o mito cínico do heroísmo institucional.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- As Três Forças Sistêmicas em Conflito -->
+        <div>
+          <div class="font-mono text-xs font-bold text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <span>⚖️</span> Tríade de Forças em Conflito Institucional
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="gridForcasSistemicas"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 02: TOPOGRAFIA DO COMPLEXO // PLANTA BAIXA & REGRAS (MOD-02)
+         ====================================================================== -->
+    <section id="mapa" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-02] TOPOGRAFIA DO COMPLEXO // PLANTA VERTICAL & REGRAS DE CONDUTA
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          4 PAVIMENTOS
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <div>
+          <h2 class="text-lg font-black text-slate-900 font-title uppercase tracking-tight">
+            Arquitetura de Confinamento Hospitalar
+          </h2>
+          <p class="text-xs text-slate-700 font-medium">
+            Estrutura verticalizada do HEET: 95% das ações dramáticas ocorrem dentro dos limites do complexo hospitalar.
+          </p>
+        </div>
+
+        <!-- Grid de 4 Andares -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="gridAndaresTopografia"></div>
+
+        <!-- As 4 Regras de Encenação Técnica -->
+        <div>
+          <div class="font-mono text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">
+            Diretrizes de Encenação & Confinamento
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs" id="gridRegrasEncenacao"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 03: PRONTUÁRIOS DO ELENCO // QUADRO FUNCIONAL (MOD-03)
+         ====================================================================== -->
+    <section id="elenco" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-03] PRONTUÁRIOS DO ELENCO // QUADRO FUNCIONAL & DILEMAS ÉTICOS
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          6 OPERADORES
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <div>
+          <h2 class="text-lg font-black text-slate-900 font-title uppercase tracking-tight">
+            Prontuários Clínicos & Funcionais
+          </h2>
+          <p class="text-xs text-slate-700 font-medium">
+            Selecione um operador para carregar a ficha técnica individual, arquétipo, CRM/COREN e arco de evolução.
+          </p>
+        </div>
+
+        <!-- Seletor de Personagens -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-300 pb-3" id="containerBotoesElenco"></div>
+
+        <!-- Detalhe do Personagem Ativo -->
+        <div id="painelDetalhePersonagem" class="space-y-4"></div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 04: LIVRO DE OCORRÊNCIAS // 9 BOLETINS DE PLANTÃO (MOD-04)
+         ====================================================================== -->
+    <section id="arcos" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-red-400"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-04] LIVRO DE OCORRÊNCIAS // 9 BOLETINS DE PLANTÃO DA MINISSÉRIE
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          3 ARCOS HISTÓRICOS
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-black text-slate-900 font-title uppercase tracking-tight">
+              Boletins de Plantão Hospitalar
+            </h2>
+            <p class="text-xs text-slate-700 font-medium">
+              Acompanhe a progressão dramática através dos 3 arcos históricos (9 episódios de 45 a 52 min).
+            </p>
+          </div>
+
+          <!-- Abas dos Arcos -->
+          <div class="flex items-center gap-1.5 bg-slate-100 p-1 border border-slate-300" id="containerAbasArcos"></div>
+        </div>
+
+        <!-- Grid de Episódios do Arco Selecionado -->
+        <div class="space-y-4" id="painelEpisodiosArco"></div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 05: MATRIZ COMPARATIVA // BENCHMARK DRAMATÚRGICO (MOD-05)
+         ====================================================================== -->
+    <section id="radar" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-05] MATRIZ COMPARATIVA // RADAR DE GÊNERO & POSICIONAMENTO COMPETITIVO
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          5 EIXOS
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <div>
+          <h2 class="text-lg font-black text-slate-900 font-title uppercase tracking-tight">
+            Radar de Diferenciação de Mercado
+          </h2>
+          <p class="text-xs text-slate-700 font-medium">
+            Comparativo multiaxial entre T.R.A.U.M.A. e as principais referências nacionais e internacionais do drama médico.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <!-- Gráfico Radar Chart.js -->
+          <div class="lg:col-span-6 bg-slate-50 p-4 border border-slate-300 flex items-center justify-center">
+            <div class="w-full max-w-[420px] aspect-square">
+              <canvas id="canvasRadarTrauma"></canvas>
+            </div>
+          </div>
+
+          <!-- Tabela de Séries e Resumos -->
+          <div class="lg:col-span-6 space-y-3" id="listaSeriesRadar"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 06: DIRETRIZES DE PRODUÇÃO & FICHA TÉCNICA (MOD-06)
+         (3 CARDS AUTÊNTICOS RESTAURADOS - SEM ALOCAÇÃO ORÇAMENTÁRIA INVENTADA)
+         ====================================================================== -->
+    <section id="producao" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-06] ESPECIFICAÇÕES TÉCNICAS & PROTOCOLO DE PRODUÇÃO
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          FICHA TÉCNICA
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <div class="border-b border-slate-300 pb-3">
+          <span class="text-xs font-mono text-[#0c326f] uppercase tracking-wider font-bold">Especificações &amp; Protocolo</span>
+          <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Diretrizes de Produção</h2>
+        </div>
+
+        <!-- Grid de 3 Cards Autênticos da Ficha Técnica -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+
+          <!-- Card 1: Especificações de Formato -->
+          <div class="bo-card p-5 space-y-3 bg-white shadow-sm border border-slate-300">
+            <h3 class="font-title text-sm font-bold text-slate-900 border-b border-slate-200 pb-2">
+              Especificações de Formato
+            </h3>
+            <ul class="space-y-2 text-slate-800 font-normal leading-relaxed">
+              <li><strong class="text-slate-950 font-bold">Formato:</strong> Minissérie Dramática em Temporada Única (9 episódios x 45 min)</li>
+              <li><strong class="text-slate-950 font-bold">Estrutura:</strong> 3 Arcos Históricos de 3 episódios (Prisão, Privação, Privatização)</li>
+              <li><strong class="text-slate-950 font-bold">Gênero:</strong> Drama Médico / Distopia Burocrática Hipernormalizada</li>
+              <li><strong class="text-slate-950 font-bold">Praça:</strong> Estado da Parahyba (Nordeste • Universo Hipernormal)</li>
+              <li><strong class="text-slate-950 font-bold">Público-Alvo:</strong> Jovens adultos e adultos fãs de ficção social densa</li>
+            </ul>
+          </div>
+
+          <!-- Card 2: Locações Principais da Planta Baixa -->
+          <div class="bo-card p-5 space-y-3 bg-white shadow-sm border border-slate-300">
+            <h3 class="font-title text-sm font-bold text-slate-900 border-b border-slate-200 pb-2">
+              Locações Principais da Planta Baixa
+            </h3>
+            <ul class="space-y-2 text-slate-800 font-normal leading-relaxed">
+              <li><strong class="text-slate-950 font-bold">Corredor de Triagem / Porta:</strong> O canteiro de superlotação crônica onde macas viram leitos permanentes.</li>
+              <li><strong class="text-slate-950 font-bold">Centro Cirúrgico (Sala 4):</strong> O bunker de precisão técnica, palco da cirurgia clandestina desobediente.</li>
+              <li><strong class="text-slate-950 font-bold">UTI Respiratória:</strong> Isolamento por lonas plásticas, foco da escassez de ventiladores e privação de EPIs.</li>
+              <li><strong class="text-slate-950 font-bold">Sala da Diretoria Geral:</strong> Espaço climatizado e asséptico onde Tarcísio comete a violência burocrática.</li>
+              <li><strong class="text-slate-950 font-bold">Subsolo &amp; Dutos:</strong> O território invisível de Aziz, matriz da fiação predial e rota de fuga.</li>
+            </ul>
+          </div>
+
+          <!-- Card 3: Parâmetros de Pesquisa Empírica & Protocolo de Realização -->
+          <div class="bo-card p-5 space-y-3 bg-white shadow-sm border border-slate-300">
+            <h3 class="font-title text-sm font-bold text-slate-900 border-b border-slate-200 pb-2">
+              Parâmetros de Pesquisa Empírica
+            </h3>
+            <ul class="space-y-2 text-slate-800 font-normal leading-relaxed">
+              <li><strong class="text-slate-950 font-bold">Base Documental:</strong> Pesquisa fundamentada nos relatórios e produções acadêmicas da Profa. Dra. Thaís Máximo (UFPB / Observatório da Saúde do Trabalhador) sobre a precarização e o sofrimento dos trabalhadores da saúde no SUS/Trauma.</li>
+              <li><strong class="text-slate-950 font-bold">Sem Didatismo:</strong> Os dados epidemiológicos operam como forças dramáticas invisíveis que empurram os personagens para o limite.</li>
+              <li><strong class="text-slate-950 font-bold">Conflito Materialista:</strong> A medicina não é tratada como sacerdócio sagrado, mas como trabalho precarizado sob cerco do capital.</li>
+              <li><strong class="text-slate-950 font-bold">Realização:</strong> Centro Comunitário-Criativo Poligonal.</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 07: LAUDOS TÉCNICOS & EVIDÊNCIAS DE CAMPO (MOD-07)
+         ====================================================================== -->
+    <section id="evidencias" class="os-window">
+      <div class="os-window-header">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="font-mono text-xs font-bold text-white tracking-wider">
+            [MOD-07] LAUDOS TÉCNICOS & EVIDÊNCIAS DE CAMPO // OBSERVATÓRIO UFPB
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600 font-bold">
+          4 RELATÓRIOS OFICIAIS
+        </span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+        
+        <div>
+          <h2 class="text-lg font-black text-slate-900 font-title uppercase tracking-tight">
+            Acervo Documental da Dra. Thaís Máximo
+          </h2>
+          <p class="text-xs text-slate-700 font-medium">
+            Estudos empíricos do Observatório da Saúde do Trabalhador (UFPB / CNPq) que fornecem o lastro de dados reais à minissérie.
+          </p>
+        </div>
+
+        <!-- Grid de Relatórios com Leitor Embutido -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gridRelatoriosEvidencias"></div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       RODAPÉ INSTITUCIONAL (ESTILO GOVERNO DA PARAHYBA & HEET)
+       (ORIGINAL AUTÊNTICO RESTAURADO)
+       ======================================================================== -->
+  <footer class="mt-20 border-t-4 border-red-600 bg-[#0c326f] text-white py-12 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
+      
+      <!-- Grid Institucional de 4 Colunas Equilibradas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-blue-900">
+        
+        <!-- Coluna 1: Órgão e Complexo Metropolitano -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded bg-white text-[#0c326f] flex flex-col items-center justify-center font-bold text-xs shadow-inner">
+              <span class="text-[7px] text-red-600 font-mono">SESP</span>
+              <span class="font-title text-[10px] leading-tight font-black">HEET</span>
+            </div>
+            <div>
+              <div class="font-title text-sm font-black text-white">Hospital Estadual de Emergência e Trauma</div>
+              <div class="text-[11px] font-bold text-[#ffeb36]">Complexo Metropolitano • Ricardo Cunha Lima</div>
+            </div>
+          </div>
+          <p class="text-blue-100 text-xs leading-relaxed">
+            Rodovia Estadual BR-230, Km 18, Parahyba, PB.<br>
+            Atendimento de Urgência e Emergência Hospitalar de Alta Complexidade • 24 Horas Ininterruptas.
+          </p>
+          <div class="text-[11px] font-mono text-blue-200 space-y-1">
+            <div><strong>PABX Geral:</strong> (83) 3000-HEET</div>
+            <div><strong>Ouvidoria SUS:</strong> Ramal 136 • <strong>NIR:</strong> Ramal 192</div>
+          </div>
+        </div>
+
+        <!-- Coluna 2: Navegação & Módulos do Sistema -->
+        <div class="space-y-2">
+          <div class="font-title text-xs font-bold text-[#ffeb36] uppercase tracking-wider">Módulos do Sistema</div>
+          <ul class="space-y-1.5 text-blue-100 font-sans text-xs">
+            <li><a href="#hero" class="hover:text-white hover:underline transition-colors">Início</a></li>
+            <li><a href="#mapa" class="hover:text-white hover:underline transition-colors">Complexo e Procedimentos</a></li>
+            <li><a href="#elenco" class="hover:text-white hover:underline transition-colors">Prontuários</a></li>
+            <li><a href="#arcos" class="hover:text-white hover:underline transition-colors">Boletins de Ocorrência</a></li>
+            <li><a href="#radar" class="hover:text-white hover:underline transition-colors">Posicionamento</a></li>
+            <li><a href="#producao" class="hover:text-white hover:underline transition-colors">Diretrizes de Produção</a></li>
+            <li><a href="#evidencias" class="hover:text-white hover:underline transition-colors">Evidências UFPB</a></li>
+          </ul>
+        </div>
+
+        <!-- Coluna 3: Serviços Públicos & Transparência -->
+        <div class="space-y-2">
+          <div class="font-title text-xs font-bold text-[#ffeb36] uppercase tracking-wider">Serviços &amp; Transparência</div>
+          <ul class="space-y-1.5 text-blue-100 font-sans text-xs">
+            <li><a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline transition-colors">Portal do Estado ↗</a></li>
+            <li><a href="https://poligonalhub.com/contato" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline transition-colors">Acesso à Informação ↗</a></li>
+            <li><a href="https://poligonalhub.com/contato" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline transition-colors">Ouvidoria SUS ↗</a></li>
+            <li><a href="https://instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline transition-colors">Portal da Transparência ↗</a></li>
+            <li><a href="https://poligonal.substack.com" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline transition-colors">Diário Oficial ↗</a></li>
+            <li><a href="https://poligonalhub.com/index.html#servicos" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline transition-colors">Carta de Serviços ↗</a></li>
+          </ul>
+        </div>
+
+        <!-- Coluna 4: Desenvolvimento Criativo -->
+        <div class="space-y-2">
+          <div class="font-title text-xs font-bold text-[#ffeb36] uppercase tracking-wider">Desenvolvimento Criativo</div>
+          <div class="font-semibold text-white">Centro Comunitário-Criativo Poligonal</div>
+          <p class="text-xs text-blue-100 leading-relaxed">
+            Dossiê Narrativo de Produção para T.R.A.U.M.A., uma história NarrATO. Baseado nos estudos da Dra. Thaís Máximo.
+          </p>
+          <div class="flex items-center gap-3 pt-2 text-xs font-mono">
+            <a href="https://poligonalhub.com" target="_blank" rel="noopener noreferrer" class="text-[#ffeb36] hover:underline font-bold">poligonalhub.com ↗</a>
+            <span class="text-blue-400">•</span>
+            <a href="https://poligonal.substack.com" target="_blank" rel="noopener noreferrer" class="text-[#ffeb36] hover:underline">Substack ↗</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barra Inferior de Direitos e Termos de Uso -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-blue-200 font-mono">
+        <div>
+          &copy; 2019–2026 T.R.A.U.M.A. • Universo Hipernormal • Governo do Estado da Parahyba / SESP / Poligonal.
+        </div>
+        <div class="text-center sm:text-right">
+          Ambiente documental de acesso técnico restrito • SIS-HEET v2.4 • Diretrizes do SUS e conformidade com a LGPD.
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       DRAWER LATERAL DE ÍNDICE MODULAR (OS MODULE DRAWER - F1 A F7)
+       ======================================================================== -->
+  <div class="os-drawer-overlay" id="drawerOverlay" onclick="toggleIndexDrawer()"></div>
+  <aside class="os-drawer" id="indexDrawer">
+    <div class="p-3 bg-[#0c326f] text-white flex items-center justify-between border-b-2 border-red-600">
+      <div class="font-mono text-xs font-bold flex items-center gap-2">
+        <span>📑</span> ÍNDICE MODULAR OS [F1-F7]
+      </div>
+      <button onclick="toggleIndexDrawer()" class="text-white hover:text-red-400 font-mono font-bold px-2 py-0.5">✕</button>
+    </div>
+
+    <!-- Campo de Busca no Índice -->
+    <div class="p-3 border-b border-slate-200 bg-slate-50">
+      <input type="text" id="filtroModulosInput" oninput="filtrarSistema(this.value)" placeholder="Filtrar módulos ou palavras-chave..." class="w-full text-xs font-mono px-2.5 py-1.5 border border-slate-300 bg-white text-slate-800 rounded focus:outline-none focus:border-blue-700">
+    </div>
+
+    <!-- Lista de Módulos (Renderizada via trauma-data.js) -->
+    <div class="p-3 overflow-y-auto flex-1 space-y-2" id="listaModulosIndex"></div>
+
+    <div class="p-2.5 bg-slate-100 border-t border-slate-200 text-[10px] font-mono text-slate-600 flex justify-between">
+      <span>Navegação Rápida</span>
+      <span>[ESC] Fechar</span>
+    </div>
+  </aside>
+
+  <!-- ========================================================================
+       MODAL DE LEITURA DE PDF (LAUDOS TÉCNICOS UFPB)
+       ======================================================================== -->
+  <div class="pdf-modal" id="pdfModal">
+    <div class="bg-white border-2 border-[#0c326f] w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl">
+      <div class="p-3 bg-[#0c326f] text-white flex items-center justify-between border-b-2 border-red-600 select-none">
+        <div class="font-mono text-xs font-bold flex items-center gap-2" id="pdfModalTitulo">
+          <span>📄</span> VISUALIZADOR DE LAUDO TÉCNICO // UFPB
+        </div>
+        <div class="flex items-center gap-3">
+          <a id="pdfModalDownload" href="#" target="_blank" class="text-xs font-mono text-[#ffeb36] hover:underline">Download PDF ↗</a>
+          <button onclick="fecharPdfViewer()" class="text-white hover:text-red-400 font-mono font-bold px-2">✕</button>
+        </div>
+      </div>
+      <div class="flex-1 bg-slate-200 relative">
+        <iframe id="pdfModalIframe" src="" class="w-full h-full border-none"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SCRIPTS DE CONTROLE DO SISTEMA & RENDERIZAÇÃO MODULAR
+       ======================================================================== -->
+  <script>
+    // 1. CARREGAMENTO INICIAL DO SISTEMA
+    document.addEventListener('DOMContentLoaded', () => {
+      renderModuloIndex();
+      renderForcasSistemicas();
+      renderTopografia();
+      renderElenco();
+      renderArcos();
+      renderEvidencias();
+      renderRadar();
+      setupTecladoShortcuts();
+    });
+
+    // 2. MONTAGEM DO ÍNDICE MODULAR
+    function renderModuloIndex(filtro = '') {
+      const container = document.getElementById('listaModulosIndex');
+      if (!container || !TRAUMA_SYSTEM || !TRAUMA_SYSTEM.INDEX) return;
+
+      const mods = TRAUMA_SYSTEM.INDEX.modulos;
+      const f = filtro.toLowerCase().trim();
+
+      const filtrados = f 
+        ? mods.filter(m => m.titulo.toLowerCase().includes(f) || m.code.toLowerCase().includes(f) || m.descricao.toLowerCase().includes(f))
+        : mods;
+
+      container.innerHTML = filtrados.map(m => `
+        <a href="#${m.id}" onclick="onSelectModulo('${m.id}')" class="block p-2.5 bo-card hover:bg-blue-50/60 transition-colors group">
+          <div class="flex items-center justify-between text-xs font-mono mb-1">
+            <span class="font-bold text-slate-900 group-hover:text-blue-900">${m.code} [${m.tecla}]</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${m.corBadge}">${m.badge}</span>
+          </div>
+          <div class="font-bold text-slate-900 text-xs">${m.titulo}</div>
+          <div class="text-[11px] text-slate-600 line-clamp-1">${m.subtitulo}</div>
+        </a>
+      `).join('');
+    }
+
+    function onSelectModulo(id) {
+      toggleIndexDrawer(false);
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function filtrarSistema(valor) {
+      renderModuloIndex(valor);
+    }
+
+    function toggleIndexDrawer(forcar) {
+      const drawer = document.getElementById('indexDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      if (!drawer || !overlay) return;
+
+      const open = forcar !== undefined ? forcar : !drawer.classList.contains('open');
+      if (open) {
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+        setTimeout(() => document.getElementById('filtroModulosInput')?.focus(), 200);
+      } else {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+    }
+
+    // 3. MONTAGEM DAS 3 FORÇAS SISTÊMICAS (MOD-01)
+    function renderForcasSistemicas() {
+      const container = document.getElementById('gridForcasSistemicas');
+      if (!container || !TRAUMA_SYSTEM.PREMISSA) return;
+
+      container.innerHTML = TRAUMA_SYSTEM.PREMISSA.forcasSistemicas.map(f => `
+        <div class="bo-card p-3.5 space-y-1.5">
+          <div class="flex items-center justify-between text-[11px] font-mono border-b border-slate-200 pb-1">
+            <span class="font-bold text-slate-900">${f.forca}</span>
+            <span class="text-[9px] px-1 bg-slate-100 font-bold border border-slate-300 text-slate-800">VETOR</span>
+          </div>
+          <div class="text-xs font-bold text-blue-900">${f.operador}</div>
+          <p class="text-xs text-slate-800 leading-relaxed font-normal">${f.mecanica}</p>
+        </div>
+      `).join('');
+    }
+
+    // 4. MONTAGEM DA TOPOGRAFIA (MOD-02)
+    function renderTopografia() {
+      const andaresCont = document.getElementById('gridAndaresTopografia');
+      const regrasCont = document.getElementById('gridRegrasEncenacao');
+      if (!andaresCont || !TRAUMA_SYSTEM.COMPLEXO) return;
+
+      andaresCont.innerHTML = TRAUMA_SYSTEM.COMPLEXO.pavimentos.map(p => `
+        <div class="bo-card p-4 space-y-2 border-t-4 ${p.corBorda}">
+          <div class="flex items-center justify-between text-xs font-mono font-bold ${p.corTexto} border-b border-slate-200 pb-1">
+            <span>${p.andar}</span>
+            <span class="text-[10px] text-slate-700">${p.codigo}</span>
+          </div>
+          <div class="font-bold text-slate-900 text-sm font-title">${p.nome}</div>
+          <div class="text-[11px] font-mono font-semibold ${p.corTexto}">${p.ala}</div>
+          <p class="text-xs text-slate-800 leading-relaxed">${p.descricao}</p>
+        </div>
+      `).join('');
+
+      if (regrasCont) {
+        regrasCont.innerHTML = TRAUMA_SYSTEM.COMPLEXO.regrasConduta.map(r => `
+          <div class="bo-card p-3 border-l-2 border-l-slate-400">
+            <div class="font-mono text-[10px] text-blue-900 font-bold mb-0.5">REGRA ${r.numero}</div>
+            <div class="font-bold text-slate-900 text-xs mb-1">${r.titulo}</div>
+            <div class="text-slate-800 text-[11px] leading-relaxed">${r.regra}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 5. MONTAGEM DO ELENCO & PRONTUÁRIOS (MOD-03)
+    let operadorAtivo = 'mariana';
+
+    function renderElenco() {
+      const containerBotoes = document.getElementById('containerBotoesElenco');
+      if (!containerBotoes || !TRAUMA_SYSTEM.PRONTUARIOS) return;
+
+      const operadores = Object.entries(TRAUMA_SYSTEM.PRONTUARIOS);
+
+      containerBotoes.innerHTML = operadores.map(([key, p]) => {
+        const ativo = key === operadorAtivo;
+        return `
+          <button onclick="selecionarOperador('${key}')" class="px-3 py-1.5 text-xs font-mono font-bold border transition-colors flex items-center gap-1.5 ${
+            ativo 
+              ? 'bg-[#0c326f] text-white border-[#0c326f] shadow-sm' 
+              : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-100'
+          }">
+            <span>${p.name.split(' ')[0]}</span>
+          </button>
+        `;
+      }).join('');
+
+      const p = TRAUMA_SYSTEM.PRONTUARIOS[operadorAtivo];
+      const painel = document.getElementById('painelDetalhePersonagem');
+      if (!painel || !p) return;
+
+      painel.innerHTML = `
+        <div class="bo-card p-5 space-y-4 border-l-4 border-l-emerald-600 bg-white shadow-sm">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono font-bold px-2 py-0.5 ${p.statusClass} border">${p.status}</span>
+                <span class="text-xs font-mono text-slate-700 font-semibold">${p.prontuario} • ${p.matricula}</span>
+              </div>
+              <h3 class="text-xl font-black text-slate-900 mt-1">${p.name}</h3>
+              <div class="text-xs font-semibold text-blue-900">${p.role}</div>
+              <div class="text-[11px] text-slate-600 font-mono mt-0.5">Lotação: ${p.lotacao}</div>
+            </div>
+
+            <div class="text-right font-mono text-xs">
+              <span class="inline-block px-2.5 py-1 text-xs font-bold ${p.tagColor} border">${p.tag}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-3 bg-slate-50 border border-slate-200 space-y-1">
+              <div class="font-mono text-[10px] text-slate-600 uppercase font-bold">DESEJO CONSCIENTE</div>
+              <p class="text-slate-900 leading-relaxed font-normal">${p.desejo}</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 space-y-1">
+              <div class="font-mono text-[10px] text-slate-600 uppercase font-bold">NECESSIDADE DRAMÁTICA</div>
+              <p class="text-slate-900 leading-relaxed font-normal">${p.necessidade}</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 space-y-1">
+              <div class="font-mono text-[10px] text-slate-600 uppercase font-bold">REAÇÃO AO COLAPSO</div>
+              <p class="text-slate-900 leading-relaxed font-normal">${p.reacao}</p>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-200 pt-3">
+            <div class="font-mono text-[10px] text-slate-600 uppercase font-bold mb-2">ARCO EVOLUTIVO NAS TRÊS ERAS</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div class="p-2.5 bg-slate-50 border-l-2 border-l-blue-600">
+                <strong class="text-blue-950 font-bold block mb-1">Arco 1 (A Prisão):</strong>
+                <span class="text-slate-800 leading-relaxed">${p.t1}</span>
+              </div>
+              <div class="p-2.5 bg-slate-50 border-l-2 border-l-amber-600">
+                <strong class="text-amber-950 font-bold block mb-1">Arco 2 (A Privação):</strong>
+                <span class="text-slate-800 leading-relaxed">${p.t2}</span>
+              </div>
+              <div class="p-2.5 bg-slate-50 border-l-2 border-l-red-600">
+                <strong class="text-red-950 font-bold block mb-1">Arco 3 (A Privatização):</strong>
+                <span class="text-slate-800 leading-relaxed">${p.t3}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function selecionarOperador(key) {
+      operadorAtivo = key;
+      renderElenco();
+    }
+
+    // 6. MONTAGEM DOS ARCOS & EPISÓDIOS (MOD-04)
+    let arcoAtivoId = 1;
+
+    function renderArcos() {
+      const containerAbas = document.getElementById('containerAbasArcos');
+      const painel = document.getElementById('painelEpisodiosArco');
+      if (!containerAbas || !painel || !TRAUMA_SYSTEM.ARCOS) return;
+
+      const arcos = TRAUMA_SYSTEM.ARCOS;
+
+      containerAbas.innerHTML = arcos.map(a => {
+        const ativo = a.id === arcoAtivoId;
+        return `
+          <button onclick="selecionarArcoTab(${a.id})" class="px-3 py-1 text-xs font-mono font-bold transition-colors ${
+            ativo
+              ? 'bg-[#0c326f] text-white shadow-sm'
+              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+          }">
+            ${a.titulo.split(':')[0]} (${a.periodo.split('•')[0].trim()})
+          </button>
+        `;
+      }).join('');
+
+      const arco = arcos.find(a => a.id === arcoAtivoId) || arcos[0];
+
+      painel.innerHTML = `
+        <div class="bo-card p-4 space-y-2 border-l-4 ${arco.corBadge}">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="font-bold text-slate-900">${arco.titulo.toUpperCase()}</span>
+            <span class="text-slate-600 font-semibold">${arco.periodo}</span>
+          </div>
+          <div class="text-xs text-slate-800">
+            CONFLITO: <strong class="text-slate-950 font-bold">${arco.conflitoCentral}</strong>
+          </div>
+          <p class="text-xs text-slate-800 leading-relaxed">${arco.descricaoOcorrencia}</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          ${arco.episodios.map(ep => `
+            <div class="bo-card p-4 space-y-3 flex flex-col justify-between">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-xs font-mono border-b border-slate-200 pb-1">
+                  <span class="font-bold text-blue-900">EP ${ep.numero}</span>
+                  <span class="text-[10px] text-slate-600 font-mono">${ep.duracao}</span>
+                </div>
+                <h4 class="font-title text-sm font-black text-slate-900 leading-snug">${ep.titulo}</h4>
+                <div class="text-[10px] font-mono text-slate-600">${ep.protocolo}</div>
+                <div class="text-[11px] font-mono text-red-700 font-bold">NATUREZA: ${ep.natureza}</div>
+                <p class="text-xs text-slate-800 leading-relaxed font-normal">${ep.desenvolvimento}</p>
+              </div>
+
+              <div class="pt-2 border-t border-slate-100 space-y-1 text-[11px]">
+                <div class="text-slate-800"><strong class="text-slate-950 font-bold">Cold Open:</strong> ${ep.coldOpen}</div>
+                <div class="text-amber-800 font-medium"><strong class="text-slate-950 font-bold">Clímax:</strong> ${ep.climax}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function selecionarArcoTab(id) {
+      arcoAtivoId = id;
+      renderArcos();
+    }
+
+    // 7. MONTAGEM DAS EVIDÊNCIAS & LAUDOS UFPB (MOD-07)
+    function renderEvidencias() {
+      const container = document.getElementById('gridRelatoriosEvidencias');
+      if (!container || !TRAUMA_SYSTEM.EVIDENCIAS) return;
+
+      container.innerHTML = TRAUMA_SYSTEM.EVIDENCIAS.map(e => `
+        <div class="bo-card p-4 space-y-2.5 flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs font-mono border-b border-slate-200 pb-1">
+              <span class="font-bold text-amber-900">${e.tag}</span>
+              <span class="text-[10px] text-slate-600">${e.tamanho}</span>
+            </div>
+            <h4 class="font-title text-sm font-black text-slate-900">${e.titulo}</h4>
+            <div class="text-xs text-slate-700 font-mono">${e.coordenacao} • ${e.periodo}</div>
+            <ul class="text-xs text-slate-800 space-y-1 list-disc list-inside pt-1">
+              ${e.destaques.map(d => `<li>${d}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+            <button onclick="abrirPdfViewer('${e.arquivo}', '${e.titulo}')" class="px-2.5 py-1 bg-[#0c326f] text-white text-xs font-mono font-bold hover:bg-blue-800 transition-colors flex items-center gap-1 shadow-sm">
+              <span>📄</span> Visualizar Laudo
+            </button>
+            <a href="${e.arquivo}" download class="text-[11px] font-mono text-slate-700 hover:text-blue-900 hover:underline font-semibold">
+              Baixar PDF ↗
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function abrirPdfViewer(url, titulo) {
+      const modal = document.getElementById('pdfModal');
+      const iframe = document.getElementById('pdfModalIframe');
+      const titEl = document.getElementById('pdfModalTitulo');
+      const downEl = document.getElementById('pdfModalDownload');
+
+      if (!modal || !iframe) return;
+
+      iframe.src = url;
+      if (titEl) titEl.innerHTML = `<span>📄</span> ${titulo}`;
+      if (downEl) downEl.href = url;
+
+      modal.classList.add('open');
+    }
+
+    function fecharPdfViewer() {
+      const modal = document.getElementById('pdfModal');
+      const iframe = document.getElementById('pdfModalIframe');
+      if (modal) modal.classList.remove('open');
+      if (iframe) iframe.src = '';
+    }
+
+    // 8. MONTAGEM DO RADAR DE MERCADO (MOD-05)
+    let chartRadar = null;
+
+    function renderRadar() {
+      const lista = document.getElementById('listaSeriesRadar');
+      if (!lista || !TRAUMA_SYSTEM.BENCHMARK) return;
+
+      const b = TRAUMA_SYSTEM.BENCHMARK;
+
+      lista.innerHTML = b.series.map(s => `
+        <div class="bo-card p-3 space-y-1 border-l-4" style="border-left-color: ${s.borda};">
+          <div class="flex items-center justify-between text-xs">
+            <strong class="text-slate-900 font-bold">${s.nome}</strong>
+            <span class="font-mono text-[10px] text-slate-600">Índice Médio: ${(s.valores.reduce((a,b)=>a+b,0)/5).toFixed(0)}%</span>
+          </div>
+          <p class="text-xs text-slate-800 leading-snug font-normal">${s.resumo}</p>
+        </div>
+      `).join('');
+
+      initChart(b);
+    }
+
+    function initChart(data) {
+      const ctx = document.getElementById('canvasRadarTrauma');
+      if (!ctx) return;
+
+      if (chartRadar) {
+        chartRadar.destroy();
+      }
+
+      chartRadar = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: data.eixos,
+          datasets: data.series.map(s => ({
+            label: s.nome,
+            data: s.valores,
+            backgroundColor: s.cor,
+            borderColor: s.borda,
+            borderWidth: s.nome.includes('TRAUMA') ? 3 : 1.5,
+            pointRadius: s.nome.includes('TRAUMA') ? 4 : 2,
+            pointBackgroundColor: s.borda
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                font: { size: 10, family: 'Inter' },
+                color: '#1e293b'
+              }
+            }
+          },
+          scales: {
+            r: {
+              angleLines: { color: '#cbd5e1' },
+              grid: { color: '#e2e8f0' },
+              pointLabels: {
+                font: { size: 10, family: 'Inter', weight: '600' },
+                color: '#0f172a'
+              },
+              ticks: { display: false, max: 100, min: 0 }
+            }
+          }
+        }
+      });
+    }
+
+    // 9. ACESSIBILIDADE, TEMA E TECLADO
+    function toggleContraste() {
+      const b = document.body;
+      if (b.classList.contains('modo-noturno')) {
+        b.classList.remove('modo-noturno');
+        localStorage.setItem('trauma_theme', 'light');
+      } else {
+        b.classList.add('modo-noturno');
+        localStorage.setItem('trauma_theme', 'noturno');
+      }
+      if (TRAUMA_SYSTEM.BENCHMARK) {
+        initChart(TRAUMA_SYSTEM.BENCHMARK);
+      }
+    }
+
+    function ajustarFonte(delta) {
+      const cur = parseFloat(document.body.style.zoom || '1.0');
+      const novo = Math.max(0.85, Math.min(1.25, cur + delta));
+      document.body.style.zoom = novo;
+    }
+
+    function setupTecladoShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          toggleIndexDrawer(false);
+          fecharPdfViewer();
+        }
+
+        const mapF = {
+          'F1': 'hero',
+          'F2': 'mapa',
+          'F3': 'elenco',
+          'F4': 'arcos',
+          'F5': 'radar',
+          'F6': 'producao',
+          'F7': 'evidencias'
+        };
+
+        if (mapF[e.key]) {
+          e.preventDefault();
+          onSelectModulo(mapF[e.key]);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
