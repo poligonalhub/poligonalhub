@@ -8,20 +8,14 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #07090e;
-      --surface: #0d111a;
-      --surface-elevated: #131926;
-      --text: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-muted: #94a3b8;
-      --ufpb-blue: #1e40af;
-      --ufpb-sky: #60a5fa;
-      --ufpb-red: #e11d48;
-      --ufpb-gold: #facc15;
-      --border: #1e293b;
-      --border-strong: #334155;
+      --bg: #05070b;
+      --text: #ffffff;
+      --text-muted: #b0b8c4;
+      --ufpb-blue: #3b82f6;
+      --ufpb-red: #ef4444;
+      --border: #262f40;
       --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
     * {
@@ -34,319 +28,211 @@
       background-color: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
-      line-height: 1.6;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      padding: 0 1.25rem;
-    }
-
-    /* Barra superior institucional nas cores da UFPB */
-    .top-bar {
-      height: 5px;
-      width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 50;
-      background: linear-gradient(
-        90deg,
-        var(--ufpb-blue) 0%,
-        var(--ufpb-blue) 55%,
-        var(--ufpb-red) 55%,
-        var(--ufpb-red) 85%,
-        var(--ufpb-gold) 85%,
-        var(--ufpb-gold) 100%
-      );
+      padding: 0 1.5rem;
     }
 
     .container {
-      max-width: 820px;
+      max-width: 720px;
       margin: 0 auto;
-      padding: 3.5rem 0 4.5rem;
+      padding: 3.5rem 0 5rem;
     }
 
-    /* Cabeçalho Acadêmico */
-    .academic-header {
-      border-bottom: 2px solid var(--border-strong);
-      padding-bottom: 2rem;
+    header {
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 1.75rem;
       margin-bottom: 2.5rem;
     }
 
-    .brand-row {
+    .header-top {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: flex-start;
       gap: 1.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
-    .institution-badge {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .institution-ufpb {
+    .inst-block {
       font-size: 0.875rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ufpb-sky);
+      line-height: 1.5;
     }
 
-    .institution-ccta {
-      font-size: 0.8125rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+    .inst-ufpb {
+      font-weight: 800;
+      letter-spacing: 0.02em;
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: var(--text);
+    }
+
+    .inst-ccta {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .inst-course {
+      margin-top: 0.5rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .inst-staff {
+      color: var(--text-muted);
+    }
+
+    .inst-staff strong {
+      color: var(--text);
+      font-weight: 600;
     }
 
     .poligonal-logo-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.65rem;
-      text-decoration: none;
-      color: var(--text);
-      padding: 0.4rem 0.65rem;
-      border: 1px solid var(--border-strong);
-      border-radius: 6px;
-      background: var(--surface);
-      transition: border-color 0.15s ease, background-color 0.15s ease;
+      display: inline-block;
+      flex-shrink: 0;
+      opacity: 0.95;
+      transition: opacity 0.15s ease;
     }
 
     .poligonal-logo-link:hover {
-      border-color: var(--ufpb-sky);
-      background: var(--surface-elevated);
+      opacity: 1;
     }
 
     .poligonal-logo {
-      width: 28px;
+      width: 44px;
       height: auto;
-      /* Inverte o PNG preto para branco puro em fundo escuro */
       filter: invert(1) brightness(2);
       display: block;
     }
 
-    .poligonal-logo-label {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    section {
+      margin-bottom: 2.75rem;
+    }
+
+    h2 {
+      font-size: 0.8125rem;
+      font-weight: 800;
       text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ufpb-blue);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+
+    .team-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .team-member {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .team-role {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .team-name {
+      font-size: 1.0625rem;
+      font-weight: 700;
       color: var(--text);
     }
 
-    .course-meta {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 0.75rem 1.5rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--ufpb-blue);
-      padding: 1rem 1.25rem;
-      border-radius: 4px;
-      margin-bottom: 2rem;
+    .academic-note {
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.65;
     }
 
-    .meta-item {
+    .academic-note strong {
+      color: var(--text);
+    }
+
+    ul.credits {
+      list-style: none;
+    }
+
+    ul.credits li {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       gap: 0.15rem;
     }
 
-    .meta-label {
-      font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
+    ul.credits li:first-child {
+      padding-top: 0.25rem;
     }
 
-    .meta-value {
-      font-size: 0.9375rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    h1 {
-      font-size: clamp(1.75rem, 4vw, 2.375rem);
-      font-weight: 900;
-      letter-spacing: -0.025em;
-      line-height: 1.15;
-      color: var(--text);
-    }
-
-    /* Seções */
-    section {
-      margin-bottom: 2.75rem;
-    }
-
-    .section-title {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--ufpb-gold);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .section-title::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background-color: var(--border-strong);
-    }
-
-    /* Grid da Equipe */
-    .team-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      border: 1px solid var(--border-strong);
-      border-radius: 4px;
-      overflow: hidden;
-      background: var(--surface);
-    }
-
-    .team-row {
-      display: grid;
-      grid-template-columns: 230px 1fr;
-      gap: 1rem;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      align-items: baseline;
-    }
-
-    .team-row:last-child {
-      border-bottom: none;
-    }
-
-    .team-name {
-      font-size: 1.0625rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .team-role {
-      font-size: 0.9375rem;
-      color: var(--text-secondary);
-    }
-
-    /* Nota de Uso Acadêmico */
-    .disclaimer {
-      margin-top: 1.5rem;
-      padding: 1.125rem 1.25rem;
-      background-color: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--ufpb-red);
-      border-radius: 4px;
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.65;
-    }
-
-    .disclaimer strong {
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    /* Listas de Créditos e Fontes */
-    .credit-list {
-      list-style: none;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background: var(--surface);
-      divide-y: 1px solid var(--border);
-    }
-
-    .credit-item {
-      padding: 0.9rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .credit-item:last-child {
-      border-bottom: none;
-    }
-
-    .credit-main {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.5rem 1rem;
-    }
-
-    .credit-title {
+    .item-line {
       font-size: 0.95rem;
-      font-weight: 700;
       color: var(--text);
     }
 
-    .credit-author {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      background: var(--surface-elevated);
-      padding: 0.1rem 0.45rem;
-      border-radius: 3px;
-      border: 1px solid var(--border-strong);
+    .item-title {
+      font-weight: 700;
     }
 
-    .credit-link {
+    .item-meta {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .item-url {
       font-family: var(--font-mono);
       font-size: 0.8125rem;
-      color: var(--ufpb-sky);
+      color: var(--ufpb-blue);
       text-decoration: underline;
       text-underline-offset: 3px;
       word-break: break-all;
-      display: inline-block;
       width: fit-content;
     }
 
-    .credit-link:hover,
-    .credit-link:focus-visible {
-      color: var(--ufpb-gold);
+    .item-url:hover,
+    .item-url:focus-visible {
+      color: var(--ufpb-red);
     }
 
-    /* Rodapé enxuto */
-    .page-footer {
+    footer {
       margin-top: 3.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      border-top: 2px solid var(--text);
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 1rem;
       font-family: var(--font-mono);
       font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .page-footer a {
-      color: var(--text-secondary);
+    footer a {
+      color: var(--text);
       text-decoration: underline;
       text-underline-offset: 3px;
     }
 
-    .page-footer a:hover {
-      color: var(--ufpb-sky);
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 540px) {
       .container {
-        padding: 2.25rem 0 3rem;
+        padding: 2.25rem 0 3.5rem;
       }
-      .team-row {
-        grid-template-columns: 1fr;
-        gap: 0.2rem;
+      .header-top {
+        flex-direction: column-reverse;
+        gap: 1.25rem;
       }
     }
 
@@ -354,226 +240,192 @@
       .poligonal-logo {
         filter: none;
       }
-      .team-grid,
-      .credit-list,
-      .course-meta,
-      .disclaimer {
-        border: 1px solid CanvasText;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="top-bar" aria-hidden="true"></div>
-
   <main class="container">
-    <header class="academic-header">
-      <div class="brand-row">
-        <div class="institution-badge">
-          <span class="institution-ufpb">Universidade Federal da Paraíba (UFPB)</span>
-          <span class="institution-ccta">Centro de Comunicação, Turismo e Artes (CCTA)</span>
+    <header>
+      <div class="header-top">
+        <div class="inst-block">
+          <div class="inst-ufpb">Universidade Federal da Paraíba (UFPB)</div>
+          <div class="inst-ccta">Centro de Comunicação, Turismo e Artes (CCTA)</div>
+          <div class="inst-course">Comunicação em Mídias Audiovisuais (2026.2) · Produção de Conteúdo Web</div>
+          <div class="inst-staff"><strong>Docente:</strong> Profª. Kellyanne Carvalho Alves &nbsp;|&nbsp; <strong>Monitora:</strong> Iasmim Karla</div>
         </div>
 
-        <a href="https://poligonalhub.com" class="poligonal-logo-link" title="Poligonal Hub">
+        <a href="https://poligonalhub.com" class="poligonal-logo-link" title="Poligonal">
           <img src="./Asset%208@4x.png" alt="Logo Poligonal" class="poligonal-logo">
-          <span class="poligonal-logo-label">Poligonal</span>
         </a>
-      </div>
-
-      <div class="course-meta">
-        <div class="meta-item">
-          <span class="meta-label">Componente Curricular</span>
-          <span class="meta-value">Comunicação em Mídias Audiovisuais (2026.2)</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Atividade</span>
-          <span class="meta-value">Produção de Conteúdo Web (CWAV1)</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Docente</span>
-          <span class="meta-value">Profª. Kellyanne Carvalho Alves</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Monitora</span>
-          <span class="meta-value">Iasmim Karla</span>
-        </div>
       </div>
 
       <h1>Créditos, fontes e referências.</h1>
     </header>
 
     <section aria-labelledby="sec-equipe">
-      <h2 id="sec-equipe" class="section-title">Equipe</h2>
-      <div class="team-grid">
-        <div class="team-row">
+      <h2 id="sec-equipe">Equipe</h2>
+      <div class="team-list">
+        <div class="team-member">
+          <span class="team-role">Pesquisa, Roteiro Preliminar, Apresentação</span>
           <span class="team-name">Orlando Alves Leite</span>
-          <span class="team-role">Pesquisa, Roteiro Preliminar e Apresentação</span>
         </div>
-        <div class="team-row">
+        <div class="team-member">
+          <span class="team-role">Assistência em Roteiro, Apresentação</span>
           <span class="team-name">José Mário Fabiano Filho</span>
-          <span class="team-role">Assistência em Roteiro e Apresentação</span>
         </div>
-        <div class="team-row">
+        <div class="team-member">
+          <span class="team-role">Roteiro Final, Captação de Áudio e Vídeo, Montagem e Finalização, Direção</span>
           <span class="team-name">Laureano Bezerramos</span>
-          <span class="team-role">Roteiro Final, Captação de Áudio e Vídeo, Montagem, Finalização e Direção</span>
         </div>
       </div>
 
-      <aside class="disclaimer" aria-label="Nota de Uso Acadêmico">
+      <p class="academic-note">
         <strong>Nota de Uso Acadêmico:</strong> Esta peça audiovisual foi produzida exclusivamente para fins didáticos e científicos no âmbito da Universidade Federal da Paraíba (UFPB), sem qualquer finalidade comercial ou lucrativa. A montagem combina ativos gráficos e vídeos devidamente licenciados, registros institucionais de acesso público e trechos de obras protegidas utilizados sob o amparo das exceções legais para fins de estudo e ensino. Ainda que o caráter estritamente acadêmico dispense o licenciamento comercial de parte desse acervo, disponibilizamos a seguir a relação integral das fontes, canais e autores originais em respeito e reconhecimento ao trabalho de seus criadores.
-      </aside>
+      </p>
     </section>
 
     <section aria-labelledby="sec-musica">
-      <h2 id="sec-musica" class="section-title">Música</h2>
-      <ul class="credit-list">
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Forró Esferográfico</span>
-            <span class="credit-author">Cabruêra</span>
+      <h2 id="sec-musica">Música</h2>
+      <ul class="credits">
+        <li>
+          <div class="item-line">
+            <span class="item-title">Forró Esferográfico</span>
+            <span class="item-meta"> — Cabruêra</span>
           </div>
-          <a class="credit-link" href="https://www.youtube.com/watch?v=CtMz7XvmVEo" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=CtMz7XvmVEo</a>
+          <a class="item-url" href="https://www.youtube.com/watch?v=CtMz7XvmVEo" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=CtMz7XvmVEo</a>
         </li>
       </ul>
     </section>
 
     <section aria-labelledby="sec-templates">
-      <h2 id="sec-templates" class="section-title">Templates</h2>
-      <ul class="credit-list">
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Documentary Lower Thirds</span>
-            <span class="credit-author">nuclear_motion · UYY33PN</span>
+      <h2 id="sec-templates">Templates</h2>
+      <ul class="credits">
+        <li>
+          <div class="item-line">
+            <span class="item-title">Documentary Lower Thirds</span>
+            <span class="item-meta"> — nuclear_motion</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/documentary-lower-thirds-UYY33PN" target="_blank" rel="noopener noreferrer">https://elements.envato.com/documentary-lower-thirds-UYY33PN</a>
+          <a class="item-url" href="https://elements.envato.com/documentary-lower-thirds-UYY33PN" target="_blank" rel="noopener noreferrer">https://elements.envato.com/documentary-lower-thirds-UYY33PN</a>
         </li>
       </ul>
     </section>
 
     <section aria-labelledby="sec-stock">
-      <h2 id="sec-stock" class="section-title">Stock media</h2>
-      <ul class="credit-list">
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Person Hand Holding Cellphone with Thumb Scrolling</span>
-            <span class="credit-author">QFNLQFU</span>
+      <h2 id="sec-stock">Stock media</h2>
+      <ul class="credits">
+        <li>
+          <div class="item-line">
+            <span class="item-title">Person Hand Holding Cellphone with Thumb Scrolling</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/person-hand-holding-cellphone-with-thumb-scrolling-QFNLQFU" target="_blank" rel="noopener noreferrer">https://elements.envato.com/person-hand-holding-cellphone-with-thumb-scrolling-QFNLQFU</a>
+          <a class="item-url" href="https://elements.envato.com/person-hand-holding-cellphone-with-thumb-scrolling-QFNLQFU" target="_blank" rel="noopener noreferrer">https://elements.envato.com/person-hand-holding-cellphone-with-thumb-scrolling-QFNLQFU</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">High-Performance Server Systems</span>
-            <span class="credit-author">FJNNCPK</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">High-Performance Server Systems</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/this-video-explores-highperformance-server-systems-FJNNCPK" target="_blank" rel="noopener noreferrer">https://elements.envato.com/this-video-explores-highperformance-server-systems-FJNNCPK</a>
+          <a class="item-url" href="https://elements.envato.com/this-video-explores-highperformance-server-systems-FJNNCPK" target="_blank" rel="noopener noreferrer">https://elements.envato.com/this-video-explores-highperformance-server-systems-FJNNCPK</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Government Buildings at Joao Pessoa in Paraiba, Brazil</span>
-            <span class="credit-author">GRBYRCC</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Government Buildings at Joao Pessoa in Paraiba, Brazil</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/government-buildings-at-joao-pessoa-in-paraiba-bra-GRBYRCC" target="_blank" rel="noopener noreferrer">https://elements.envato.com/government-buildings-at-joao-pessoa-in-paraiba-bra-GRBYRCC</a>
+          <a class="item-url" href="https://elements.envato.com/government-buildings-at-joao-pessoa-in-paraiba-bra-GRBYRCC" target="_blank" rel="noopener noreferrer">https://elements.envato.com/government-buildings-at-joao-pessoa-in-paraiba-bra-GRBYRCC</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Hand Holding Smartphone and Scrolling Social Media</span>
-            <span class="credit-author">HXJCTWG</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Hand Holding Smartphone and Scrolling Social Media</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/hand-holding-smartphone-and-scrolling-social-media-HXJCTWG" target="_blank" rel="noopener noreferrer">https://elements.envato.com/hand-holding-smartphone-and-scrolling-social-media-HXJCTWG</a>
+          <a class="item-url" href="https://elements.envato.com/hand-holding-smartphone-and-scrolling-social-media-HXJCTWG" target="_blank" rel="noopener noreferrer">https://elements.envato.com/hand-holding-smartphone-and-scrolling-social-media-HXJCTWG</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Big Data Plane Graph with Quantum Computing AI Technology</span>
-            <span class="credit-author">7TTGA84</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Big Data Plane Graph with Quantum Computing AI Technology</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/big-data-plane-graph-with-quantum-computing-ai-tec-7TTGA84" target="_blank" rel="noopener noreferrer">https://elements.envato.com/big-data-plane-graph-with-quantum-computing-ai-tec-7TTGA84</a>
+          <a class="item-url" href="https://elements.envato.com/big-data-plane-graph-with-quantum-computing-ai-tec-7TTGA84" target="_blank" rel="noopener noreferrer">https://elements.envato.com/big-data-plane-graph-with-quantum-computing-ai-tec-7TTGA84</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Old Downtown at Joao Pessoa in Paraiba, Brazil</span>
-            <span class="credit-author">5TEP4DY</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Old Downtown at Joao Pessoa in Paraiba, Brazil</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/old-downtown-at-joao-pessoa-in-paraiba-brazil-5TEP4DY" target="_blank" rel="noopener noreferrer">https://elements.envato.com/old-downtown-at-joao-pessoa-in-paraiba-brazil-5TEP4DY</a>
+          <a class="item-url" href="https://elements.envato.com/old-downtown-at-joao-pessoa-in-paraiba-brazil-5TEP4DY" target="_blank" rel="noopener noreferrer">https://elements.envato.com/old-downtown-at-joao-pessoa-in-paraiba-brazil-5TEP4DY</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Solon de Lucena Lake at Joao Pessoa in Paraiba, Brazil</span>
-            <span class="credit-author">UH6ELN7</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Solon de Lucena Lake at Joao Pessoa in Paraiba, Brazil</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/solon-de-lucena-lake-at-joao-pessoa-in-paraiba-bra-UH6ELN7" target="_blank" rel="noopener noreferrer">https://elements.envato.com/solon-de-lucena-lake-at-joao-pessoa-in-paraiba-bra-UH6ELN7</a>
+          <a class="item-url" href="https://elements.envato.com/solon-de-lucena-lake-at-joao-pessoa-in-paraiba-bra-UH6ELN7" target="_blank" rel="noopener noreferrer">https://elements.envato.com/solon-de-lucena-lake-at-joao-pessoa-in-paraiba-bra-UH6ELN7</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Historic Center at Joao Pessoa in Paraiba, Brazil</span>
-            <span class="credit-author">37XJ8LW</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Historic Center at Joao Pessoa in Paraiba, Brazil</span>
           </div>
-          <a class="credit-link" href="https://elements.envato.com/historic-center-at-joao-pessoa-in-paraiba-brazil-37XJ8LW" target="_blank" rel="noopener noreferrer">https://elements.envato.com/historic-center-at-joao-pessoa-in-paraiba-brazil-37XJ8LW</a>
+          <a class="item-url" href="https://elements.envato.com/historic-center-at-joao-pessoa-in-paraiba-brazil-37XJ8LW" target="_blank" rel="noopener noreferrer">https://elements.envato.com/historic-center-at-joao-pessoa-in-paraiba-brazil-37XJ8LW</a>
         </li>
       </ul>
     </section>
 
     <section aria-labelledby="sec-youtube">
-      <h2 id="sec-youtube" class="section-title">Youtube</h2>
-      <ul class="credit-list">
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">INSTITUCIONAL: Instituto Federal da Paraíba - Campus João Pessoa</span>
-            <span class="credit-author">Canal IFPB Campus João Pessoa</span>
+      <h2 id="sec-youtube">Youtube</h2>
+      <ul class="credits">
+        <li>
+          <div class="item-line">
+            <span class="item-title">INSTITUCIONAL: Instituto Federal da Paraíba - Campus João Pessoa</span>
+            <span class="item-meta"> — Canal IFPB Campus João Pessoa</span>
           </div>
-          <a class="credit-link" href="https://www.youtube.com/watch?v=hQRxRQHCP70" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=hQRxRQHCP70</a>
+          <a class="item-url" href="https://www.youtube.com/watch?v=hQRxRQHCP70" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=hQRxRQHCP70</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Centro de João Pessoa - Drone João Pessoa</span>
-            <span class="credit-author">Canal ben jammin'</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Centro de João Pessoa - Drone João Pessoa</span>
+            <span class="item-meta"> — Canal ben jammin'</span>
           </div>
-          <a class="credit-link" href="https://www.youtube.com/watch?v=x8hWnbcy3ts" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=x8hWnbcy3ts</a>
+          <a class="item-url" href="https://www.youtube.com/watch?v=x8hWnbcy3ts" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=x8hWnbcy3ts</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Vídeo Institucional da UFPB - 2021</span>
-            <span class="credit-author">Canal UFPB</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Vídeo Institucional da UFPB - 2021</span>
+            <span class="item-meta"> — Canal UFPB</span>
           </div>
-          <a class="credit-link" href="https://www.youtube.com/watch?v=-Bf_EIERti8" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=-Bf_EIERti8</a>
+          <a class="item-url" href="https://www.youtube.com/watch?v=-Bf_EIERti8" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=-Bf_EIERti8</a>
         </li>
       </ul>
     </section>
 
     <section aria-labelledby="sec-noticias">
-      <h2 id="sec-noticias" class="section-title">Notícias e reportagens</h2>
-      <ul class="credit-list">
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">PF vê abuso de poder econômico e manipulação de dados em campanha de Google e Telegram contra PL das Fake News</span>
-            <span class="credit-author">G1 Política · Márcio Falcão (31/01/2024)</span>
+      <h2 id="sec-noticias">Notícias e reportagens</h2>
+      <ul class="credits">
+        <li>
+          <div class="item-line">
+            <span class="item-title">PF vê abuso de poder econômico e manipulação de dados em campanha de Google e Telegram contra PL das Fake News</span>
+            <span class="item-meta"> — G1 Política · Márcio Falcão (31/01/2024)</span>
           </div>
-          <a class="credit-link" href="https://g1.globo.com/politica/noticia/2024/01/31/pf-ve-abuso-de-poder-economico-e-manipulacao-de-dados-em-campanha-do-google-e-telegram-contra-pl-das-fake-news.ghtml" target="_blank" rel="noopener noreferrer">https://g1.globo.com/politica/noticia/2024/01/31/pf-ve-abuso-de-poder-economico-e-manipulacao-de-dados-em-campanha-do-google-e-telegram-contra-pl-das-fake-news.ghtml</a>
+          <a class="item-url" href="https://g1.globo.com/politica/noticia/2024/01/31/pf-ve-abuso-de-poder-economico-e-manipulacao-de-dados-em-campanha-do-google-e-telegram-contra-pl-das-fake-news.ghtml" target="_blank" rel="noopener noreferrer">https://g1.globo.com/politica/noticia/2024/01/31/pf-ve-abuso-de-poder-economico-e-manipulacao-de-dados-em-campanha-do-google-e-telegram-contra-pl-das-fake-news.ghtml</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">A turma do block: como as Big Techs montaram equipes de lobby que derrubam projetos de lei</span>
-            <span class="credit-author">Agência Pública · Alexandre Orrico (09/09/2025)</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">A turma do block: como as Big Techs montaram equipes de lobby que derrubam projetos de lei</span>
+            <span class="item-meta"> — Agência Pública · Alexandre Orrico (09/09/2025)</span>
           </div>
-          <a class="credit-link" href="https://apublica.org/2025/09/a-turma-do-block-como-as-big-techs-montaram-equipes-de-lobby-que-derrubam-projetos-de-lei/" target="_blank" rel="noopener noreferrer">https://apublica.org/2025/09/a-turma-do-block-como-as-big-techs-montaram-equipes-de-lobby-que-derrubam-projetos-de-lei/</a>
+          <a class="item-url" href="https://apublica.org/2025/09/a-turma-do-block-como-as-big-techs-montaram-equipes-de-lobby-que-derrubam-projetos-de-lei/" target="_blank" rel="noopener noreferrer">https://apublica.org/2025/09/a-turma-do-block-como-as-big-techs-montaram-equipes-de-lobby-que-derrubam-projetos-de-lei/</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Como as Big Techs aprofundam a seca no Nordeste</span>
-            <span class="credit-author">Jornal O Futuro (13/09/2025)</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Como as Big Techs aprofundam a seca no Nordeste</span>
+            <span class="item-meta"> — Jornal O Futuro (13/09/2025)</span>
           </div>
-          <a class="credit-link" href="https://jornalofuturo.com.br/artigo/Y5Thfj-como-as-big-techs-aprofundam-a-seca-no-nordeste" target="_blank" rel="noopener noreferrer">https://jornalofuturo.com.br/artigo/Y5Thfj-como-as-big-techs-aprofundam-a-seca-no-nordeste</a>
+          <a class="item-url" href="https://jornalofuturo.com.br/artigo/Y5Thfj-como-as-big-techs-aprofundam-a-seca-no-nordeste" target="_blank" rel="noopener noreferrer">https://jornalofuturo.com.br/artigo/Y5Thfj-como-as-big-techs-aprofundam-a-seca-no-nordeste</a>
         </li>
-        <li class="credit-item">
-          <div class="credit-main">
-            <span class="credit-title">Data centers não têm destaque em programas de candidatos, mas devem impactar o Nordeste</span>
-            <span class="credit-author">Marco Zero Conteúdo</span>
+        <li>
+          <div class="item-line">
+            <span class="item-title">Data centers não têm destaque em programas de candidatos, mas devem impactar o Nordeste</span>
+            <span class="item-meta"> — Marco Zero Conteúdo</span>
           </div>
-          <a class="credit-link" href="https://marcozero.org/data-centers-nao-tem-destaque-em-programas-de-candidatos-mas-devem-impactar-o-nordeste/" target="_blank" rel="noopener noreferrer">https://marcozero.org/data-centers-nao-tem-destaque-em-programas-de-candidatos-mas-devem-impactar-o-nordeste/</a>
+          <a class="item-url" href="https://marcozero.org/data-centers-nao-tem-destaque-em-programas-de-candidatos-mas-devem-impactar-o-nordeste/" target="_blank" rel="noopener noreferrer">https://marcozero.org/data-centers-nao-tem-destaque-em-programas-de-candidatos-mas-devem-impactar-o-nordeste/</a>
         </li>
       </ul>
     </section>
 
-    <footer class="page-footer">
+    <footer>
       <span>UFPB · CCTA · 2026.2</span>
       <a href="https://poligonalhub.com">poligonalhub.com/UFPB/CWAV1</a>
     </footer>
