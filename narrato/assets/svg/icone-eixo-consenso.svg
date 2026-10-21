@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420">
+  <g transform="rotate(-4 210 210)">
+    <path fill-rule="evenodd" d="M12 126L406 116L410 298L8 306Z M178 160H242Q290 160 290 210Q290 260 242 260H178Q130 260 130 210Q130 160 178 160Z M40 176L62 176L48 250L26 250Z M80 176L102 176L88 250L66 250Z M336 172L358 172L344 246L322 246Z M376 172L398 172L384 246L362 246Z"/>
+    <rect x="164" y="178" width="12" height="64"/>
+    <rect x="244" y="178" width="12" height="64"/>
+    <ellipse cx="210" cy="210" rx="26" ry="22"/>
+  </g>
+</svg>

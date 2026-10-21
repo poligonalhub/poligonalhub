@@ -1,0 +1,1830 @@
+/* =========================================================================
+   NarrATO · componentes do sistema visual
+   -------------------------------------------------------------------------
+   Índice das peças, na ordem em que entram. O scripts/build_site.py junta
+   cada @import num único assets/css/componentes.css; a pasta _sass não é
+   publicada. As peças só leem var(--token) do tokens.css (ADR-008) e são
+   carregadas depois do narrato.css, para valer sobre o legado. Cada peça
+   que entra aqui apaga do legado as regras que substituiu.
+   ========================================================================= */
+/* --- componentes/base.css --- */
+/* ---------- Base: chão, letra e foco ----------
+   O chão é a superfície da página nos dois temas. OpenDyslexic em tudo, sem
+   itálico. Os padrões de fita são imagem, não valor, e moram aqui. */
+:root {
+  --fita1: url("../images/Pattern_FitaDeObra1.png");
+  --fita2: url("../images/Pattern_FitaDeObra2.png");
+  --concreto: url("../images/textura-concreto-ladrilho.jpg");
+}
+
+html { background: var(--superficie-pagina); scroll-behavior: smooth; }
+body {
+  background: var(--superficie-pagina);
+  color: var(--tinta-corpo);
+  font-family: var(--fonte-leitura);
+  font-size: var(--tipo-corpo);
+  line-height: var(--entrelinha-corpo);
+}
+em, i, cite { font-style: normal; }
+:focus-visible { outline: var(--borda-media) solid var(--foco); outline-offset: 3px; }
+::selection { background: var(--acento); color: var(--tinta-sobre-acento); }
+
+/* A visão do Caderno ocupa a página; a casca centraliza o conteúdo e a de
+   leitura fica na medida do texto */
+.view-container { max-width: none; margin: 0; padding: 0; }
+.casca { max-width: var(--medida-larga); margin: 0 auto; padding: var(--espaco-5) var(--espaco-4) var(--espaco-8); }
+.casca--leitura { max-width: 60rem; }
+@media (min-width: 40rem) { .casca { padding-inline: var(--espaco-6); } }
+
+/* A fita delimita, não decora: separa blocos, nunca fica atrás de texto */
+.hazard-stripe, .faixa-fita {
+  height: 8px;
+  background: var(--fita2) repeat-x left center / auto 8px;
+  border: 0;
+}
+
+/* No tema claro o logotipo branco some no creme: troca pela versão escura */
+[data-theme="claro"] .brand-logo,
+[data-theme="claro"] #heroLogoWhite { content: url("../svg/logo-narrato-escura.svg"); }
+
+/* --- componentes/botao.css --- */
+/* ---------- Botão ----------
+   A pílula torta do menu da vitrine: terra clara, contorno amarelo, lados
+   levemente fora do prumo. A forma sai de duas camadas recortadas (contorno
+   e miolo), para não depender de SVG na marcação. Alvo de toque: 44 px.
+   Variantes: forte (amarelo, para a ação principal) e discreto (só traço).
+   As classes do legado que viram botão entram na mesma regra. */
+.botao,
+.btn-inspect, .btn-resumo-mini, .btn-buy-book, .card-btn,
+.modal-foot-btn, .modal-read-toggle,
+.header-nav-btn.cta-licitacao {
+  --botao-fundo: var(--superficie-faixa);
+  --botao-traco: var(--acento);
+  --botao-tinta: var(--tinta-sobre-faixa);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-2);
+  min-height: 2.75rem;
+  padding: var(--espaco-1) var(--espaco-4);
+  border: 0;
+  border-radius: var(--raio-1);
+  background: none;
+  box-shadow: none;
+  color: var(--botao-tinta);
+  font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+  text-decoration: none;
+  text-transform: none;
+  cursor: pointer;
+  transition: transform var(--duracao-curta);
+}
+.botao::before, .botao::after,
+.btn-inspect::before, .btn-inspect::after,
+.btn-resumo-mini::before, .btn-resumo-mini::after,
+.btn-buy-book::before, .btn-buy-book::after,
+.card-btn::before, .card-btn::after,
+.modal-foot-btn::before, .modal-foot-btn::after,
+.modal-read-toggle::before, .modal-read-toggle::after,
+.header-nav-btn.cta-licitacao::before, .header-nav-btn.cta-licitacao::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  clip-path: polygon(0.3% 2%, 98.5% 2%, 99.7% 98%, 1% 98%);
+}
+.botao::before, .btn-inspect::before, .btn-resumo-mini::before, .btn-buy-book::before, .card-btn::before,
+.modal-foot-btn::before, .modal-read-toggle::before, .header-nav-btn.cta-licitacao::before {
+  inset: 0;
+  background: var(--botao-traco);
+  filter: drop-shadow(var(--sombra-baixa));
+}
+.botao::after, .btn-inspect::after, .btn-resumo-mini::after, .btn-buy-book::after, .card-btn::after,
+.modal-foot-btn::after, .modal-read-toggle::after, .header-nav-btn.cta-licitacao::after {
+  inset: 2px;
+  background: var(--botao-fundo);
+}
+.botao:hover, .btn-inspect:hover, .btn-resumo-mini:hover, .btn-buy-book:hover, .card-btn:hover,
+.modal-foot-btn:hover:not(:disabled), .modal-read-toggle:hover, .header-nav-btn.cta-licitacao:hover {
+  transform: translateY(-2px);
+  color: var(--botao-tinta);
+  background: none;
+  border-color: transparent;
+}
+.botao:active, .btn-inspect:active, .modal-foot-btn:active { transform: translateY(1px); }
+.modal-foot-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Forte: o amarelo marca a ação principal (adquirir, licitação, lido) */
+.botao--forte, .btn-buy-book, .card-btn.btn-buy, .header-nav-btn.cta-licitacao, .modal-read-toggle.read-active {
+  --botao-fundo: var(--acento);
+  --botao-traco: var(--tinta-sobre-acento);
+  --botao-tinta: var(--tinta-sobre-acento);
+}
+
+/* Discreto: só o traço, para a ação secundária (limpar, ajuda) */
+.botao--discreto {
+  --botao-fundo: var(--superficie-pagina);
+  --botao-traco: var(--traco-forte);
+  --botao-tinta: var(--tinta-corpo);
+}
+
+/* Botão de ícone do cabeçalho (tipografia, ajuda): quadrado, só traço */
+.header-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--traco-forte);
+  border-radius: var(--raio-1);
+  background: none;
+  color: var(--tinta-corpo);
+  font: var(--peso-negrito) var(--tipo-corpo) / 1 var(--fonte-leitura);
+  cursor: pointer;
+}
+.header-icon-btn:hover, .header-icon-btn.highlight-gold:hover { border-color: var(--acento); background: none; color: var(--tinta-corpo); }
+.header-icon-btn.highlight-gold { border-color: var(--acento); color: var(--acento); background: none; }
+
+/* Troca de tema: a peça "Tema claro" da vitrine */
+.troca-tema {
+  min-height: 2.75rem;
+  padding: 0 var(--espaco-3);
+  background: none;
+  border: 2px solid var(--traco-forte);
+  border-radius: var(--raio-1);
+  color: var(--tinta-corpo);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.troca-tema:hover { border-color: var(--acento); }
+.troca-tema[aria-pressed="true"] { background: var(--tinta-corpo); color: var(--superficie-pagina); border-color: var(--tinta-corpo); }
+
+/* Os botões dos índices de fontes e glossário vestem a mesma peça: estes
+   seletores existem para que a poda do legado tire as cores antigas deles. */
+.btn-ficha, .btn-ficha:hover, .btn-buy, .btn-buy:hover { background: none; border: 0; color: var(--botao-tinta); }
+
+/* --- componentes/campo.css --- */
+/* ---------- Campo de busca ----------
+   Papel translúcido com borda grossa em tinta, texto em caixa alta. É a busca
+   universal (omni-search) do cabeçalho de todas as páginas. */
+.omni-search-wrapper { position: relative; flex: 1 1 16rem; min-width: 0; max-width: 32rem; }
+.omni-search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  min-height: 3.25rem;
+  padding: 0 var(--espaco-3);
+  background: color-mix(in srgb, var(--superficie-papel) 88%, transparent);
+  border: var(--borda-media) solid var(--tinta-papel);
+  border-radius: var(--raio-1);
+  box-shadow: none;
+}
+.omni-search-box:focus-within { outline: var(--borda-media) solid var(--foco); outline-offset: 2px; border-color: var(--tinta-papel); box-shadow: none; }
+.omni-search-icon { display: none; }
+.omni-search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tinta-papel);
+  font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.4 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+}
+.omni-search-input::placeholder { color: color-mix(in srgb, var(--tinta-papel) 70%, transparent); }
+.omni-search-input:focus { outline: none; }
+.omni-search-clear { border: 0; background: none; color: var(--tinta-papel); font: inherit; cursor: pointer; padding: var(--espaco-1); }
+.omni-search-kbd {
+  flex: none;
+  padding: 0 var(--espaco-1);
+  border: var(--borda-fina) solid var(--tinta-papel);
+  border-radius: var(--raio-1);
+  background: none;
+  color: var(--tinta-papel);
+  font: var(--tipo-rotulo) / 1.6 var(--fonte-tecnica);
+}
+@media (max-width: 40rem) { .omni-search-kbd { display: none; } }
+
+/* A lista de resultados é papel apoiado sobre o chão */
+.omni-dropdown {
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  border: 0;
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+}
+.omni-tabs { border-bottom: 2px solid var(--superficie-painel); background: none; }
+.omni-tab {
+  border: 0;
+  border-bottom: var(--borda-media) solid transparent;
+  border-radius: var(--raio-1);
+  background: none;
+  color: var(--tinta-papel);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+}
+.omni-tab:hover { background: var(--superficie-painel); color: var(--tinta-papel); }
+.omni-tab.active { border-bottom-color: var(--tinta-papel); background: var(--superficie-painel); color: var(--tinta-papel); }
+.omni-group-title { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.omni-item { border-radius: var(--raio-1); color: var(--tinta-papel); border-color: var(--superficie-painel); }
+.omni-item:hover, .omni-item.selected { background: var(--superficie-painel); }
+.omni-item-title { color: var(--tinta-papel); font-family: var(--fonte-leitura); }
+.omni-item-sub, .omni-item-desc, .omni-empty { color: var(--tinta-papel); font-family: var(--fonte-leitura); }
+
+/* --- componentes/etiqueta.css --- */
+/* ---------- Etiqueta ----------
+   Rótulo curto em caixa alta. O selo é amarelo, levemente torto, com a sombra
+   curta do ladrilho; a variante traço serve para ano e domínio; a tag é texto
+   com cerquilha. Substitui as cinco etiquetas do legado. */
+.etiqueta, .cat-pill, .omni-item-badge, .modal-box-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  padding: var(--espaco-1) var(--espaco-2);
+  border: 0;
+  border-radius: var(--raio-1);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  box-shadow: var(--sombra-baixa);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+.etiqueta--traco, .year-pill, .cat-pill.dominio-narratologia {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--espaco-1) var(--espaco-2);
+  border: 2px solid currentColor;
+  border-radius: var(--raio-1);
+  background: none;
+  color: inherit;
+  box-shadow: none;
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transform: none;
+}
+.tag-chip {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio-1);
+  background: none;
+  color: inherit;
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.tag-chip::before { content: "#"; }
+.tag-chip:hover { background: none; color: inherit; text-decoration-color: var(--acento); }
+
+/* --- componentes/ladrilho.css --- */
+/* ---------- Ladrilho de capítulo e botões do capítulo ----------
+   O ícone do capítulo (desenho da Direção de Arte, assets/svg/CAPxxNarrATO.svg)
+   sobre a forma torta amarela, com sombra dura curta. Grande na faixa, pequeno
+   no menu. Os botões marcar e recolher são o desenho da vitrine; o estado vem
+   de aria-pressed e aria-expanded. A forma mora em includes/simbolos.html. */
+.ladrilho { position: relative; flex: none; display: grid; place-items: center; width: 4.6rem; height: 4.9rem; }
+.ladrilho svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(var(--sombra-baixa)); }
+.ladrilho svg use { fill: var(--acento); }
+.ladrilho .icone { position: relative; width: 74%; height: 74%; transform: rotate(-4deg); }
+.ladrilho--menu { width: 2.25rem; height: 2.2rem; }
+
+.botao-cap { display: grid; place-items: center; width: 3.75rem; height: 3.75rem; padding: 0; background: none; border: 0; cursor: pointer; color: inherit; }
+.botao-cap svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(var(--sombra-baixa)); transition: transform var(--duracao-curta); }
+.botao-cap:hover svg { transform: translateY(-2px); }
+.botao-cap:active svg { transform: translateY(1px); }
+.botao-cap[aria-pressed="false"] .visto { display: none; }
+.botao-cap[aria-pressed="false"] .caixa-marcar { opacity: 0.85; }
+.botao-cap[aria-expanded="true"] .barra-vertical { display: none; }
+
+/* --- componentes/cabecalho.css --- */
+/* ---------- Cabeçalho ----------
+   A barra da vitrine: chão da página, traço embaixo, seções em caixa alta e a
+   seção atual como botão (terra clara, contorno amarelo). Serve ao Caderno
+   (.site-header, que o caderno.js revela ao rolar) e às páginas internas
+   (.narrato-header, include cabecalho.html). */
+.site-header.docked {
+  background-color: var(--superficie-pagina);
+  border-bottom: 2px solid var(--traco-regra);
+  box-shadow: var(--sombra-alta);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.header-slogan-badge {
+  background: none;
+  border: 2px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  font-family: var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+}
+.slogan-neutro { color: var(--tinta-suave); }
+.slogan-ouro { color: var(--acento); }
+[data-theme="claro"] .slogan-ouro { color: var(--tinta-titulo); }
+
+:root {
+  --altura-cabecalho: 6.25rem;
+}
+
+.narrato-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 6.25rem;
+  gap: var(--espaco-3) var(--espaco-5);
+  padding: var(--espaco-3) clamp(1.25rem, 3.5vw, 2.75rem);
+  background: var(--superficie-pagina);
+  border-bottom: 2px solid var(--traco-regra);
+  font-family: var(--fonte-leitura);
+}
+.narrato-header + .faixa-fita { position: sticky; top: var(--altura-cabecalho, 6.25rem); }
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  color: var(--tinta-corpo);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.header-brand .brand-logo {
+  height: 4.25rem;
+  width: auto;
+  transition: transform var(--duracao-curta) ease;
+}
+.header-brand:hover .brand-logo {
+  transform: scale(1.03);
+}
+.header-title-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.header-subtitle {
+  font: var(--peso-negrito) 0.92rem / 1.35 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+  max-width: 25rem;
+}
+@media (max-width: 68rem) {
+  .header-subtitle {
+    display: none;
+  }
+}
+
+/* As seções: rótulo em caixa alta; a atual vira botão */
+.header-nav, .header-nav-links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-1) var(--espaco-2); margin-left: auto; }
+.header-nav-link, .header-nav-btn:not(.cta-licitacao) {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  min-height: 3.25rem;
+  padding: var(--espaco-2) var(--espaco-3);
+  border: 0;
+  border-radius: var(--raio-1);
+  background: none;
+  color: var(--tinta-suave);
+  font: var(--peso-negrito) 0.92rem / 1 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.header-nav-link:hover, .header-nav-btn:not(.cta-licitacao):hover { color: var(--tinta-corpo); background: none; border-color: transparent; }
+.header-nav-btn .nav-idx { font-family: var(--fonte-tecnica); color: inherit; opacity: 0.7; background: none; }
+.header-nav-link[aria-current="page"], .header-nav-btn.active:not(.cta-licitacao) { color: var(--tinta-sobre-faixa); background: none; }
+.header-nav-link[aria-current="page"]::before, .header-nav-btn.active:not(.cta-licitacao)::before,
+.header-nav-link[aria-current="page"]::after, .header-nav-btn.active:not(.cta-licitacao)::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  clip-path: polygon(0.3% 2%, 98.5% 2%, 99.7% 98%, 1% 98%);
+}
+.header-nav-link[aria-current="page"]::before, .header-nav-btn.active:not(.cta-licitacao)::before { inset: 0; background: var(--acento); }
+.header-nav-link[aria-current="page"]::after, .header-nav-btn.active:not(.cta-licitacao)::after { inset: 2px; background: var(--superficie-faixa); }
+.header-nav-btn.active .nav-idx { color: inherit; }
+.header-nav-btn.cta-licitacao { font-size: var(--tipo-rotulo); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+
+@media (max-width: 40rem) {
+  .narrato-header .omni-search-wrapper { order: 3; flex-basis: 100%; max-width: none; }
+  .header-nav { margin-left: 0; }
+}
+
+/* Caderno em tela estreita: a busca ocupa a linha, as seções rolam de lado
+   numa faixa só, e as ferramentas (tema, letra, ajuda) vêm depois */
+@media (max-width: 62rem) {
+  .site-header .header-actions { flex-wrap: wrap; justify-content: flex-start; gap: var(--espaco-2); }
+  .site-header .omni-search-wrapper { order: 1; flex: 1 1 100%; max-width: none; }
+  .site-header .header-nav-links { order: 2; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; margin-left: 0; scrollbar-width: none; }
+  .site-header .header-nav-links > * { flex: none; }
+  .site-header .header-util-group { order: 3; margin-left: auto; }
+}
+
+/* =============================================================================
+   PÁGINA DO VOCABULÁRIO: DESLOCAMENTO CENTRAL DA OMNI-SEARCH & FIXAÇÃO DE TERMOS
+   ============================================================================= */
+.pagina-vocabulario .narrato-header .omni-search-wrapper {
+  display: none !important;
+}
+
+.vocabulario-omnisearch-hero {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto var(--espaco-4);
+}
+.vocabulario-omnisearch-hero .omni-search-wrapper {
+  max-width: 100%;
+  width: 100%;
+}
+.vocabulario-omnisearch-hero .omni-search-box {
+  min-height: 3.5rem;
+  padding: 0 var(--espaco-3);
+  font-size: 1.05rem;
+  border-width: 2px;
+  border-color: var(--traco-forte);
+  background: var(--superficie-elevada);
+  box-shadow: var(--sombra-media);
+}
+.vocabulario-omnisearch-hero .omni-search-box:focus-within {
+  border-color: var(--acento);
+  box-shadow: 0 0 16px rgba(255, 178, 1, 0.25);
+}
+.vocabulario-omnisearch-hero .omni-search-input {
+  font-size: 1.05rem;
+}
+
+/* Cartões do Vocabulário: Topo com âncora e botão Martelo/Prego */
+.gloss-card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--espaco-1);
+}
+.btn-prego-fixar {
+  background: none;
+  border: 1px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--tinta-suave);
+  transition: all var(--duracao-curta) ease;
+}
+.btn-prego-fixar:hover {
+  border-color: var(--acento);
+  background: var(--superficie-afundada);
+  transform: scale(1.15);
+}
+.btn-prego-fixar.fixado {
+  border-color: var(--acento);
+  background: rgba(255, 178, 1, 0.15);
+  color: var(--acento);
+}
+.gloss-card.verbete-fixado {
+  border-top: 3px solid var(--acento);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* --- componentes/faixa-pagina.css --- */
+/* ---------- Faixa de título da seção ----------
+   O topo do Caderno na vitrine: o concreto como fundo, o título em branco com
+   sombra de tinta. Abre cada seção (Caderno, Argamassa, Bibliografia,
+   Glossário). O concreto é igual nos dois temas, como o papel. */
+.page-title-banner.faixa-pagina {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: var(--espaco-6) clamp(1rem, 4vw, 6rem) var(--espaco-5);
+  background: var(--concreto) center / 25rem;
+  border-bottom: 0;
+}
+.faixa-pagina-dentro { max-width: var(--medida-larga); margin: 0 auto; display: grid; gap: var(--espaco-2); }
+.faixa-pagina .hero-title {
+  margin: 0;
+  color: var(--tinta-sobre-faixa);
+  font: var(--peso-regular) var(--tipo-titulo-obra) / var(--entrelinha-titulo) var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+  text-shadow: 0 2px 0 color-mix(in srgb, var(--tinta-papel) 60%, transparent);
+  text-wrap: balance;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+.faixa-pagina .hero-subtitle {
+  justify-self: start;
+  margin: 0;
+  padding: var(--espaco-1) var(--espaco-3);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  box-shadow: var(--sombra-baixa);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.3 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+
+/* Barra de progresso de leitura, logo abaixo da faixa do Caderno */
+.progresso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-6);
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  box-shadow: var(--sombra-alta);
+}
+.progresso-rotulo { display: block; font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.progresso-numero { font: var(--peso-negrito) var(--tipo-subtitulo) / 1.3 var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); color: var(--tinta-papel); }
+.progresso .botao--discreto { --botao-fundo: var(--superficie-papel); --botao-traco: var(--tinta-papel); --botao-tinta: var(--tinta-papel); }
+
+/* Folha: bloco de leitura em papel (Argamassa) */
+.folha {
+  display: grid;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-6);
+  padding: var(--espaco-5) var(--espaco-5) var(--espaco-6);
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  box-shadow: var(--sombra-alta);
+  border: 0;
+  border-radius: var(--raio-1);
+}
+.folha p { margin: 0; max-width: var(--medida-leitura); line-height: var(--entrelinha-corpo); }
+.folha-titulo { margin: 0; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-titulo-secao) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+
+/* --- componentes/capitulo.css --- */
+/* ---------- Capítulo ----------
+   Faixa em terra clara com o ladrilho, o título, a foto do capítulo e os
+   botões marcar e recolher; a fita fecha a faixa; o painel lilás guarda a
+   introdução e os cinco tópicos (três em cima, dois embaixo).
+   O subtítulo é terra-980 sobre a terra, 4,70:1, sem sombra: o cimento
+   media 2,8:1 e dependia de um halo atrás das letras (16/10/2026). */
+.capitulos { display: grid; gap: var(--espaco-6); }
+.capitulo { display: block; box-shadow: var(--sombra-alta); scroll-margin-top: 6rem; background: none; border: 0; border-radius: var(--raio-1); overflow: visible; }
+
+.faixa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-4);
+  min-height: 5.5rem;
+  padding: var(--espaco-2) var(--espaco-4) var(--espaco-2) var(--espaco-5);
+  background: var(--superficie-faixa);
+  overflow: hidden;
+  transition: filter var(--duracao-curta) ease, box-shadow var(--duracao-curta) ease;
+}
+.faixa:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+.faixa-textos { position: relative; z-index: 1; min-width: 0; display: grid; gap: var(--espaco-1); }
+.faixa-rotulo {
+  margin: 0;
+  color: var(--tinta-sobre-faixa);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+}
+.faixa h2 {
+  margin: 0;
+  color: var(--tinta-sobre-faixa);
+  font: var(--peso-negrito) var(--tipo-titulo-cap) / var(--entrelinha-titulo) var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+}
+.faixa-subtitulo {
+  margin: 0;
+  color: var(--tinta-sobre-faixa-suave);
+  font: var(--peso-negrito) var(--tipo-corpo) / 1.3 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+}
+.faixa-foto {
+  align-self: stretch;
+  flex: 1 1 0;
+  min-width: 6rem;
+  margin: calc(-1 * var(--espaco-2)) calc(-1 * var(--espaco-4)) calc(-1 * var(--espaco-2)) 0;
+  background: no-repeat left center / cover;
+}
+.faixa-acoes { position: absolute; z-index: 2; right: var(--espaco-6); top: 50%; transform: translateY(-50%); display: flex; gap: var(--espaco-4); }
+
+.painel {
+  display: grid;
+  gap: var(--espaco-5);
+  padding: var(--espaco-5) clamp(0.75rem, 2vw, 1.6rem) var(--espaco-6);
+  background: var(--superficie-painel);
+  color: var(--tinta-papel);
+}
+.painel[hidden] { display: none; }
+
+/* A introdução do capítulo: texto corrido preenchendo o container em coluna única */
+.painel .chapter-intro-prose {
+  margin: 0 0 var(--espaco-4);
+  padding: 0;
+  border: 0;
+  max-width: 100%;
+  width: 100%;
+}
+.painel .chapter-intro-p {
+  margin: 0 0 var(--espaco-3);
+  color: var(--tinta-papel);
+  font-size: var(--tipo-corpo);
+  line-height: 1.7;
+  text-align: left;
+  max-width: 100%;
+}
+.painel .chapter-intro-p:last-child { margin-bottom: 0; }
+
+/* Os cinco tópicos: três em cima e dois embaixo */
+.topicos-grade { display: grid; gap: var(--espaco-4); grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.topicos-grade > * { grid-column: span 2; }
+.topicos-grade > :nth-child(n+4) { grid-column: span 3; }
+
+@media (max-width: 62rem) {
+  .topicos-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .topicos-grade > *, .topicos-grade > :nth-child(n+4) { grid-column: auto; }
+  .topicos-grade > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (max-width: 52rem) {
+  .faixa { flex-wrap: wrap; padding: var(--espaco-2) var(--espaco-3) 0; gap: var(--espaco-2) var(--espaco-3); }
+  .faixa .ladrilho { width: 3.5rem; height: 3.7rem; }
+  .faixa-textos { flex: 1 1 10rem; }
+  .faixa h2 { font-size: var(--tipo-subtitulo); }
+  .faixa-subtitulo { font-size: var(--tipo-corpo-reduzido); }
+  .faixa-foto { order: 3; flex: 1 0 100%; align-self: auto; height: 3.5rem; margin: 0 calc(-1 * var(--espaco-3)); }
+  .faixa-acoes { top: auto; bottom: var(--espaco-1); right: var(--espaco-2); transform: none; gap: var(--espaco-1); }
+  .faixa-acoes .botao-cap { width: 3rem; height: 3rem; }
+}
+@media (max-width: 40rem) {
+  .topicos-grade { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- componentes/materia.css --- */
+/* ---------- Caixa de Matéria Didática ----------
+   Papel cimento com a tarja amarela entre fitas, o título, a divisa e o
+   bloco de texto; a fita fecha a caixa. Sem eixo: consenso e dissenso saíram
+   do projeto. O quadrado da tarja marca a matéria lida (classe materia-lida / topic-lido,
+   que o caderno.js e progresso.js aplicam). */
+.materia, .topico {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  border: 0;
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+  backdrop-filter: none;
+  transition: transform var(--duracao-curta);
+}
+.materia:hover, .topico:hover { transform: translateY(-2px); border-color: transparent; box-shadow: var(--sombra-alta); }
+.materia-tarja, .topico-tarja { padding-block: 6px; background: var(--fita2) repeat-x left top / auto 6px, var(--fita2) repeat-x left bottom / auto 6px; }
+.materia-tarja > div, .topico-tarja > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--espaco-3);
+  min-height: 1.75rem;
+  padding-inline: var(--espaco-4) var(--espaco-3);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+}
+.materia-rotulo, .topico-rotulo { margin: 0; font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.2 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); }
+
+.materia-check-indicator, .topic-check-indicator {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid var(--tinta-sobre-acento);
+  border-radius: var(--raio-1);
+  background: none;
+  color: transparent;
+  font-size: 0;
+}
+.materia-lida .materia-check-indicator,
+.topic-lido .topic-check-indicator { background: var(--tinta-sobre-acento); }
+.materia-lida .materia-check-indicator::after,
+.topic-lido .topic-check-indicator::after { content: "✓"; color: var(--acento); font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura); }
+
+.materia-cabeca, .topico-cabeca { padding: var(--espaco-3) var(--espaco-4) var(--espaco-2); }
+.materia-cabeca h3, .topico-cabeca h3, .materia .card-heading, .topico .card-heading {
+  margin: 0;
+  color: var(--tinta-papel);
+  font: var(--peso-negrito) var(--tipo-corpo) / var(--entrelinha-titulo) var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+}
+.materia-divisa, .topico-divisa { height: 2px; flex: none; background: var(--fita1) repeat-x center / auto 9px; }
+.materia-bloco, .topico-bloco { display: flex; flex-direction: column; gap: var(--espaco-2); padding: var(--espaco-3) var(--espaco-4); flex: 1; }
+.materia .card-prose, .topico .card-prose { margin: 0; color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.materia-abrir, .topico-abrir {
+  align-self: flex-end;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tinta-papel);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.materia-abrir:hover, .topico-abrir:hover { text-decoration-color: var(--superficie-faixa); }
+.materia-codigo, .topico-codigo { font-family: var(--fonte-tecnica); text-transform: none; text-decoration: none; opacity: 0.75; }
+.materia-pe, .topico-pe { height: 7px; flex: none; margin-top: auto; background: var(--fita1) repeat-x center / auto 7px; }
+
+/* --- componentes/menu-capitulos.css --- */
+/* ---------- Menu de capítulos ----------
+   O menu-cap da vitrine, no lugar do dock flutuante: uma barra presa ao pé
+   da tela enquanto se lê o Caderno. O capítulo atual aparece como botão, com
+   o ladrilho e o nome; os outros, só com o ladrilho e o número. O caderno.js
+   revela a barra (.visible) e marca o capítulo atual (.active). */
+.toolbelt-wrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 95;
+  display: block;
+  max-width: none;
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--duracao-longa), transform var(--duracao-longa), visibility var(--duracao-longa);
+}
+.toolbelt-wrapper.visible { transform: none; opacity: 1; visibility: visible; pointer-events: auto; }
+
+.toolbelt-dock.menu-cap {
+  display: flex;
+  width: 100%;
+  max-width: none;
+  align-items: center;
+  gap: var(--espaco-3);
+  overflow-x: auto;
+  padding: var(--espaco-2) clamp(1rem, 4vw, 6rem) calc(var(--espaco-2) + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--superficie-elevada) 94%, transparent);
+  border: 0;
+  border-top: 2px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+  backdrop-filter: none;
+  scrollbar-width: thin;
+}
+
+/* O capítulo atual: botão de texto com o ladrilho */
+.dock-active-banner {
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  min-height: 2.75rem;
+  padding: var(--espaco-1) var(--espaco-3) var(--espaco-1) var(--espaco-1);
+  border: 0;
+  background: none;
+  color: var(--tinta-sobre-faixa);
+  font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+  white-space: nowrap;
+  opacity: 1;
+  transform: none;
+}
+.dock-active-banner::before, .dock-active-banner::after { content: ""; position: absolute; z-index: -1; clip-path: polygon(0.3% 2%, 98.5% 2%, 99.7% 98%, 1% 98%); }
+.dock-active-banner::before { inset: 0; background: var(--acento); }
+.dock-active-banner::after { inset: 2px; background: var(--superficie-faixa); }
+.dock-active-banner .ladrilho--menu { margin-block: -0.5rem; }
+
+.dock-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  width: auto;
+  height: auto;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio-1);
+  background: none;
+  color: var(--tinta-suave);
+  font: var(--peso-negrito) var(--tipo-subtitulo) / 1 var(--fonte-leitura);
+  text-decoration: none;
+  box-shadow: none;
+  transform: none;
+}
+.dock-btn:hover { color: var(--tinta-corpo); background: none; transform: translateY(-2px); }
+.dock-btn.active { display: none; }
+.dock-btn.btn-top { margin-left: auto; padding-inline: var(--espaco-2); font-size: var(--tipo-titulo-secao); }
+.dock-tooltip, .dock-divider { display: none; }
+
+@media (max-width: 40rem) {
+  .dock-active-banner #dockActiveText { max-width: 9rem; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* --- componentes/cartoes.css --- */
+/* ---------- Cartões de acervo ----------
+   Livro (Bibliografia), verbete (Glossário) e pilar (Argamassa): papel
+   cimento apoiado no chão, sombra do papel, cantos retos. */
+.books-grid, .book-grid, .glossario-grid { display: grid; gap: var(--espaco-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); width: 100%; }
+
+.book-card, .verbete-card, .pilar-block-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4);
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  border: 0;
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+  cursor: default;
+  transform: none;
+  transition: transform var(--duracao-curta);
+}
+.book-card:hover, .verbete-card:hover, .pilar-block-vertical:hover { transform: translateY(-2px); border-color: transparent; box-shadow: var(--sombra-alta); background: var(--superficie-papel); }
+
+/* Livro */
+.book-card-top { display: flex; gap: var(--espaco-4); align-items: flex-start; }
+.book-cover-wrap-vert, .pilar-book-cover {
+  flex: none;
+  width: 5.5rem;
+  aspect-ratio: 2 / 3;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--raio-1);
+  background: var(--superficie-painel);
+  box-shadow: var(--sombra-baixa);
+}
+.book-cover-wrap-vert img, .pilar-book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.capa-vazia { width: 100%; height: 100%; background: var(--superficie-painel); }
+.book-meta-col { display: grid; gap: var(--espaco-2); min-width: 0; }
+.book-badge-row { display: flex; flex-wrap: wrap; gap: var(--espaco-2); align-items: center; }
+.book-title { margin: 0; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-corpo) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.book-author { margin: 0; color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); }
+.book-tags-row, .verbete-tags { display: flex; flex-wrap: wrap; gap: var(--espaco-1) var(--espaco-3); }
+.book-brief-desc { margin: 0; color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.book-actions-row { display: flex; flex-wrap: wrap; gap: var(--espaco-3); margin-top: auto; border: 0; padding: 0; }
+
+/* Verbete */
+.verbete-card { justify-content: space-between; }
+.verbete-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--espaco-2); flex-wrap: wrap; margin-bottom: var(--espaco-2); }
+.verbete-slug { margin: 0; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-corpo) / var(--entrelinha-titulo) var(--fonte-tecnica); letter-spacing: 0; overflow-wrap: anywhere; }
+.verbete-def { margin: 0; color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.verbete-pe { display: grid; gap: var(--espaco-3); }
+.verbete-pe .btn-inspect { justify-self: start; }
+
+/* Pilar da Argamassa */
+.pilares-vertical-stack { display: grid; gap: var(--espaco-4); margin-top: var(--espaco-3); }
+.pilar-block-vertical { background: var(--superficie-painel); box-shadow: var(--sombra-baixa); }
+.pilar-block-vertical:hover { background: var(--superficie-painel); }
+.pilar-head { margin: 0; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-subtitulo) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.pilar-prose { margin: 0; color: var(--tinta-papel); line-height: var(--entrelinha-corpo); }
+.pilar-praxis { margin: 0; padding: var(--espaco-3) var(--espaco-4); background: var(--superficie-papel); color: var(--tinta-papel); border: 0; border-left: var(--borda-grossa) solid var(--acento); border-radius: var(--raio-1); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.pilar-praxis strong { display: block; color: var(--tinta-papel); font-size: var(--tipo-rotulo); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; margin-bottom: var(--espaco-1); }
+.pilar-book-mini { display: flex; align-items: center; gap: var(--espaco-3); flex-wrap: wrap; padding: 0; background: none; border: 0; }
+.pilar-book-cover { width: 3rem; }
+.pilar-book-info { display: grid; gap: var(--espaco-1); flex: 1 1 12rem; min-width: 0; }
+.pilar-book-info .pb-title { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.3 var(--fonte-leitura); }
+.pilar-book-info .pb-author { color: var(--tinta-papel); font-size: var(--tipo-rotulo); }
+
+/* Cartões dos índices de fontes e de glossário (build_fontes e build_glossario) */
+.bib-title { margin: 0; color: var(--tinta-titulo); font: var(--peso-negrito) var(--tipo-titulo-obra) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.book-card-info, .book-card-meta { display: grid; gap: var(--espaco-1); min-width: 0; }
+.book-cover { width: 5.5rem; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border: 0; border-radius: var(--raio-1); box-shadow: var(--sombra-baixa); }
+.book-year { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-tecnica); }
+.book-foco { margin: 0; color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.book-cat-badge {
+  justify-self: start;
+  display: inline-flex;
+  padding: var(--espaco-1) var(--espaco-2);
+  border: 0;
+  border-radius: var(--raio-1);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  box-shadow: var(--sombra-baixa);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+.book-card.basilar { box-shadow: var(--sombra-alta), inset var(--borda-grossa) 0 0 var(--acento); }
+.card-footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--espaco-2) var(--espaco-3); margin-top: auto; padding-top: var(--espaco-3); border-top: 2px solid var(--superficie-painel); }
+.card-tag-count { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.card-btn-group { display: flex; flex-wrap: wrap; gap: var(--espaco-2); align-items: center; }
+.book-card .card-btn { padding: 0.35rem 0.85rem; min-height: 2.25rem; font-size: var(--tipo-rotulo); white-space: nowrap; }
+
+.gloss-card { display: flex; flex-direction: column; gap: var(--espaco-3); padding: var(--espaco-4); background: var(--superficie-papel); color: var(--tinta-papel); border: 0; border-radius: var(--raio-1); box-shadow: var(--sombra-alta); transition: transform var(--duracao-curta); }
+.gloss-card:hover { transform: translateY(-2px); border-color: transparent; }
+.gloss-card-title { margin: 0; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-subtitulo) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.gloss-card-tagbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: var(--espaco-2); margin-top: auto; padding-top: var(--espaco-3); border-top: 2px solid var(--superficie-painel); }
+.gloss-card-tagbar .card-btn { margin-left: auto; }
+.gloss-tag-item { flex-shrink: 1; white-space: normal; display: inline-flex; padding: var(--espaco-1) var(--espaco-2); border: 2px solid currentColor; border-radius: var(--raio-1); background: none; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.gloss-tag-item.tag-narrato { border-color: var(--acento); background: var(--acento); color: var(--tinta-sobre-acento); }
+.gloss-card-def { margin: 0; color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.gloss-card-ancora { margin: 0; padding-left: var(--espaco-3); border-left: var(--borda-media) solid var(--superficie-faixa); color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); }
+
+/* --- componentes/modal.css --- */
+/* ---------- Modal (andaime) ----------
+   Assunto, fonte, verbete e Entenda: a janela é painel lilás com a fita no
+   topo; dentro, as caixas de texto são papel. O fundo escurece o chão. */
+.modal-scaffold-backdrop { background: color-mix(in srgb, var(--superficie-afundada) 88%, transparent); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.modal-scaffold-frame {
+  background: var(--superficie-painel) var(--fita2) repeat-x left top / auto 8px;
+  padding-top: 8px;
+  color: var(--tinta-papel);
+  border: 0;
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+}
+.scaffold-corner { display: none; }
+.modal-scaffold-head { border-bottom: 2px solid var(--superficie-faixa); background: var(--superficie-painel); }
+.modal-breadcrumbs, .modal-breadcrumbs span { color: var(--tinta-papel); font-family: var(--fonte-leitura); font-size: var(--tipo-rotulo); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.modal-breadcrumbs a { color: var(--tinta-papel); text-decoration: underline; text-underline-offset: 3px; }
+.modal-breadcrumbs a:hover { color: var(--tinta-papel); text-decoration-color: var(--superficie-faixa); }
+.modal-breadcrumbs .crumb-active { color: var(--tinta-papel); font-weight: var(--peso-negrito); }
+.modal-close-btn {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 2px solid var(--tinta-papel);
+  border-radius: var(--raio-1);
+  background: none;
+  color: var(--tinta-papel);
+  font: var(--peso-negrito) var(--tipo-corpo) / 1 var(--fonte-leitura);
+  cursor: pointer;
+}
+.modal-close-btn:hover { background: var(--tinta-papel); color: var(--superficie-painel); border-color: var(--tinta-papel); }
+.modal-scaffold-body { color: var(--tinta-papel); }
+.modal-scaffold-body h1, .modal-scaffold-body h2, .modal-scaffold-body h3 { color: var(--tinta-papel); font-family: var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.modal-scaffold-box {
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  border: 0;
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-baixa);
+}
+.modal-scaffold-box p, .modal-scaffold-box div { color: var(--tinta-papel); }
+.modal-scaffold-box p { margin: 0; }
+.modal-scaffold-box p + p { margin-top: var(--espaco-3); }
+.modal-scaffold-foot { border-top: 2px solid var(--superficie-faixa); background: var(--superficie-painel); }
+.modal-foot-legend { color: var(--tinta-papel); font-size: var(--tipo-rotulo); }
+.modal-head-actions { display: flex; align-items: center; gap: var(--espaco-3); }
+
+/* Item de livro mencionado no assunto (montado pelo caderno.js) */
+.mencao { display: flex; gap: var(--espaco-3); align-items: center; padding: var(--espaco-2); background: var(--superficie-painel); color: var(--tinta-papel); }
+.mencao-capa { width: 2.75rem; aspect-ratio: 2 / 3; flex: none; overflow: hidden; background: var(--superficie-papel); box-shadow: var(--sombra-baixa); }
+.mencao-capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* --- componentes/pagina-interna.css --- */
+/* ---------- Páginas internas ----------
+   Tópico, ficha de fonte e verbete, e os índices de fontes e glossário.
+   O texto corrido fica no chão, na medida de leitura; o que se consulta ao
+   lado (resumo, aplicação, menções, seções da ficha) vai em papel. */
+.main-wrap { max-width: var(--medida-larga); margin: 0 auto; padding: var(--espaco-5) var(--espaco-4) var(--espaco-8); }
+@media (min-width: 40rem) { .main-wrap { padding-inline: var(--espaco-6); } }
+
+/* Migalha */
+.breadcrumb-nav { display: flex; flex-wrap: wrap; gap: var(--espaco-1) var(--espaco-2); align-items: center; margin-bottom: var(--espaco-4); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.breadcrumb-link { color: var(--tinta-suave); text-decoration: underline; text-underline-offset: 3px; }
+.breadcrumb-link:hover { color: var(--tinta-corpo); }
+.breadcrumb-sep { color: var(--tinta-suave); }
+.breadcrumb-current { color: var(--tinta-corpo); }
+
+/* Cabeçalho do tópico */
+.topico-header { margin-bottom: var(--espaco-5); padding-bottom: var(--espaco-4); border-bottom: 0; background: none; }
+.topico-header::after { content: ""; display: block; height: 8px; margin-top: var(--espaco-4); background: var(--fita2) repeat-x left center / auto 8px; }
+.topico-num-badge {
+  display: inline-flex;
+  margin: 0 0 var(--espaco-3);
+  padding: var(--espaco-1) var(--espaco-2);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  box-shadow: var(--sombra-baixa);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+.topico-page-title, .verbete-title, .single-book-title, .gloss-title {
+  margin: 0;
+  color: var(--tinta-titulo);
+  font: var(--peso-negrito) var(--tipo-titulo-pagina) / var(--entrelinha-titulo) var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-titulo);
+  text-wrap: balance;
+}
+.topico-header .page-subtitle { margin: var(--espaco-2) 0 0; max-width: var(--medida-leitura); color: var(--tinta-suave); font-size: var(--tipo-corpo); line-height: var(--entrelinha-corpo); }
+
+/* Texto do tópico e coluna lateral */
+.topico-view-wrap { display: grid; gap: var(--espaco-6); grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem); align-items: start; }
+@media (max-width: 62rem) { .topico-view-wrap { grid-template-columns: minmax(0, 1fr); } }
+.topico-body { max-width: var(--medida-leitura); color: var(--tinta-corpo); font-size: var(--tipo-corpo); line-height: var(--entrelinha-corpo); }
+.topico-body h2, .topico-body h3 { margin: var(--espaco-5) 0 var(--espaco-2); color: var(--tinta-titulo); font: var(--peso-negrito) var(--tipo-titulo-secao) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.topico-body h2:first-child, .topico-body h3:first-child { margin-top: 0; }
+.topico-body p { margin: 0 0 var(--espaco-3); }
+.topico-body a { color: inherit; text-decoration-color: var(--acento); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.topico-body strong { color: var(--tinta-titulo); }
+
+.topico-sidebar { display: grid; gap: var(--espaco-4); position: sticky; top: 6rem; }
+.sidebar-box, .single-section, .verbete-conditional-box {
+  padding: var(--espaco-4);
+  background: var(--superficie-papel);
+  color: var(--tinta-papel);
+  border: 0;
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+}
+.sidebar-box-title, .single-section-title, .verbete-cond-title {
+  display: inline-flex;
+  margin: 0 0 var(--espaco-3);
+  padding: var(--espaco-1) var(--espaco-2);
+  border: 0;
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  box-shadow: var(--sombra-baixa);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+.sidebar-box-title span { color: inherit; }
+.sidebar-box-content, .single-section-body { color: var(--tinta-papel); font-size: var(--tipo-corpo-reduzido); line-height: var(--entrelinha-corpo); }
+.sidebar-box-content p, .single-section-body p { color: var(--tinta-papel); }
+
+/* Menção a livro-fonte, dentro da coluna lateral */
+.mencao-card { display: flex; gap: var(--espaco-3); align-items: flex-start; padding: var(--espaco-2); margin-bottom: var(--espaco-2); background: var(--superficie-painel); border: 0; border-radius: var(--raio-1); }
+.mencao-cover { width: 3rem; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: var(--raio-1); box-shadow: var(--sombra-baixa); }
+.mencao-title { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.3 var(--fonte-leitura); }
+.mencao-author { color: var(--tinta-papel); font-size: var(--tipo-rotulo); }
+.mencao-btns { display: flex; flex-wrap: wrap; gap: var(--espaco-3); margin-top: var(--espaco-2); }
+.btn-resumo, .btn-adquirir { padding: 0; border: 0; background: none; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.btn-resumo:hover, .btn-adquirir:hover { background: none; color: var(--tinta-papel); text-decoration-color: var(--superficie-faixa); }
+
+/* Navegação entre tópicos */
+.topic-nav-bar { display: flex; justify-content: space-between; gap: var(--espaco-4); margin-top: var(--espaco-6); padding-top: var(--espaco-4); border-top: 2px solid var(--traco-regra); }
+.topic-nav-btn { display: grid; gap: var(--espaco-1); padding: var(--espaco-3) var(--espaco-4); background: var(--superficie-papel); color: var(--tinta-papel); border: 0; border-radius: var(--raio-1); box-shadow: var(--sombra-alta); text-decoration: none; transition: transform var(--duracao-curta); }
+.topic-nav-btn:hover { transform: translateY(-2px); background: var(--superficie-papel); border-color: transparent; }
+.topic-nav-btn .nav-hint { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.topic-nav-btn .nav-target-title { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-corpo-reduzido) / 1.3 var(--fonte-leitura); }
+
+/* Ficha de fonte e verbete */
+.single-book-hero, .verbete-hero { display: flex; flex-wrap: wrap; gap: var(--espaco-5); align-items: flex-start; margin-bottom: var(--espaco-5); background: none; border: 0; padding: 0; }
+.single-book-cover { width: 9rem; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: var(--raio-1); box-shadow: var(--sombra-alta); }
+.single-book-main { display: grid; gap: var(--espaco-2); flex: 1 1 18rem; min-width: 0; }
+.single-book-author { color: var(--tinta-suave); font-size: var(--tipo-corpo); }
+.single-book-tag, .topic-pill { display: inline-flex; padding: var(--espaco-1) var(--espaco-2); border: 2px solid currentColor; border-radius: var(--raio-1); background: none; color: inherit; font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; text-decoration: none; }
+.single-book-actions { display: flex; flex-wrap: wrap; gap: var(--espaco-3); }
+.single-section { margin-bottom: var(--espaco-4); }
+.badges-cloud { display: flex; flex-wrap: wrap; gap: var(--espaco-2); }
+.verbete-meta-row { display: flex; flex-wrap: wrap; gap: var(--espaco-2); align-items: center; }
+.verbete-ancora-highlight { padding: var(--espaco-3) var(--espaco-4); background: var(--superficie-papel); color: var(--tinta-papel); border: 0; border-left: var(--borda-grossa) solid var(--acento); border-radius: var(--raio-1); }
+.dialogue-grid { display: grid; gap: var(--espaco-3); }
+/* Consenso e dissenso sem cor, sem tarja e sem símbolo: só o rótulo os separa */
+.dialogue-box { padding: var(--espaco-3); background: none; border: var(--borda-fina) solid var(--traco-regra); border-radius: var(--raio-1); }
+.dialogue-title { margin-bottom: var(--espaco-2); color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.dialogue-item + .dialogue-item { margin-top: var(--espaco-2); }
+.dialogue-item { padding: var(--espaco-3); background: var(--superficie-painel); color: var(--tinta-papel); border: 0; border-radius: var(--raio-1); }
+
+/* Barra de filtros dos índices */
+.steam-bar { display: flex; flex-wrap: wrap; gap: var(--espaco-3); align-items: center; justify-content: space-between; margin-bottom: var(--espaco-5); padding: var(--espaco-3) var(--espaco-4); background: var(--superficie-papel); color: var(--tinta-papel); border: 0; border-radius: var(--raio-1); box-shadow: var(--sombra-alta); }
+.steam-filters { display: flex; flex-wrap: wrap; gap: var(--espaco-2); }
+.steam-counter { color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.filter-pill, .pill-btn { min-height: 2.75rem; padding: 0 var(--espaco-3); border: 2px solid var(--tinta-papel); border-radius: var(--raio-1); background: none; color: var(--tinta-papel); font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; cursor: pointer; }
+.filter-pill:hover, .pill-btn:hover { background: var(--superficie-painel); color: var(--tinta-papel); }
+.filter-pill.active, .pill-btn.active { background: var(--tinta-papel); color: var(--superficie-papel); border-color: var(--tinta-papel); }
+
+/* Janela de detalhe dos índices */
+.detail-overlay { background: color-mix(in srgb, var(--superficie-afundada) 88%, transparent); backdrop-filter: none; }
+.detail-modal { background: var(--superficie-painel) var(--fita2) repeat-x left top / auto 8px; padding-top: 8px; color: var(--tinta-papel); border: 0; border-radius: var(--raio-1); box-shadow: var(--sombra-alta); }
+.close-modal-btn { width: 2.75rem; height: 2.75rem; border: 2px solid var(--tinta-papel); border-radius: var(--raio-1); background: none; color: var(--tinta-papel); cursor: pointer; }
+
+/* --- componentes/rodape.css --- */
+/* ---------- Fomento e rodapé ----------
+   Os selos dos financiadores ficam sobre papel, em tinta, para valer nos dois
+   temas. O rodapé é o chão afundado, com a fita marcando o fim da obra. */
+.fomento-section {
+  background: var(--superficie-papel);
+  border-top: 0;
+  position: relative;
+}
+.fomento-section::before { content: ""; position: absolute; inset: 0 0 auto; height: 8px; background: var(--fita2) repeat-x left center / auto 8px; }
+.fomento-seal-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.fomento-seal {
+  filter: var(--filtro-selo);
+  opacity: 0.85;
+  transition: opacity var(--duracao-curta) ease, transform var(--duracao-curta) ease, filter var(--duracao-curta) ease;
+}
+.fomento-seal:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+[data-theme="escuro"] .fomento-seal:hover {
+  filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+}
+[data-theme="claro"] .fomento-seal:hover,
+:root:not([data-theme="escuro"]) .fomento-seal:hover {
+  filter: brightness(0) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.poligonal-footer { background: var(--superficie-afundada); color: var(--tinta-suave); border-top: 2px solid var(--traco-regra); font-family: var(--fonte-leitura); }
+.poligonal-footer-title, .poligonal-footer-heading { color: var(--tinta-corpo); font-family: var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.poligonal-footer-heading { font-size: var(--tipo-rotulo); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.poligonal-footer-desc, .poligonal-footer-copy, .poligonal-footer-origin { color: var(--tinta-suave); }
+.poligonal-footer-nav li a, .poligonal-footer-email { color: var(--tinta-corpo); text-decoration: none; }
+.poligonal-footer-nav li a:hover, .poligonal-footer-email:hover { color: var(--acento); }
+.poligonal-footer-accent { color: var(--acento); }
+.poligonal-footer-bottom { border-top: var(--borda-fina) solid var(--traco-regra); }
+
+/* --- componentes/estrutura.css --- */
+/* ---------- Estrutura do site ----------
+   O cabeçalho único (uma linha no desktop, gaveta no mobile), o sumário que
+   acompanha a leitura na index e nos tópicos, e a abertura do Caderno no
+   lugar do hero. Vem por último para valer sobre as peças anteriores. */
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.pular-conteudo {
+  position: absolute;
+  left: var(--espaco-3);
+  top: -4rem;
+  z-index: 200;
+  padding: var(--espaco-2) var(--espaco-3);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura);
+}
+.pular-conteudo:focus { top: var(--espaco-2); }
+
+/* Cabeçalho único: marca, seções, busca, Acessibilidade, Configurações e ajuda numa linha */
+.narrato-header { flex-wrap: nowrap; gap: var(--espaco-4); }
+.cabecalho-gaveta { display: flex; flex: 1; align-items: center; gap: var(--espaco-3); min-width: 0; }
+.cabecalho-gaveta .header-nav { flex-wrap: nowrap; margin-left: 0; gap: var(--espaco-1); }
+.cabecalho-gaveta .header-nav-link { white-space: nowrap; font-size: 0.92rem; }
+.cabecalho-gaveta .omni-search-wrapper { flex: 1 1 16rem; max-width: 28rem; margin-left: auto; }
+.omni-search-input { text-transform: none; letter-spacing: 0; }
+.omni-search-input::-webkit-search-cancel-button { display: none; }
+
+.cabecalho-menu, .acessibilidade-botao, .configuracoes-botao, .header-ajuda {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  min-width: 3.25rem;
+  padding: 0 var(--espaco-3);
+  background: none;
+  border: 2px solid var(--traco-forte);
+  border-radius: var(--raio-1);
+  color: var(--tinta-corpo);
+  font: var(--peso-negrito) 0.92rem / 1 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.cabecalho-menu:hover, .acessibilidade-botao:hover, .configuracoes-botao:hover { border-color: var(--acento); }
+.header-ajuda {
+  min-width: 2.75rem;
+  padding: 0;
+  color: var(--acento);
+  transition: transform var(--duracao-curta) cubic-bezier(0.16, 1, 0.3, 1), box-shadow var(--duracao-curta) ease, border-color var(--duracao-curta) ease, color var(--duracao-curta) ease;
+}
+.header-ajuda:hover {
+  border-color: var(--acento);
+  transform: scale(1.14) rotate(6deg);
+  box-shadow: 0 0 12px rgba(255, 178, 1, 0.45);
+  color: var(--acento);
+}
+.cabecalho-menu { display: none; margin-left: auto; }
+
+/* Barra de Acessibilidade: Ícone internacional com expansão horizontal */
+.acessibilidade-wrapper {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  height: 3.25rem;
+  border: 2px solid var(--traco-forte);
+  border-radius: var(--raio-1);
+  background: var(--superficie-pagina);
+  transition: border-color var(--duracao-curta) ease, background var(--duracao-curta) ease;
+  flex: none;
+  overflow: hidden;
+}
+.acessibilidade-wrapper:hover { border-color: var(--acento); }
+.acessibilidade-wrapper.aberta { border-color: var(--acento); background: var(--superficie-elevada); }
+
+.acessibilidade-gatilho {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-1);
+  height: 100%;
+  padding: 0 var(--espaco-2);
+  background: none;
+  border: 0;
+  color: var(--tinta-corpo);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.acessibilidade-gatilho:hover { color: var(--acento); }
+
+.icone-acessibilidade {
+  display: inline-block;
+  width: 1.6rem;
+  height: 1.6rem;
+  background-color: currentColor;
+  -webkit-mask: url("../images/icones/acessicon.png") no-repeat center / contain;
+  mask: url("../images/icones/acessicon.png") no-repeat center / contain;
+  flex-shrink: 0;
+}
+
+/* Hover no botão fechado: revela o texto "Acessibilidade" */
+.acessibilidade-rotulo-hover {
+  display: inline-block;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  text-transform: uppercase;
+  transition: max-width var(--duracao-longa) cubic-bezier(0, 0, 0.2, 1), opacity var(--duracao-curta) ease, margin var(--duracao-curta) ease;
+}
+.acessibilidade-wrapper:not(.aberta):hover .acessibilidade-rotulo-hover {
+  max-width: 9rem;
+  opacity: 1;
+  margin-left: var(--espaco-1);
+}
+
+/* Controles revelados quando aberto (expansão horizontal) */
+.acessibilidade-controles {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-width var(--duracao-longa) cubic-bezier(0, 0, 0.2, 1), opacity var(--duracao-curta) ease;
+  white-space: nowrap;
+}
+.acessibilidade-wrapper.aberta .acessibilidade-controles {
+  max-width: 25rem;
+  opacity: 1;
+  pointer-events: auto;
+  padding-right: var(--espaco-2);
+}
+
+.botao-acess-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  height: 2.35rem;
+  padding: 0 var(--espaco-2);
+  background: none;
+  border: 1px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  color: var(--tinta-corpo);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duracao-curta), border-color var(--duracao-curta), color var(--duracao-curta);
+}
+.botao-acess-item:hover {
+  border-color: var(--acento);
+  background: var(--superficie-afundada);
+  color: var(--tinta-titulo);
+}
+.botao-acess-item[aria-pressed="true"] {
+  border-color: var(--acento);
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  font-weight: 700;
+}
+.icone-fonte {
+  font-family: var(--fonte-tecnica);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.grupo-zoom-fonte {
+  display: inline-flex;
+  gap: 2px;
+}
+.botao-acess-zoom {
+  padding: 0 0.45rem;
+  font-family: var(--fonte-tecnica);
+  font-weight: 700;
+}
+
+/* Botão Engrenagem */
+.configuracoes-botao {
+  min-width: 2.75rem;
+  padding: 0;
+  color: var(--tinta-suave);
+}
+.configuracoes-botao:hover {
+  color: var(--tinta-corpo);
+}
+.icone-engrenagem {
+  transition: transform var(--duracao-longa) ease;
+}
+.configuracoes-botao:hover .icone-engrenagem,
+.configuracoes[open] .icone-engrenagem {
+  transform: rotate(60deg);
+  color: var(--acento);
+}
+
+/* Painéis Flutuantes (Acessibilidade & Configurações) */
+.acessibilidade-painel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--espaco-2));
+  z-index: 120;
+  display: grid;
+  gap: var(--espaco-2);
+  min-width: 15rem;
+  padding: var(--espaco-3);
+  background: var(--superficie-elevada);
+  border: 2px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+}
+
+.configuracoes-painel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--espaco-2));
+  z-index: 120;
+  display: grid;
+  gap: var(--espaco-2);
+  min-width: 13.5rem;
+  padding: var(--espaco-3);
+  background: var(--superficie-elevada);
+  border: 2px solid var(--acento);
+  border-radius: var(--raio-1);
+  box-shadow: var(--sombra-alta);
+}
+[data-theme="claro"] .configuracoes-painel {
+  background: #ffffff;
+  border: 2px solid var(--traco-forte);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+}
+
+.config-icones-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-2);
+  margin-top: var(--espaco-1);
+}
+
+.botao-icon-config {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  background: var(--superficie-pagina);
+  border: 1px solid var(--traco-forte);
+  border-radius: var(--raio-1);
+  color: var(--tinta-corpo);
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all var(--duracao-curta) ease;
+}
+.botao-icon-config:hover,
+.botao-icon-config:focus-visible {
+  border-color: var(--acento);
+  color: var(--tinta-titulo);
+  background: var(--superficie-afundada);
+  transform: translateY(-1px);
+}
+.botao-icon-config--perigo:hover,
+.botao-icon-config--perigo:focus-visible {
+  border-color: var(--cor-tijolo-700);
+  background: rgba(184, 50, 30, 0.15);
+  color: var(--cor-tijolo-700);
+}
+
+/* =============================================================================
+   TOOLTIP NARRATO OFICIAL: PLACA DE SINALIZAÇÃO DE OBRA (PADRÃO UNIVERSAL GLOBAL)
+   ============================================================================= */
+.narrato-global-tooltip {
+  position: fixed;
+  z-index: 999999;
+  pointer-events: none;
+  background: #FFB201;
+  color: #121214;
+  font-family: var(--fonte-leitura, sans-serif);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.45rem 0.85rem;
+  border: 2px solid #141416;
+  border-radius: 3px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  clip-path: polygon(
+    6px 0%, calc(100% - 6px) 0%,
+    100% 6px, 100% calc(100% - 6px),
+    calc(100% - 6px) 100%, 6px 100%,
+    0% calc(100% - 6px), 0% 6px
+  );
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px) scale(0.96);
+  transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.15s;
+}
+
+.narrato-global-tooltip.visivel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Fallback CSS puro caso JS esteja desativado */
+html:not(.tem-tooltip-js) [data-tooltip] {
+  position: relative;
+}
+
+html:not(.tem-tooltip-js) [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: #FFB201;
+  color: #121214;
+  font-family: var(--fonte-leitura, sans-serif);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.45rem 0.85rem;
+  border: 2px solid #141416;
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  clip-path: polygon(
+    6px 0%, calc(100% - 6px) 0%,
+    100% 6px, 100% calc(100% - 6px),
+    calc(100% - 6px) 100%, 6px 100%,
+    0% calc(100% - 6px), 0% 6px
+  );
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--duracao-curta, 0.2s) ease,
+              transform var(--duracao-curta, 0.2s) cubic-bezier(0.16, 1, 0.3, 1),
+              visibility var(--duracao-curta, 0.2s);
+  z-index: 1000;
+}
+
+html:not(.tem-tooltip-js) [data-tooltip]:hover::after,
+html:not(.tem-tooltip-js) [data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+html:not(.tem-tooltip-js) [data-tooltip-pos="baixo"]::after {
+  bottom: auto;
+  top: calc(100% + 10px);
+  transform: translateX(-50%) translateY(-6px);
+}
+html:not(.tem-tooltip-js) [data-tooltip-pos="baixo"]:hover::after,
+html:not(.tem-tooltip-js) [data-tooltip-pos="baixo"]:focus-visible::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+.painel-secao-rotulo {
+  font-family: var(--fonte-tecnica);
+  font-size: var(--tipo-rotulo);
+  color: var(--tinta-suave);
+  text-transform: uppercase;
+  letter-spacing: var(--espacejamento-rotulo);
+  margin-top: var(--espaco-1);
+}
+.painel-divisor {
+  height: 1px;
+  background: var(--traco-regra);
+  margin: var(--espaco-1) 0;
+}
+.botao-painel {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  min-height: 2.5rem;
+  padding: var(--espaco-1) var(--espaco-3);
+  background: none;
+  border: 1px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  color: var(--tinta-corpo);
+  font: var(--peso-negrito) var(--tipo-rotulo) / 1.2 var(--fonte-leitura);
+  letter-spacing: var(--espacejamento-rotulo);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.botao-painel:hover {
+  border-color: var(--acento);
+  background: var(--superficie-afundada);
+}
+.botao-painel[aria-pressed="true"] {
+  background: var(--acento);
+  color: var(--tinta-sobre-acento);
+  border-color: var(--acento);
+  font-weight: 700;
+}
+.botao-painel--perigo {
+  color: var(--cor-tijolo-700);
+  border-color: var(--cor-tijolo-700);
+}
+.botao-painel--perigo:hover {
+  background: var(--cor-tijolo-700);
+  color: var(--cor-branco);
+  border-color: var(--cor-tijolo-700);
+}
+.botao-painel-icone {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Abaixo de 64rem as seções, a busca e a Leitura vão para a gaveta do Menu */
+@media (max-width: 64rem) {
+  .narrato-header { position: sticky; }
+  .cabecalho-menu { display: inline-flex; }
+  .cabecalho-gaveta {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--espaco-3);
+    padding: var(--espaco-4) clamp(1rem, 4vw, 3rem) var(--espaco-5);
+    background: var(--superficie-pagina);
+    border-bottom: 2px solid var(--traco-regra);
+    box-shadow: var(--sombra-alta);
+  }
+  .narrato-header.menu-aberto .cabecalho-gaveta { display: flex; }
+  .cabecalho-gaveta .header-nav { flex-direction: column; align-items: stretch; }
+  .cabecalho-gaveta .omni-search-wrapper { order: -1; flex: none; width: 100%; max-width: none; margin: 0; }
+  .leitura-painel { position: static; margin-top: var(--espaco-2); box-shadow: none; }
+  .header-ajuda { width: auto; padding: 0 var(--espaco-3); }
+  .header-ajuda::after { content: " Entenda o NarrATO"; margin-left: var(--espaco-1); color: var(--tinta-corpo); }
+}
+
+/* Página com sumário: coluna do sumário à esquerda, conteúdo à direita */
+.com-sumario {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  gap: var(--espaco-6);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--espaco-5) clamp(1rem, 3vw, 2.5rem) 0 clamp(1rem, 2vw, 1.5rem);
+}
+.com-sumario > .main-wrap { margin: 0; max-width: none; padding: 0 0 var(--espaco-8); }
+.caderno-principal { min-width: 0; padding-bottom: var(--espaco-8); }
+
+.sumario {
+  position: sticky;
+  top: calc(var(--altura-cabecalho, 3.5rem) + 8px + var(--espaco-4));
+  align-self: start;
+  max-height: calc(100vh - var(--altura-cabecalho, 3.5rem) - 8px - var(--espaco-6));
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  font-family: var(--fonte-leitura);
+  font-size: var(--tipo-corpo-reduzido);
+}
+.sumario-topo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+  padding-bottom: var(--espaco-3);
+  margin-bottom: var(--espaco-2);
+  border-bottom: 2px solid var(--traco-regra);
+}
+.sumario-rotulo { margin: 0; color: var(--tinta-titulo); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+.sumario-fechar { display: none; background: none; border: 0; color: var(--tinta-corpo); font-size: 1.1rem; cursor: pointer; align-self: flex-end; }
+.sumario-recolher-desktop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: var(--superficie-pagina);
+  border: 1px solid var(--traco-regra);
+  border-radius: var(--raio-1);
+  color: var(--tinta-suave);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--duracao-curta) ease;
+}
+.sumario-recolher-desktop:hover {
+  border-color: var(--acento);
+  color: var(--tinta-titulo);
+  background: var(--superficie-afundada);
+}
+
+.sumario-progresso { margin: 0; color: var(--tinta-suave); font-size: var(--tipo-rotulo); }
+.sumario-trilho {
+  height: 8px;
+  background: var(--superficie-afundada);
+  border-radius: var(--raio-pilula);
+  overflow: hidden;
+  border: 1px solid var(--traco-regra);
+}
+.sumario-trilho span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--fita2) repeat-x left center / auto 8px;
+  background-color: var(--acento);
+  transition: width var(--duracao-curta) ease;
+  animation: faixaTrilhoLoop 20s linear infinite;
+}
+@keyframes faixaTrilhoLoop {
+  0% { background-position-x: 0; }
+  100% { background-position-x: 1000px; }
+}
+
+/* Modo Foco / Sumário Recolhido no Desktop */
+@media (min-width: 64.01rem) {
+  .com-sumario.sumario-recolhido {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    transition: grid-template-columns var(--duracao-media) cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .com-sumario.sumario-recolhido .sumario {
+    overflow: hidden;
+    padding: var(--espaco-2) var(--espaco-1);
+    align-items: center;
+  }
+  .com-sumario.sumario-recolhido .sumario-progresso,
+  .com-sumario.sumario-recolhido .sumario-trilho,
+  .com-sumario.sumario-recolhido .sumario-capitulos {
+    display: none;
+  }
+  .com-sumario.sumario-recolhido .sumario-topo {
+    border-bottom: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+@media (max-width: 64rem) {
+  .sumario-recolher-desktop { display: none; }
+}
+
+.sumario-capitulos, .sumario-topicos { list-style: none; margin: 0; padding: 0; }
+.sumario-cap-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--espaco-3);
+  align-items: center;
+  padding: var(--espaco-2);
+  border-radius: var(--raio-1);
+  color: var(--tinta-corpo);
+  text-decoration: none;
+  font-weight: var(--peso-negrito);
+}
+.sumario-cap-link:hover { background: var(--superficie-painel); }
+.sumario-cap-link[aria-current] { background: var(--superficie-faixa); color: var(--tinta-sobre-faixa); }
+.sumario-cap-textos { display: grid; gap: 0.1rem; }
+.sumario-num { color: var(--tinta-suave); font: var(--peso-regular) var(--tipo-rotulo) / 1.2 var(--fonte-tecnica); }
+.sumario-cap-link[aria-current] .sumario-num { color: inherit; }
+.sumario-conta { font-family: var(--fonte-tecnica); font-size: var(--tipo-rotulo); font-weight: var(--peso-regular); opacity: 0.8; }
+.sumario-cap.completo .sumario-conta { color: var(--acento); opacity: 1; }
+
+.sumario-topicos { display: none; margin: var(--espaco-1) 0 var(--espaco-3) 2.25rem; }
+.sumario-cap.aberto .sumario-topicos { display: block; }
+.sumario-topicos a {
+  display: flex;
+  gap: var(--espaco-2);
+  align-items: baseline;
+  padding: var(--espaco-1) var(--espaco-2);
+  border-left: 2px solid var(--traco-regra);
+  color: var(--tinta-suave);
+  text-decoration: none;
+  line-height: 1.35;
+}
+.sumario-topicos a:hover { color: var(--tinta-corpo); border-left-color: var(--tinta-suave); }
+.sumario-topicos a[aria-current="page"] { color: var(--tinta-titulo); border-left-color: var(--acento); font-weight: var(--peso-negrito); }
+.sumario-marca { flex: none; width: 0.7rem; height: 0.7rem; border: 2px solid var(--traco-forte); border-radius: 2px; transform: translateY(0.1rem); }
+.sumario-topicos a.lido .sumario-marca { background: var(--acento); border-color: var(--acento); }
+
+.sumario-barra-movel, .sumario-veu { display: none; }
+
+/* Abaixo de 64rem o sumário vira gaveta, aberta pela barra fina do topo */
+@media (max-width: 64rem) {
+  .com-sumario { grid-template-columns: minmax(0, 1fr); padding-top: 0; }
+  .sumario-barra-movel {
+    position: sticky;
+    top: calc(var(--altura-cabecalho, 3.5rem) + 8px);
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: var(--espaco-3);
+    margin: 0 calc(-1 * clamp(1rem, 3vw, 2rem)) var(--espaco-4);
+    padding: var(--espaco-2) clamp(1rem, 3vw, 2rem);
+    background: var(--superficie-pagina);
+    border-bottom: 1px solid var(--traco-regra);
+  }
+  .sumario-abrir {
+    flex: none;
+    min-height: 2.5rem;
+    padding: 0 var(--espaco-3);
+    background: none;
+    border: 2px solid var(--traco-forte);
+    border-radius: var(--raio-1);
+    color: var(--tinta-corpo);
+    font: var(--peso-negrito) var(--tipo-rotulo) / 1 var(--fonte-leitura);
+    letter-spacing: var(--espacejamento-rotulo);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .sumario-barra-atual { min-width: 0; overflow: hidden; color: var(--tinta-suave); font: var(--tipo-rotulo) / 1.3 var(--fonte-leitura); text-overflow: ellipsis; white-space: nowrap; }
+  .sumario {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 160;
+    width: min(22rem, 86vw);
+    align-self: stretch;
+    max-height: none;
+    padding: var(--espaco-4);
+    background: var(--superficie-pagina);
+    box-shadow: var(--sombra-alta);
+    transform: translateX(-105%);
+    transition: transform var(--duracao-curta);
+  }
+  .sumario-fechar { display: block; }
+  .sumario-aberto .sumario { transform: none; }
+  .sumario-aberto .sumario-veu { display: block; position: fixed; inset: 0; z-index: 150; background: rgb(0 0 0 / 0.55); }
+}
+
+/* Abertura do Caderno: lema, título e progresso, sem hero */
+.caderno-abertura { margin-bottom: var(--espaco-5); }
+.caderno-lema { margin: 0 0 var(--espaco-2); color: var(--acento); font: var(--peso-negrito) var(--tipo-rotulo) / 1.4 var(--fonte-leitura); letter-spacing: var(--espacejamento-rotulo); text-transform: uppercase; }
+[data-theme="claro"] .caderno-lema { color: var(--tinta-titulo); }
+.caderno-titulo { margin: 0; color: var(--tinta-titulo); font: var(--peso-negrito) var(--tipo-titulo-pagina) / var(--entrelinha-titulo) var(--fonte-leitura); letter-spacing: var(--espacejamento-titulo); }
+.caderno-sub { margin: var(--espaco-2) 0 var(--espaco-4); color: var(--tinta-suave); }
+.caderno-abertura .progresso { margin-bottom: 0; }
+
+/* Marcar a matéria como lida na própria página do tópico */
+.topico-header-row { display: flex; flex-wrap: wrap; gap: var(--espaco-3); align-items: flex-start; justify-content: space-between; }
+.marcar-lido { display: inline-flex; align-items: center; gap: var(--espaco-2); flex: none; }
+.marcar-lido-caixa { width: 1rem; height: 1rem; border: 2px solid currentColor; border-radius: 2px; }
+.marcar-lido[aria-pressed="true"] .marcar-lido-caixa { background: var(--acento); border-color: var(--acento); }
+
+/* Argamassa como página própria: medida de leitura e ar sob o título */
+.main-wrap.casca--leitura { max-width: 60rem; }
+.casca--leitura > .bib-sub { margin-bottom: var(--espaco-5); }
+
+/* O sumário fica colado à esquerda e o conteúdo ocupa o resto da largura.
+   Na index o texto do capítulo acompanha o painel inteiro e, em tela larga,
+   se divide em colunas de uns 85 caracteres para a linha não passar do legível. */
+.pagina-caderno .painel .chapter-intro-prose { max-width: 100%; width: 100%; columns: auto; }
+.pagina-caderno .painel .chapter-intro-p { break-inside: auto; max-width: 100%; }
+

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420">
+  <defs>
+    <g id="m">
+      <path d="M118 46L302 38L306 118L114 124Z"/>
+      <path d="M194 134L226 134L228 372L192 372Z"/>
+      <path d="M184 380L236 380L238 410L182 410Z"/>
+    </g>
+    <mask id="corte" maskUnits="userSpaceOnUse" x="0" y="0" width="420" height="420">
+      <rect width="420" height="420" fill="#fff"/>
+      <path transform="rotate(-40 210 240)" d="M194 134L226 134L228 372L192 372Z" fill="#000" stroke="#000" stroke-width="24"/>
+    </mask>
+  </defs>
+  <g mask="url(#corte)"><use href="#m" transform="rotate(40 210 240)"/></g>
+  <use href="#m" transform="rotate(-40 210 240)"/>
+  <path d="M202 8L218 8L214 52L206 52Z"/>
+  <path d="M150 22L164 14L182 54L172 62Z"/>
+  <path d="M270 22L256 14L238 54L248 62Z"/>
+</svg>

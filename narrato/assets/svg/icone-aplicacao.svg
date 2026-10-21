@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420">
+  <defs>
+    <g id="lapis">
+      <path fill-rule="evenodd" d="M184 20L236 18L238 292L182 294Z M205 44H215V270H205Z"/>
+      <path d="M182 304L238 302L222 352L198 352Z"/>
+      <path d="M200 362L220 362L212 392L208 392Z"/>
+    </g>
+    <mask id="corte" maskUnits="userSpaceOnUse" x="0" y="0" width="420" height="420">
+      <rect width="420" height="420" fill="#fff"/>
+      <g transform="translate(70 18) rotate(38 210 210)" fill="#000" stroke="#000" stroke-width="26" stroke-linejoin="round">
+        <path d="M184 20L236 18L238 292L182 294Z"/><path d="M182 304L238 302L222 352L198 352Z"/><path d="M200 362L220 362L212 392L208 392Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#corte)">
+    <path fill-rule="evenodd" d="M40 34L256 30L256 104L330 104L334 392L36 396Z M76 140H296V156H76Z M76 186H296V202H76Z M76 232H296V248H76Z M76 278H220V294H76Z M76 324H180V340H76Z"/>
+    <path d="M270 30L330 90L270 90Z"/>
+  </g>
+  <use href="#lapis" transform="translate(70 18) rotate(38 210 210)"/>
+</svg>

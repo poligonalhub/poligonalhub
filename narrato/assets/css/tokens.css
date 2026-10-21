@@ -1,0 +1,247 @@
+/* =========================================================================
+   NarrATO — tokens.css
+   -------------------------------------------------------------------------
+   A única fonte de valor do NarrATO (ADR-008). O site, o livro digital e o
+   PDF importam este arquivo; nenhuma outra folha declara cor, tamanho,
+   espaçamento, raio, traço ou sombra.
+
+   Versão: 0.3 — 2026-10-16
+   0.2 — 2026-10-07: partido do canteiro, aprovado por Laureano Bezerramos
+   sobre a vitrine (sistema-visual/vitrine/). Chão, papel, amarelo como sinal.
+   A escala tipográfica foi recompactada: razão 1,125 sobre 16 px.
+   0.3 — 2026-10-16: o papel e o painel acompanham o tema. Até a 0.2 eles
+   ficavam claros nos dois temas, e no escuro a folha de leitura era uma
+   caixa clara com tinta preta sobre o chão escuro.
+
+   A lógica dos dois temas: cada papel pertence a uma família da marca, e o
+   tema só escolhe o degrau. Nenhuma cor de fora das famílias entra.
+     chão     creme-100   | terra-900
+     papel    cimento-300 | cimento-800
+     painel   lilás-200   | lilás-800
+     faixa    terra-500 nos dois
+     sinal    amarelo-500 nos dois
+   Os degraus 800 são a cor da família misturada à terra-950, o mais escuro
+   da marca (lilás 12%, cimento 22%), para que o escuro continue quente.
+
+   Contraste medido (WCAG), 16/10/2026:
+     claro   tinta-900 sobre cimento-300 11,96 · sobre lilás-200 10,80
+             tijolo-700 sobre cimento-300 5,89 · terra-700 sobre creme 6,86
+     escuro  creme-100 sobre cimento-800 8,11 · sobre terra-900 12,85
+             lilás-200 sobre cimento-800 6,32 · amarelo sobre cimento-800 5,46
+     os dois tinta-900 sobre amarelo 9,34 · branco sobre terra-500 3,93,
+             que só passa em título grande
+             terra-980 sobre terra-500 4,70: o subtítulo da faixa
+
+   Nomes e papéis: SPECs/030-identidade-visual/031-sistema-visual/02-projeto/arte.md
+   Pontos de quebra (CSS não aceita variável em @media):
+     telefone  40rem
+     lateral   62rem
+   ========================================================================= */
+
+
+/* ---------- Primitivos: a marca. Só este arquivo os lê. ---------- */
+:root {
+  --cor-terra-950: #1F1714;
+  --cor-terra-980: #191210;     /* terra-950 a 80%: a tinta suave sobre a faixa */
+  --cor-terra-900: #2C211D;
+  --cor-terra-700: #684633;
+  --cor-terra-500: #B1714D;
+
+  --cor-amarelo-500: #FFB201;
+  --cor-tijolo-700: #9D1300;
+
+  --cor-lilas-200: #DACBD0;
+  --cor-lilas-800: #352D2B;     /* lilás 12% sobre terra-950: o painel no escuro */
+  --cor-cimento-300: #D9D9D9;
+  --cor-cimento-800: #48423F;   /* cimento 22% sobre terra-950: o papel no escuro */
+  --cor-concreto-400: #9F988A;
+
+  --cor-tinta-900: #1D1D1B;
+  --cor-branco: #FFFFFF;
+
+  --cor-creme-050: #FAEFE3;
+  --cor-creme-100: #F3E7D9;
+  --cor-creme-200: #E8DACA;
+}
+
+
+/* ---------- Semânticos: tema claro (padrão do livro e do PDF) ---------- */
+:root,
+[data-theme="claro"] {
+  color-scheme: light;
+
+  /* O chão e seus dois tons */
+  --superficie-pagina: var(--cor-creme-100);
+  --superficie-elevada: var(--cor-creme-050);
+  --superficie-afundada: var(--cor-creme-200);
+
+  /* O que se apoia no chão: a família não muda, o degrau acompanha o tema */
+  --superficie-papel: var(--cor-cimento-300);
+  --superficie-painel: var(--cor-lilas-200);
+  --superficie-faixa: var(--cor-terra-500);
+
+  /* Tinta sobre o chão */
+  --tinta-corpo: var(--cor-tinta-900);
+  --tinta-suave: var(--cor-terra-700);
+  --tinta-titulo: var(--cor-tijolo-700);
+
+  /* Tinta sobre papel, faixa e sinal */
+  --tinta-papel: var(--cor-tinta-900);
+  --tinta-sobre-faixa: var(--cor-branco);
+  --tinta-sobre-faixa-suave: var(--cor-terra-980);
+  --tinta-sobre-acento: var(--cor-tinta-900);
+
+  --traco-regra: var(--cor-terra-500);
+  --traco-forte: var(--cor-terra-700);
+
+  /* Selos e logos de uma cor só tomam a tinta do papel */
+  --filtro-selo: brightness(0);
+
+  --acento: var(--cor-amarelo-500);
+  --foco: var(--cor-tijolo-700);
+
+  /* Consenso e dissenso são preenchimento de tarja, sempre com rótulo e símbolo.
+     Métodos, reescrita e coletivo não têm cor até a QA6. */
+  --eixo-consenso: var(--cor-amarelo-500);
+  --eixo-dissenso: var(--cor-tijolo-700);
+
+  /* Só o painel do sistema visual usa os estados; o site não */
+  --estado-sucesso: #2D6A2E;
+  --estado-erro: #A3261C;
+}
+
+
+/* ---------- Semânticos: tema escuro (padrão do canteiro) ---------- */
+[data-theme="escuro"] {
+  color-scheme: dark;
+
+  --superficie-pagina: var(--cor-terra-900);
+  --superficie-elevada: var(--cor-terra-700);
+  --superficie-afundada: var(--cor-terra-950);
+
+  --superficie-papel: var(--cor-cimento-800);
+  --superficie-painel: var(--cor-lilas-800);
+  --superficie-faixa: var(--cor-terra-500);
+
+  --tinta-corpo: var(--cor-creme-100);
+  --tinta-suave: var(--cor-lilas-200);
+  --tinta-titulo: var(--cor-branco);
+
+  --tinta-papel: var(--cor-creme-100);
+  --tinta-sobre-faixa: var(--cor-branco);
+  --tinta-sobre-faixa-suave: var(--cor-terra-980);
+  --tinta-sobre-acento: var(--cor-tinta-900);
+
+  --traco-regra: var(--cor-terra-700);
+  --traco-forte: var(--cor-terra-500);
+
+  --filtro-selo: brightness(0) invert(1);
+
+  --acento: var(--cor-amarelo-500);
+  --foco: var(--cor-amarelo-500);
+
+  --eixo-consenso: var(--cor-amarelo-500);
+  --eixo-dissenso: var(--cor-tijolo-700);
+
+  --estado-sucesso: #34D399;
+  --estado-erro: #F87171;
+}
+
+
+/* ---------- Semânticos sem tema: tipo, espaço e forma ---------- */
+:root {
+  --fonte-leitura: "OpenDyslexic", Verdana, sans-serif;
+  --fonte-tecnica: "OpenDyslexicMono", "JetBrains Mono", Consolas, monospace;
+
+  --peso-regular: 400;
+  --peso-negrito: 700;
+
+  /* Razão 1,125 sobre 16 px, arredondada ao par de pixels.
+     O OpenDyslexic já desenha ~15% maior que uma sans comum, por isso a
+     escala é curta. O degrau de 29 px é pulado entre página e obra. */
+  --tipo-titulo-obra: 2rem;          /* 32 */
+  --tipo-titulo-pagina: 1.625rem;    /* 26 */
+  --tipo-titulo-cap: 1.375rem;       /* 22 */
+  --tipo-titulo-secao: 1.25rem;      /* 20 */
+  --tipo-subtitulo: 1.125rem;        /* 18: botão e subtítulo */
+  --tipo-corpo: 1rem;                /* 16 */
+  --tipo-corpo-reduzido: 0.875rem;   /* 14: o menor para frase */
+  --tipo-rotulo: 0.75rem;            /* 12: só rótulo curto em caixa alta */
+
+  --entrelinha-corpo: 1.6;
+  --entrelinha-titulo: 1.2;
+
+  /* Espacejamento: títulos 4%, rótulos em caixa alta 8% */
+  --espacejamento-titulo: 0.04em;
+  --espacejamento-rotulo: 0.08em;
+
+  --medida-leitura: 64ch;
+  --medida-larga: 75rem;
+
+  /* Progressão sobre o ritmo do corpo, que é 1,6rem */
+  --espaco-1: 0.25rem;
+  --espaco-2: 0.5rem;
+  --espaco-3: 0.8rem;
+  --espaco-4: 1.2rem;
+  --espaco-5: 1.6rem;
+  --espaco-6: 2.4rem;
+  --espaco-7: 3.2rem;
+  --espaco-8: 4.8rem;
+
+  /* Sem cantos arredondados (regra "feito à mão, com prumo").
+     A pílula fica para o que é redondo por natureza, como o ponto. */
+  --raio-1: 0;
+  --raio-2: 0;
+  --raio-3: 0;
+  --raio-pilula: 999px;
+
+  --borda-fina: 1px;
+  --borda-media: 3px;
+  --borda-grossa: 7px;
+
+  /* Sombras curtas e duras: a do ladrilho e a do papel */
+  --sombra-baixa: 1.5px 1.5px 0 rgb(0 0 0 / 0.25);
+  --sombra-alta: -2px 2px 4px rgb(0 0 0 / 0.42);
+
+  --duracao-curta: 120ms;
+  --duracao-longa: 240ms;
+}
+
+/* Alternativa de acessibilidade: Fonte Pesada voltada para pessoas com baixa visão.
+   Substitui a fonte disléxica por uma tipografia ultra-espessa e encorpada (Barlow Black / 900). */
+:root[data-font="pesada"] {
+  --fonte-leitura: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --fonte-tecnica: "JetBrains Mono", Consolas, monospace;
+  --peso-regular: 800;
+  --peso-negrito: 900;
+  --entrelinha-corpo: 1.7;
+  --espacejamento-titulo: 0.03em;
+}
+
+:root[data-font="pesada"] body,
+:root[data-font="pesada"] p,
+:root[data-font="pesada"] article,
+:root[data-font="pesada"] .topico-body,
+:root[data-font="pesada"] .materia-body,
+:root[data-font="pesada"] .card-heading,
+:root[data-font="pesada"] .card-prose,
+:root[data-font="pesada"] .chapter-intro-p,
+:root[data-font="pesada"] .sidebar-box-content {
+  font-weight: 800 !important;
+  letter-spacing: 0.012em;
+}
+
+:root[data-font="pesada"] h1,
+:root[data-font="pesada"] h2,
+:root[data-font="pesada"] h3,
+:root[data-font="pesada"] .topico-page-title,
+:root[data-font="pesada"] .materia-page-title {
+  font-weight: 900 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duracao-curta: 0ms;
+    --duracao-longa: 0ms;
+  }
+}
