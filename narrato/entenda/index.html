@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="escuro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entenda • NarrATO</title>
+  
+  <meta name="description" content="Entenda o que é o NarrATO, como funciona o laboratório de Engenharia Narratológica, a Licitação e o Alvará NarrATO.">
+  <meta name="author" content="Centro Comunitário-Criativo Poligonal">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#2C211D">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Poligonal Hub • NarrATO">
+  <meta property="og:title" content="Entenda • NarrATO">
+  <meta property="og:description" content="Laboratório online de narratologia regido pela Aprendizagem Baseada em Projetos e Metodologias Ativas.">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/svg/logo-poligonal.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Compartilhados e do Canteiro -->
+  <link rel="stylesheet" href="../../shared/footer.css">
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/narrato.css">
+  <link rel="stylesheet" href="../assets/css/componentes.css">
+  <!-- Tema, Acessibilidade e Configurações do cabeçalho único NarrATO (tokens.css).
+     Gerencia: fontes externas (Barlow e JetBrains Mono), tema (escuro/claro),
+     tipografia (disléxica/Barlow pesada), escala de fonte e menus. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  (function () {
+    'use strict';
+    var html = document.documentElement;
+
+    // 1. Inicialização síncrona no head para evitar FOUC
+    var tema = 'escuro';
+    try {
+      if (localStorage.getItem('narrato-tema') === 'claro') tema = 'claro';
+    } catch (e) {}
+    html.setAttribute('data-theme', tema);
+
+    var fonte = 'dislexica';
+    try {
+      if (localStorage.getItem('narrato-font') === 'pesada') fonte = 'pesada';
+    } catch (e) {}
+    if (fonte === 'pesada') {
+      html.setAttribute('data-font', 'pesada');
+    } else {
+      html.removeAttribute('data-font');
+    }
+
+    // Escala de tamanho de fonte salva
+    try {
+      var savedZoom = localStorage.getItem('narrato-font-size');
+      if (savedZoom && !isNaN(Number(savedZoom))) {
+        html.style.fontSize = savedZoom + '%';
+      }
+    } catch (e) {}
+
+    function sincronizarBotoes() {
+      var claro = html.getAttribute('data-theme') === 'claro';
+      var pesada = html.getAttribute('data-font') === 'pesada';
+
+      // 1. Tema (Sol / Lua)
+      document.querySelectorAll('[data-troca-tema]').forEach(function (btn) {
+        btn.setAttribute('aria-pressed', String(claro));
+        var txt = btn.querySelector('[data-tema-texto]');
+        var icone = btn.querySelector('[data-tema-icone]');
+        if (txt) txt.textContent = claro ? 'Tema claro' : 'Tema escuro';
+        if (icone) {
+          icone.classList.toggle('icone-banco--tema-claro', claro);
+          icone.classList.toggle('icone-banco--tema-escuro', !claro);
+        }
+        btn.setAttribute('title', claro ? 'Tema claro ativo. Clique para alternar para tema escuro.' : 'Tema escuro ativo. Clique para alternar para tema claro.');
+      });
+
+      // 2. Toggle Único de Fonte (Identificação transparente do estado ativo)
+      document.querySelectorAll('[data-toggle-fonte]').forEach(function (btn) {
+        btn.setAttribute('aria-pressed', String(pesada));
+        var txt = btn.querySelector('[data-fonte-texto]');
+        if (txt) txt.textContent = pesada ? 'Fonte Pesada' : 'Fonte Disléxica';
+        btn.setAttribute('title', pesada ? 'Fonte Pesada (Barlow) ativa. Clique para alternar para Fonte Disléxica.' : 'Fonte Disléxica (OpenDyslexic) ativa. Clique para alternar para Fonte Pesada.');
+      });
+
+      // Retrocompatibilidade
+      document.querySelectorAll('[data-opcao-fonte="dislexica"]').forEach(function (btn) {
+        btn.setAttribute('aria-pressed', String(!pesada));
+      });
+      document.querySelectorAll('[data-opcao-fonte="pesada"]').forEach(function (btn) {
+        btn.setAttribute('aria-pressed', String(pesada));
+      });
+    }
+
+    function abrirGavetaMobile(aberta) {
+      var botao = document.querySelector('[data-menu-alternar]');
+      if (!botao) return;
+      botao.setAttribute('aria-expanded', String(aberta));
+      var header = document.querySelector('.narrato-header');
+      if (header) header.classList.toggle('menu-aberto', aberta);
+    }
+
+    function toggleBarraAcessibilidade(abrir) {
+      var wrapper = document.querySelector('[data-acessibilidade-wrapper]');
+      var gatilho = document.getElementById('btnAcessibilidadeGatilho');
+      if (!wrapper) return;
+      var deveAbrir = typeof abrir === 'boolean' ? abrir : !wrapper.classList.contains('aberta');
+      wrapper.classList.toggle('aberta', deveAbrir);
+      if (gatilho) gatilho.setAttribute('aria-expanded', String(deveAbrir));
+      var controles = document.getElementById('acessibilidadeControles');
+      if (controles) controles.setAttribute('aria-hidden', String(!deveAbrir));
+      try {
+        localStorage.setItem('narrato-acessibilidade-aberta', deveAbrir ? '1' : '0');
+      } catch (err) {}
+    }
+
+    // Exposição global para outros módulos (ex: progresso.js ao importar backup)
+    window.sincronizarBotoesTema = sincronizarBotoes;
+    window.toggleBarraAcessibilidade = toggleBarraAcessibilidade;
+
+    document.addEventListener('click', function (e) {
+      var alvo = e.target.closest ? e.target : null;
+      if (!alvo) return;
+
+      // Gatilho da Barra de Acessibilidade
+      var btnGatilho = alvo.closest('#btnAcessibilidadeGatilho');
+      if (btnGatilho) {
+        e.stopPropagation();
+        toggleBarraAcessibilidade();
+        return;
+      }
+
+      // Troca de Tema (Sol / Lua)
+      var btnTema = alvo.closest('[data-troca-tema]');
+      if (btnTema) {
+        var novoClaro = html.getAttribute('data-theme') !== 'claro';
+        var novoTema = novoClaro ? 'claro' : 'escuro';
+        html.setAttribute('data-theme', novoTema);
+        try { localStorage.setItem('narrato-tema', novoTema); } catch (err) {}
+        sincronizarBotoes();
+        return;
+      }
+
+      // Toggle Único de Fonte (Disléxica vs Barlow Pesada)
+      var btnToggleFonte = alvo.closest('[data-toggle-fonte]');
+      if (btnToggleFonte) {
+        var ehPesada = html.getAttribute('data-font') === 'pesada';
+        if (ehPesada) {
+          html.removeAttribute('data-font');
+          try { localStorage.setItem('narrato-font', 'dislexica'); } catch (err) {}
+        } else {
+          html.setAttribute('data-font', 'pesada');
+          try { localStorage.setItem('narrato-font', 'pesada'); } catch (err) {}
+        }
+        sincronizarBotoes();
+        return;
+      }
+
+      // Retrocompatibilidade: data-opcao-fonte
+      var btnFonteLegada = alvo.closest('[data-opcao-fonte]');
+      if (btnFonteLegada) {
+        var tipo = btnFonteLegada.getAttribute('data-opcao-fonte');
+        if (tipo === 'pesada') {
+          html.setAttribute('data-font', 'pesada');
+          try { localStorage.setItem('narrato-font', 'pesada'); } catch (err) {}
+        } else {
+          html.removeAttribute('data-font');
+          try { localStorage.setItem('narrato-font', 'dislexica'); } catch (err) {}
+        }
+        sincronizarBotoes();
+        return;
+      }
+
+      // Zoom de Fonte (A- / A+)
+      var btnZoom = alvo.closest('[data-zoom-fonte]');
+      if (btnZoom) {
+        var delta = parseInt(btnZoom.getAttribute('data-zoom-fonte'), 10) || 0;
+        var currentZoom = 100;
+        try {
+          var saved = localStorage.getItem('narrato-font-size');
+          if (saved && !isNaN(Number(saved))) currentZoom = Number(saved);
+        } catch (err) {}
+        var novoZoom = Math.max(80, Math.min(140, currentZoom + (delta * 10)));
+        html.style.fontSize = novoZoom + '%';
+        try { localStorage.setItem('narrato-font-size', String(novoZoom)); } catch (err) {}
+        return;
+      }
+
+      // Toggle Menu Mobile
+      var menuBtn = alvo.closest('[data-menu-alternar]');
+      if (menuBtn) {
+        abrirGavetaMobile(menuBtn.getAttribute('aria-expanded') !== 'true');
+        return;
+      }
+
+      // Fecha barra de acessibilidade e menus ao clicar fora
+      var wrapperAcess = document.querySelector('[data-acessibilidade-wrapper]');
+      if (wrapperAcess && wrapperAcess.classList.contains('aberta') && !wrapperAcess.contains(alvo)) {
+        toggleBarraAcessibilidade(false);
+      }
+
+      document.querySelectorAll('details[data-acessibilidade], details[data-configuracoes]').forEach(function (det) {
+        if (det.open && !det.contains(alvo)) {
+          det.open = false;
+        }
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        abrirGavetaMobile(false);
+        toggleBarraAcessibilidade(false);
+        document.querySelectorAll('details[data-acessibilidade], details[data-configuracoes]').forEach(function (det) {
+          det.open = false;
+        });
+        if (typeof window.fecharModalProgresso === 'function') {
+          window.fecharModalProgresso();
+        }
+      }
+    });
+
+    // Marcação da Seção Ativa
+    function secaoAtual() {
+      var caminho = location.pathname;
+      var secao = /\/fontes\//.test(caminho) ? 'fontes'
+        : (/\/vocab\//.test(caminho) || /\/glossario\//.test(caminho)) ? 'vocab'
+        : /\/argamassa\//.test(caminho) ? 'argamassa' : 'caderno';
+
+      document.querySelectorAll('.header-nav-link[data-secao]').forEach(function (a) {
+        var s = a.getAttribute('data-secao');
+        if (s === secao) {
+          a.setAttribute('aria-current', 'page');
+        } else {
+          a.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    // Altura dinâmica do cabeçalho
+    function alturaCabecalho() {
+      var cab = document.querySelector('.narrato-header');
+      if (!cab || !window.ResizeObserver) return;
+      new ResizeObserver(function () {
+        html.style.setProperty('--altura-cabecalho', cab.offsetHeight + 'px');
+      }).observe(cab);
+    }
+
+    // =========================================================================
+    // SISTEMA UNIVERSAL DE TOOLTIPS: PLACA DE SINALIZAÇÃO DE OBRA (CATÁLOGO #4)
+    // Cobre 100% dos elementos atuais e futuros com [title] ou [data-tooltip]
+    // =========================================================================
+    var tooltipGlobal = null;
+    var targetAtivo = null;
+
+    function obterTooltipGlobal() {
+      if (!tooltipGlobal) {
+        tooltipGlobal = document.createElement('div');
+        tooltipGlobal.id = 'narratoGlobalTooltip';
+        tooltipGlobal.className = 'narrato-global-tooltip';
+        tooltipGlobal.setAttribute('role', 'tooltip');
+        tooltipGlobal.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(tooltipGlobal);
+        html.classList.add('tem-tooltip-js');
+      }
+      return tooltipGlobal;
+    }
+
+    function encontrarAlvoTooltip(node) {
+      if (!node || node.nodeType !== 1) return null;
+      if (node.closest('.materia-card, .topic-card, .book-card, .vocab-card, .chapter-intro-prose, .card-prose, .card-heading, #btnAcessibilidadeGatilho, .acessibilidade-gatilho')) {
+        return null;
+      }
+      var alvo = node.closest('[data-tooltip], [title]');
+      if (!alvo) return null;
+
+      if (alvo.hasAttribute('title')) {
+        var val = alvo.getAttribute('title').trim();
+        if (val) alvo.setAttribute('data-tooltip', val);
+        alvo.removeAttribute('title');
+      }
+
+      var texto = alvo.getAttribute('data-tooltip');
+      return (texto && texto.trim()) ? { el: alvo, texto: texto.trim() } : null;
+    }
+
+    function posicionarTooltip(el, texto) {
+      var tip = obterTooltipGlobal();
+      tip.textContent = texto;
+
+      var rect = el.getBoundingClientRect();
+      var tipRect = tip.getBoundingClientRect();
+
+      var top = rect.top - tipRect.height - 10;
+      var left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+
+      if (top < 8) {
+        top = rect.bottom + 10;
+      }
+
+      var margem = 12;
+      if (left < margem) {
+        left = margem;
+      } else if (left + tipRect.width > window.innerWidth - margem) {
+        left = window.innerWidth - margem - tipRect.width;
+      }
+
+      tip.style.top = Math.round(top) + 'px';
+      tip.style.left = Math.round(left) + 'px';
+      tip.classList.add('visivel');
+      tip.setAttribute('aria-hidden', 'false');
+    }
+
+    function esconderTooltip() {
+      if (tooltipGlobal) {
+        tooltipGlobal.classList.remove('visivel');
+        tooltipGlobal.setAttribute('aria-hidden', 'true');
+      }
+      targetAtivo = null;
+    }
+
+    document.addEventListener('mouseover', function (e) {
+      var achado = encontrarAlvoTooltip(e.target);
+      if (!achado) {
+        if (targetAtivo && (!e.relatedTarget || !targetAtivo.contains(e.relatedTarget))) {
+          esconderTooltip();
+        }
+        return;
+      }
+      targetAtivo = achado.el;
+      posicionarTooltip(achado.el, achado.texto);
+    }, { passive: true });
+
+    document.addEventListener('mouseout', function (e) {
+      if (targetAtivo && (!e.relatedTarget || !targetAtivo.contains(e.relatedTarget))) {
+        esconderTooltip();
+      }
+    }, { passive: true });
+
+    document.addEventListener('focusin', function (e) {
+      var achado = encontrarAlvoTooltip(e.target);
+      if (achado) {
+        targetAtivo = achado.el;
+        posicionarTooltip(achado.el, achado.texto);
+      }
+    }, { passive: true });
+
+    document.addEventListener('focusout', function () {
+      esconderTooltip();
+    }, { passive: true });
+
+    window.addEventListener('scroll', esconderTooltip, { passive: true });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Restaura estado aberto/fechado da barra de acessibilidade se o usuário a deixou aberta
+      try {
+        if (localStorage.getItem('narrato-acessibilidade-aberta') === '1') {
+          toggleBarraAcessibilidade(true);
+        }
+      } catch (err) {}
+
+      sincronizarBotoes();
+      secaoAtual();
+      alturaCabecalho();
+    });
+  })();
+</script>
+
+</head>
+<body class="onboarding-page">
+
+  <!-- Cabeçalho único do site: o mesmo em todas as páginas.
+     Contém navegação, busca unificada, painel de Acessibilidade (A) e Configurações (engrenagem). -->
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+<header class="narrato-header">
+  <a href="../index.html" class="header-brand" aria-label="NarrATO, início do Caderno de Encargos">
+    <img src="../assets/svg/logo-narrato-white.svg" alt="NarrATO" class="brand-logo">
+  </a>
+  <button type="button" class="cabecalho-menu" data-menu-alternar aria-expanded="false" aria-controls="cabecalhoGaveta"><span class="icone-banco icone-banco--menu icone-banco--antes" aria-hidden="true"></span>Menu</button>
+  <div class="cabecalho-gaveta" id="cabecalhoGaveta">
+    <nav class="header-nav" aria-label="Seções">
+      <a href="../index.html" class="header-nav-link" data-secao="caderno"><span class="icone-banco icone-banco--caderno icone-banco--antes" aria-hidden="true"></span>Caderno de Encargos</a>
+      <a href="../argamassa/index.html" class="header-nav-link" data-secao="argamassa"><span class="icone-banco icone-banco--argamassa icone-banco--antes" aria-hidden="true"></span>Argamassa</a>
+      <a href="../fontes/index.html" class="header-nav-link" data-secao="fontes"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Livros de Ordem</a>
+      <a href="../vocab/index.html" class="header-nav-link" data-secao="vocab"><span class="icone-banco icone-banco--vocab icone-banco--antes" aria-hidden="true"></span>Vocabulário</a>
+    </nav>
+
+    <!-- Na página Vocabulário, a busca desce para o hero centralizado; nas demais seções, fica no cabeçalho -->
+    
+    <!-- Busca única do cabeçalho: matérias, livros e vocabulário em tempo real.
+     A lógica mora no caderno.js (index) e no narrato.js (páginas internas). -->
+<div class="omni-search-wrapper" data-omni-search role="search">
+  <div class="omni-search-box">
+    <label class="visualmente-oculto" for="omniSearchInput">Buscar no NarrATO</label>
+    <span class="icone-banco icone-banco--buscar" aria-hidden="true"></span>
+    <input type="search" id="omniSearchInput" class="omni-search-input" placeholder="Buscar matérias, livros, verbetes" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()" autocomplete="off">
+    <button type="button" id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca" aria-label="Limpar busca" style="display:none;"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
+    <kbd class="omni-search-kbd">Ctrl+K</kbd>
+  </div>
+
+  <div id="omniDropdown" class="omni-dropdown">
+    <div class="omni-tabs">
+      <button type="button" class="omni-tab active" data-filter="todos" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="materia" onclick="setOmniFilter('materia')">Matérias (<span id="countMaterias">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="livro" onclick="setOmniFilter('livro')">Livros (<span id="countLivros">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="verbete" onclick="setOmniFilter('verbete')">Vocabulário (<span id="countVerbetes">0</span>)</button>
+    </div>
+    <div id="omniResultsBody"></div>
+  </div>
+</div>
+
+    
+
+    <div class="header-util-group" id="headerUtilGroup">
+
+    <!-- Barra de Acessibilidade: Ícone internacional que expande horizontalmente ao clicar -->
+    <div class="acessibilidade-wrapper" id="acessibilidadeWrapper" data-acessibilidade-wrapper>
+      <button type="button" class="acessibilidade-gatilho" id="btnAcessibilidadeGatilho" aria-expanded="false" aria-label="Acessibilidade" title="Acessibilidade">
+        <span class="icone-banco icone-banco--acessibilidade icone-acessibilidade" aria-hidden="true"></span>
+        <span class="acessibilidade-rotulo-hover">Acessibilidade</span>
+      </button>
+
+      <div class="acessibilidade-controles" id="acessibilidadeControles" aria-hidden="true">
+        <!-- 1. Tema: Sol no escuro / Lua no claro -->
+        <button type="button" class="botao-acess-item" data-troca-tema aria-pressed="false" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+          <span class="icone-banco icone-banco--tema-claro icone-tema" data-tema-icone aria-hidden="true"></span>
+          <span class="acess-item-rotulo" data-tema-texto>Tema claro</span>
+        </button>
+
+        <!-- 2. Toggle Único de Fonte: Disléxica vs Barlow Pesada -->
+        <button type="button" class="botao-acess-item" data-toggle-fonte aria-pressed="false" title="Alternar tipografia: OpenDyslexic / Barlow Pesada" aria-label="Alternar fonte">
+          <span class="icone-fonte" aria-hidden="true">Aa</span>
+          <span class="acess-item-rotulo" data-fonte-texto>Fonte Disléxica</span>
+        </button>
+
+        <!-- 3. Controles de Tamanho de Fonte (A- / A+) -->
+        <div class="grupo-zoom-fonte" role="group" aria-label="Tamanho da fonte">
+          <button type="button" class="botao-acess-item botao-acess-zoom" data-zoom-fonte="-1" title="Diminuir tamanho da fonte (A−)" aria-label="Diminuir fonte">
+            <span>A−</span>
+          </button>
+          <button type="button" class="botao-acess-item botao-acess-zoom" data-zoom-fonte="1" title="Aumentar tamanho da fonte (A+)" aria-label="Aumentar fonte">
+            <span>A+</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de Configurações: Engrenagem industrial entre Barra de Acessibilidade e ? -->
+    <details class="configuracoes" data-configuracoes>
+      <summary class="configuracoes-botao" aria-label="Configurações" title="Configurações">
+        <span class="icone-banco icone-banco--configuracoes icone-engrenagem" aria-hidden="true"></span>
+      </summary>
+      <div class="configuracoes-painel">
+        <div class="painel-secao-rotulo">Configurações</div>
+        <div class="config-icones-linha" role="toolbar" aria-label="Ações de Progresso e Dados">
+          <button type="button" class="botao-icon-config" onclick="abrirModalProgresso()" data-tooltip="Gerenciar Progresso" aria-label="Gerenciar Progresso"><span class="icone-banco icone-banco--progresso-gerenciar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config" data-exportar-progresso data-tooltip="Exportar progresso" aria-label="Exportar progresso"><span class="icone-banco icone-banco--progresso-exportar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config" data-importar-progresso data-tooltip="Importar progresso" aria-label="Importar progresso"><span class="icone-banco icone-banco--progresso-importar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config botao-icon-config--perigo" data-resetar-progresso data-tooltip="Limpar Progresso" aria-label="Limpar Progresso"><span class="icone-banco icone-banco--progresso-limpar" aria-hidden="true"></span></button>
+        </div>
+        <input type="file" id="inputImportarBackup" accept=".json" style="display:none" aria-hidden="true">
+      </div>
+    </details>
+
+    <a href="../index.html#entenda" class="header-ajuda" title="Entenda" aria-label="Entenda"><span class="icone-banco icone-banco--ajuda" aria-hidden="true"></span></a>
+    </div>
+  </div>
+</header>
+<div class="faixa-fita" aria-hidden="true"></div>
+<!-- 5. MODAL DE GERENCIAMENTO DE PROGRESSO & BACKUP (#modalProgressoBackdrop) -->
+<div id="modalProgressoBackdrop" class="modal-scaffold-backdrop" onclick="fecharModalProgresso(event)">
+  <div class="modal-scaffold-frame" onclick="event.stopPropagation()" style="max-width:680px;">
+    <span class="scaffold-corner corner-tl"></span>
+    <span class="scaffold-corner corner-tr"></span>
+    <span class="scaffold-corner corner-bl"></span>
+    <span class="scaffold-corner corner-br"></span>
+
+    <div class="modal-scaffold-head">
+      <div class="modal-breadcrumbs">
+        <span>Configurações</span>
+        <span>›</span>
+        <span class="crumb-active">Progresso & Cópia de Segurança</span>
+      </div>
+      <button class="modal-close-btn" onclick="fecharModalProgresso()" title="Fechar (Esc ou clique fora)"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="modal-scaffold-body" id="modalProgressoBody">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1 style="font-size:1.5rem; margin:0 0 0.3rem 0; color:var(--tinta-titulo);"><span class="icone-banco icone-banco--progresso-gerenciar icone-banco--antes" aria-hidden="true"></span>Progresso do Canteiro</h1>
+          <p style="font-size:0.88rem; color:var(--tinta-suave); margin:0;">Seus dados ficam salvos localmente neste navegador.</p>
+        </div>
+        <span id="modalProgressoStatusBadge" class="cat-pill" style="font-size:0.75rem;">SINCRONIZADO</span>
+      </div>
+
+      <div class="modal-scaffold-box">
+        <span class="modal-box-label">ESTATÍSTICAS ATUAIS 📊</span>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-top:0.5rem;">
+          <div style="background:var(--superficie-afundada); padding:0.85rem 1rem; border-radius:0; border:1px solid var(--traco-regra);">
+            <div style="font-size:0.75rem; color:var(--tinta-suave); text-transform:uppercase; font-weight:700;">Matérias Lidas</div>
+            <div id="modalProgressoMateriasCount" style="font-size:1.6rem; font-weight:800; color:var(--acento); margin-top:0.2rem;">0 / 50</div>
+          </div>
+          <div style="background:var(--superficie-afundada); padding:0.85rem 1rem; border-radius:0; border:1px solid var(--traco-regra);">
+            <div style="font-size:0.75rem; color:var(--tinta-suave); text-transform:uppercase; font-weight:700;">Capítulos Concluídos</div>
+            <div id="modalProgressoCapitulosCount" style="font-size:1.6rem; font-weight:800; color:var(--tinta-titulo); margin-top:0.2rem;">0 / 10</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-scaffold-box">
+        <span class="modal-box-label">AÇÕES DE BACKUP & SEGURANÇA ⚙️</span>
+        <p style="font-size:0.88rem; line-height:1.6; color:var(--tinta-corpo); margin:0 0 1rem 0;">
+          Exporte uma cópia em arquivo JSON para guardar seu avanço ou transferir para outro dispositivo.
+        </p>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <button type="button" class="btn-resumo" data-exportar-progresso style="padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:700;">
+            <span class="icone-banco icone-banco--progresso-exportar icone-banco--antes" aria-hidden="true"></span>Exportar progresso
+          </button>
+          <button type="button" class="btn-resumo" data-importar-progresso style="padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:700; background:none; border:1px solid var(--traco-forte); color:var(--tinta-corpo);">
+            <span class="icone-banco icone-banco--progresso-importar icone-banco--antes" aria-hidden="true"></span>Importar progresso
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-scaffold-box" style="border-left: 3px solid var(--cor-tijolo-700);">
+        <span class="modal-box-label" style="color:var(--cor-tijolo-700);">ZONA DE RISCO ⚠️</span>
+        <p style="font-size:0.85rem; line-height:1.6; color:var(--tinta-suave); margin:0 0 0.75rem 0;">
+          Deseja zerar todo o histórico de leituras e capítulos concluídos? Esta ação não pode ser desfeita.
+        </p>
+        <div>
+          <button type="button" class="btn-resumo" data-resetar-progresso style="background:none; border:1px solid var(--cor-tijolo-700); color:var(--cor-tijolo-700); padding:0.5rem 1rem; font-size:0.82rem; font-weight:700;">
+            <span class="icone-banco icone-banco--progresso-limpar icone-banco--antes" aria-hidden="true"></span>Limpar Todo o Progresso
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <main class="onboarding-main" style="max-width:920px; margin:0 auto; padding:2rem 1.25rem 4rem;">
+
+    <!-- BLOCO 1: HERO COM MASCOTE PASSARINHO E BALÃO DE FALA -->
+    <section class="onboarding-hero-card" style="background:#1B1A1E; border:1px solid rgba(255,178,1,0.25); border-radius:12px; padding:2.5rem 2rem; margin-bottom:2.5rem; position:relative; overflow:hidden;">
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; z-index:2;">
+        
+        <!-- Mascote Passarinho com Capacete -->
+        <div class="mascot-wrap" style="width:120px; height:120px; margin-bottom:1.25rem; filter:drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+          <img src="../assets/emblema-passarinho-preenchido.svg" alt="Mascote NarrATO com Capacete de Canteiro" style="width:100%; height:100%; object-fit:contain;">
+        </div>
+
+        <!-- Balão de Fala do Mascote (NarrATO quem?) -->
+        <div class="mascot-speech-bubble" style="background:#262327; border:2px solid #FFB201; border-radius:14px; padding:1.25rem 1.5rem; max-width:680px; margin-bottom:1.5rem; position:relative; box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+          <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:12px solid #FFB201;"></div>
+          <span style="display:block; font-size:0.85rem; color:#FFB201; font-family:'JetBrains Mono', monospace; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.4rem;">NarrATO quem?</span>
+          <p style="font-size:1.05rem; line-height:1.6; color:#F0ECE1; margin:0; font-weight:500;">
+            "O NarrATO é uma obra em construção há uma década. Reúne apostila, videoaulas e comunidade dedicada aos estudos de Narratologia."
+          </p>
+        </div>
+
+        <!-- Emblema NarrATO Oficial -->
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
+          <img src="../assets/svg/logo-narrato-white.svg" alt="NarrATO" style="height:44px;">
+        </div>
+      </div>
+    </section>
+
+    <!-- DIVISOR ZEBRADO DE CANTEIRO -->
+    <div class="hazard-stripe" style="margin:2rem 0;"></div>
+
+    <!-- BLOCO 2: COMO FUNCIONA? -->
+    <section class="onboarding-section-card" style="background:#1B1A1E; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2rem; margin-bottom:2rem;">
+      <h2 style="font-size:1.5rem; color:#FFB201; margin-bottom:1rem; font-family:'JetBrains Mono', monospace;">Como funciona?</h2>
+      <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin-bottom:1.25rem;">
+        O curso tem 10 aulas que destrincham o ofício de criar histórias: arcos dramáticos, tema, diálogos, tempo e espaço. O conteúdo bebe de uma base teórica refinada por mais de uma década, ancorada em nomes como Doc Comparato, Robert McKee, K. M. Weiland e John Truby.
+      </p>
+
+      <div style="background:#141416; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1.25rem; margin-bottom:1.25rem;">
+        <span style="display:block; font-size:0.9rem; font-weight:700; color:#FFB201; font-family:'JetBrains Mono', monospace; margin-bottom:0.75rem;">Você consome no seu ritmo:</span>
+        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.6rem;">
+          <li style="display:flex; align-items:flex-start; gap:0.6rem; font-size:0.95rem; color:#E0DDD5; line-height:1.6;">
+            <span style="color:#FFB201;">📖</span>
+            <div><strong>Em texto:</strong> direto no site, pelo Substack ou baixando o PDF completo.</div>
+          </li>
+          <li style="display:flex; align-items:flex-start; gap:0.6rem; font-size:0.95rem; color:#E0DDD5; line-height:1.6;">
+            <span style="color:#FFB201;">🎥</span>
+            <div><strong>Em vídeo:</strong> aulas disponíveis no YouTube.</div>
+          </li>
+        </ul>
+      </div>
+
+      <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin:0; border-left:3px solid #FFB201; padding-left:1rem; background:rgba(255,178,1,0.04); padding-top:0.6rem; padding-bottom:0.6rem; border-radius:0 6px 6px 0;">
+        O coração da experiência é o <strong>Laboratório assíncrono</strong>: o espaço onde participantes selecionados apresentam pitchings de seus projetos e trocam rodadas diretas de feedback.
+      </p>
+    </section>
+
+    <!-- DIVISOR ZEBRADO DE CANTEIRO -->
+    <div class="hazard-stripe" style="margin:2rem 0;"></div>
+
+    <!-- BLOCO 3: É PRA MIM? -->
+    <section class="onboarding-section-card" style="background:#1B1A1E; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2rem; margin-bottom:2rem;">
+      <h2 style="font-size:1.5rem; color:#FFB201; margin-bottom:1rem; font-family:'JetBrains Mono', monospace;">É pra mim?</h2>
+      <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin-bottom:1rem;">
+        Os espaços do NarrATO prezam por segurança, convivência leve, inclusão e respeito mútuo.
+      </p>
+      <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin-bottom:1.5rem;">
+        Há ampla liberdade criativa para abordar temas tabu, cenas gráficas e dilemas morais, desde que sirvam à narrativa e não ao choque gratuito. Por essa maturidade temática, o laboratório exige idade mínima de 16 anos.
+      </p>
+      <div style="background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.4); border-left:4px solid #EF4444; border-radius:6px; padding:1rem 1.25rem;">
+        <p style="font-size:0.95rem; line-height:1.6; color:#FCA5A5; margin:0; font-family:'JetBrains Mono', monospace;">
+          <strong style="color:#FFF;">Linha vermelha inegociável:</strong> qualquer história que viole direitos humanos, negue a existência de minorias ou contenha psicofobia será sumariamente descartada.
+        </p>
+      </div>
+    </section>
+
+    <!-- DIVISOR ZEBRADO DE CANTEIRO -->
+    <div class="hazard-stripe" style="margin:2rem 0;"></div>
+
+    <!-- BLOCO 4: COMO PARTICIPAR? (LICITAÇÃO) -->
+    <section id="licitacao" class="onboarding-section-card" style="background:#26221C; border:2px solid #FFB201; border-radius:12px; padding:2.5rem 2rem; margin-bottom:2rem; text-align:center;">
+      <div style="max-width:680px; margin:0 auto;">
+        <span class="icone-banco icone-banco--documento" aria-hidden="true" style="font-size:2.5rem; display:block; margin:0 auto 0.5rem;"></span>
+        <h2 style="font-size:1.75rem; color:#FFB201; margin-bottom:0.75rem; font-family:'JetBrains Mono', monospace;">Como participar?</h2>
+        <p style="font-size:1.02rem; line-height:1.7; color:#F0ECE1; margin-bottom:1rem; text-align:left;">
+          Para estudar as 10 aulas, basta acessar o site, o canal no YouTube ou assinar a publicação no Substack — o acesso é imediato e irrestrito.
+        </p>
+        <p style="font-size:1.02rem; line-height:1.7; color:#F0ECE1; margin-bottom:1.75rem; text-align:left;">
+          Para entrar no Laboratório, o ingresso ocorre por seleção via <strong>Licitação</strong> (nosso formulário de inscrição), onde você submete a proposta inicial da sua história.
+        </p>
+        <a href="https://poligonalhub.com/narrato/#licitacao" class="btn-licitacao-cta" style="display:inline-flex; align-items:center; gap:0.5rem; background:linear-gradient(135deg, #FFB201, #E59800); color:#141416; font-size:1.05rem; font-weight:700; padding:0.85rem 2rem; border-radius:8px; text-decoration:none; box-shadow:0 4px 14px rgba(255,178,1,0.35); transition:transform 0.2s ease;">
+          <span class="icone-banco icone-banco--documento" aria-hidden="true"></span>
+          <span>Acessar Formulário de Licitação</span>
+          <span class="icone-banco icone-banco--link-externo" aria-hidden="true"></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- DIVISOR ZEBRADO DE CANTEIRO -->
+    <div class="hazard-stripe" style="margin:2rem 0;"></div>
+
+    <!-- BLOCO 5: É GRATUITO? -->
+    <section class="onboarding-section-card" style="background:#1B1A1E; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2rem; margin-bottom:2rem;">
+      <h2 style="font-size:1.5rem; color:#FFB201; margin-bottom:1rem; font-family:'JetBrains Mono', monospace;">É gratuito?</h2>
+      <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin-bottom:0.75rem;">
+        Sim! Todo o acervo do NarrATO (textos e vídeos) é 100% gratuito e aberto a todas as idades.
+      </p>
+      <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin:0;">
+        A vaga no Laboratório também não tem custo financeiro algum, mas é restrita a 10 participantes por turma e passa pelo crivo de seleção da Licitação.
+      </p>
+    </section>
+
+    <!-- DIVISOR ZEBRADO DE CANTEIRO -->
+    <div class="hazard-stripe" style="margin:2rem 0;"></div>
+
+    <!-- BLOCO 6: TEM CERTIFICADO? (ALVARÁ NARRATO) -->
+    <section class="onboarding-section-card" style="background:#1B1A1E; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2rem; margin-bottom:2.5rem;">
+      <div style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap; margin-bottom:1.5rem;">
+        <div style="width:80px; height:80px; background:#221E19; border:1px solid #FFB201; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.2rem; flex-shrink:0;">
+          📜
+        </div>
+        <div style="flex:1; min-width:280px;">
+          <h2 style="font-size:1.5rem; color:#FFB201; margin-bottom:0.5rem; font-family:'JetBrains Mono', monospace;">Tem Certificado?</h2>
+          <p style="font-size:1rem; line-height:1.7; color:#E0DDD5; margin:0;">
+            Sim, mediante entrega prática. No NarrATO, o certificado se chama <strong>Alvará</strong>.
+          </p>
+        </div>
+      </div>
+
+      <p style="font-size:0.95rem; color:#A09D95; font-family:'JetBrains Mono', monospace; margin-bottom:1rem;">
+        Para obtê-lo, cada Operari cumpre quatro etapas:
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+        <div style="background:#141416; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1.25rem;">
+          <span style="font-size:0.8rem; font-weight:700; color:#FFB201; font-family:'JetBrains Mono', monospace; display:block; margin-bottom:0.4rem;">01. Licitação</span>
+          <p style="font-size:0.88rem; line-height:1.6; color:#D0CDC5; margin:0;">
+            Envia a proposta inicial da história na inscrição do Laboratório.
+          </p>
+        </div>
+
+        <div style="background:#141416; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1.25rem;">
+          <span style="font-size:0.8rem; font-weight:700; color:#FFB201; font-family:'JetBrains Mono', monospace; display:block; margin-bottom:0.4rem;">02. Canteiro e Exercícios</span>
+          <p style="font-size:0.88rem; line-height:1.6; color:#D0CDC5; margin:0;">
+            Responde às folhas de exercícios de cada capítulo, testando sua história sob novos ângulos.
+          </p>
+        </div>
+
+        <div style="background:#141416; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1.25rem;">
+          <span style="font-size:0.8rem; font-weight:700; color:#FFB201; font-family:'JetBrains Mono', monospace; display:block; margin-bottom:0.4rem;">03. Diário de Obra</span>
+          <p style="font-size:0.88rem; line-height:1.6; color:#D0CDC5; margin:0;">
+            Documenta o raciocínio e a tomada de decisões ao longo do processo.
+          </p>
+        </div>
+
+        <div style="background:#141416; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1.25rem;">
+          <span style="font-size:0.8rem; font-weight:700; color:#FFB201; font-family:'JetBrains Mono', monospace; display:block; margin-bottom:0.4rem;">04. Laudo de Conclusão</span>
+          <p style="font-size:0.88rem; line-height:1.6; color:#D0CDC5; margin:0;">
+            Submete a versão atualizada da história (Projeto de Conclusão) acompanhada do Diário de Obra.
+          </p>
+        </div>
+      </div>
+
+      <p style="font-size:0.95rem; line-height:1.7; color:#E0DDD5; margin:0; border-top:1px solid rgba(255,255,255,0.08); padding-top:1rem;">
+        Após a análise técnica da entrega, o Operari recebe o <strong>Alvará NarrATO</strong> (Certificado de Conclusão de Curso + Lab).
+      </p>
+    </section>
+
+    <!-- BLOCO DE AÇÃO FINAL: ESCOLHA DE DESTINO -->
+    <section style="background:#141416; border:1px dashed rgba(255,255,255,0.15); border-radius:12px; padding:2rem; text-align:center;">
+      <h3 style="font-size:1.2rem; color:#FFF; margin-bottom:0.75rem; font-family:'JetBrains Mono', monospace;">Pronto para iniciar a jornada?</h3>
+      <p style="font-size:0.95rem; color:#A09D95; margin-bottom:1.5rem;">Escolha por onde deseja começar sua navegação:</p>
+      
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="../index.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; background:#FFB201; color:#141416; font-weight:700; padding:0.75rem 1.5rem; border-radius:6px; font-size:0.95rem;">
+          <span class="icone-banco icone-banco--caderno" aria-hidden="true"></span> Ir para o Caderno de Encargos
+        </a>
+        <a href="../argamassa/index.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.08); color:#FFF; font-weight:600; padding:0.75rem 1.5rem; border-radius:6px; font-size:0.95rem; border:1px solid rgba(255,255,255,0.15);">
+          <span class="icone-banco icone-banco--argamassa" aria-hidden="true"></span> Conhecer o Argamassa (PPP)
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOMENTO PÚBLICO -->
+  <!-- ============================================================== -->
+<!-- NARRATO V1.0 - PRODUZIDO E FINANCIADO POR (POLIGONAL + SELOS)  -->
+<!-- Include Desacoplado para uso em todas as páginas do Canteiro  -->
+<!-- ============================================================== -->
+<section class="fomento-section" id="fomento">
+  <div class="fomento-inner">
+    <div class="fomento-row">
+      <!-- Bloco da Poligonal -->
+      <div class="fomento-block fomento-obra">
+        <span class="fomento-sublabel">UMA OBRA</span>
+        <div class="fomento-logo-wrap" data-tooltip="Centro Comunitário-Criativo Poligonal">
+          <img src="../assets/svg/logo-poligonal.svg" alt="Centro Comunitário-Criativo Poligonal" class="fomento-seal fomento-seal-lead">
+        </div>
+      </div>
+
+      <div class="fomento-divider-v" aria-hidden="true"></div>
+
+      <!-- Bloco dos Financiadores Públicos -->
+      <div class="fomento-block fomento-financiamento">
+        <span class="fomento-sublabel">V. 1.0. FINANCIADA POR</span>
+        <div class="fomento-seals-grid">
+          <span class="fomento-seal-item" data-tooltip="PNAB • Política Nacional Aldir Blanc">
+            <img src="../assets/svg/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal">
+          </span>
+          <span class="fomento-seal-item" data-tooltip="Fundação Cultural de João Pessoa">
+            <img src="../assets/svg/FUNJOPE.svg" alt="FUNJOPE" class="fomento-seal">
+          </span>
+          <span class="fomento-seal-item" data-tooltip="Prefeitura Municipal de João Pessoa">
+            <img src="../assets/svg/PMJP.svg" alt="Prefeitura Municipal de João Pessoa" class="fomento-seal">
+          </span>
+          <span class="fomento-seal-item" data-tooltip="FMC • Fundo Municipal de Cultura">
+            <img src="../assets/svg/FMC.svg" alt="Fundo Municipal de Cultura" class="fomento-seal">
+          </span>
+          <span class="fomento-seal-item" data-tooltip="Ministério da Cultura">
+            <img src="../assets/svg/MINC.svg" alt="Ministério da Cultura" class="fomento-seal">
+          </span>
+          <span class="fomento-seal-item" data-tooltip="Governo Federal • Brasil">
+            <img src="../assets/svg/GOV.svg" alt="Governo Federal" class="fomento-seal">
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO -->
+  <!-- RODAPÉ INSTITUCIONAL UNIFICADO POLIGONAL HUB -->
+<footer class="poligonal-footer" data-poligonal-footer>
+<div class="poligonal-footer-container">
+  <div class="poligonal-footer-top">
+    <div class="poligonal-footer-brand-col">
+      <h3 class="poligonal-footer-title">Centro Comunitário-Criativo Poligonal</h3>
+      <p class="poligonal-footer-desc">
+        Vários ângulos, todos anti-imperialistas.<br>
+        Desenvolvedores de audiovisual, jogos e soluções web.
+      </p>
+      <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
+        poligonalhub@gmail.com<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div class="poligonal-footer-links-group">
+      <div class="poligonal-footer-col">
+        <h4 class="poligonal-footer-heading">Navegação</h4>
+        <ul class="poligonal-footer-nav">
+          <li><a href="../index.html">Caderno de Encargos</a></li>
+          <li><a href="../argamassa/index.html">Argamassa (PPP)</a></li>
+          <li><a href="../fontes/index.html">Bibliografia</a></li>
+          <li><a href="../vocab/index.html">Vocabulário</a></li>
+        </ul>
+      </div>
+
+      <div class="poligonal-footer-col">
+        <h4 class="poligonal-footer-heading">Comunidade</h4>
+        <ul class="poligonal-footer-nav">
+          <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+          <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+          <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+          <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo)<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="poligonal-footer-bottom">
+    <span class="poligonal-footer-copy">
+      &copy; <span data-poligonal-year>2026</span> Centro Comunitário-Criativo Poligonal. Todos os direitos reservados.
+    </span>
+    <span class="poligonal-footer-origin">
+      Nordestinamente orgulhosos 🌵
+    </span>
+  </div>
+</div>
+</footer>
+
+  <script src="../../shared/hub-footer.js"></script>
+  <script src="../assets/js/progresso.js"></script>
+  <script src="../assets/js/narrato.js"></script>
+</body>
+</html>

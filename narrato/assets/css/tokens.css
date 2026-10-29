@@ -3,15 +3,19 @@
    -------------------------------------------------------------------------
    A única fonte de valor do NarrATO (ADR-008). O site, o livro digital e o
    PDF importam este arquivo; nenhuma outra folha declara cor, tamanho,
-   espaçamento, raio, traço ou sombra.
+   espaçamento, traço ou sombra. Canto não tem token: é reto em tudo.
 
-   Versão: 0.3 — 2026-10-16
+   Versão: 0.4 — 2026-10-21
    0.2 — 2026-10-07: partido do canteiro, aprovado por Laureano Bezerramos
    sobre a vitrine (sistema-visual/vitrine/). Chão, papel, amarelo como sinal.
    A escala tipográfica foi recompactada: razão 1,125 sobre 16 px.
    0.3 — 2026-10-16: o papel e o painel acompanham o tema. Até a 0.2 eles
    ficavam claros nos dois temas, e no escuro a folha de leitura era uma
    caixa clara com tinta preta sobre o chão escuro.
+   0.4 — 2026-10-21: saem os raios e as cores de eixo, por parecer da
+   Direção de Arte no painel. O canto é reto em tudo, sem token: quem
+   precisa zerar o canto do navegador escreve 0. Consenso e dissenso saíram
+   do NarrATO em 07/10, e as cores deles vão junto.
 
    A lógica dos dois temas: cada papel pertence a uma família da marca, e o
    tema só escolhe o degrau. Nenhuma cor de fora das famílias entra.
@@ -100,11 +104,6 @@
   --acento: var(--cor-amarelo-500);
   --foco: var(--cor-tijolo-700);
 
-  /* Consenso e dissenso são preenchimento de tarja, sempre com rótulo e símbolo.
-     Métodos, reescrita e coletivo não têm cor até a QA6. */
-  --eixo-consenso: var(--cor-amarelo-500);
-  --eixo-dissenso: var(--cor-tijolo-700);
-
   /* Só o painel do sistema visual usa os estados; o site não */
   --estado-sucesso: #2D6A2E;
   --estado-erro: #A3261C;
@@ -139,9 +138,6 @@
 
   --acento: var(--cor-amarelo-500);
   --foco: var(--cor-amarelo-500);
-
-  --eixo-consenso: var(--cor-amarelo-500);
-  --eixo-dissenso: var(--cor-tijolo-700);
 
   --estado-sucesso: #34D399;
   --estado-erro: #F87171;
@@ -188,13 +184,6 @@
   --espaco-7: 3.2rem;
   --espaco-8: 4.8rem;
 
-  /* Sem cantos arredondados (regra "feito à mão, com prumo").
-     A pílula fica para o que é redondo por natureza, como o ponto. */
-  --raio-1: 0;
-  --raio-2: 0;
-  --raio-3: 0;
-  --raio-pilula: 999px;
-
   --borda-fina: 1px;
   --borda-media: 3px;
   --borda-grossa: 7px;
@@ -221,12 +210,19 @@
 :root[data-font="pesada"] body,
 :root[data-font="pesada"] p,
 :root[data-font="pesada"] article,
+:root[data-font="pesada"] li,
+:root[data-font="pesada"] blockquote,
+:root[data-font="pesada"] .folha,
 :root[data-font="pesada"] .topico-body,
 :root[data-font="pesada"] .materia-body,
 :root[data-font="pesada"] .card-heading,
 :root[data-font="pesada"] .card-prose,
 :root[data-font="pesada"] .chapter-intro-p,
-:root[data-font="pesada"] .sidebar-box-content {
+:root[data-font="pesada"] .chapter-intro-prose,
+:root[data-font="pesada"] .sidebar-box-content,
+:root[data-font="pesada"] .book-desc,
+:root[data-font="pesada"] .vocab-def,
+:root[data-font="pesada"] .argamassa-prose {
   font-weight: 800 !important;
   letter-spacing: 0.012em;
 }
@@ -234,8 +230,12 @@
 :root[data-font="pesada"] h1,
 :root[data-font="pesada"] h2,
 :root[data-font="pesada"] h3,
+:root[data-font="pesada"] h4,
 :root[data-font="pesada"] .topico-page-title,
-:root[data-font="pesada"] .materia-page-title {
+:root[data-font="pesada"] .materia-page-title,
+:root[data-font="pesada"] .folha-titulo,
+:root[data-font="pesada"] .book-title,
+:root[data-font="pesada"] .vocab-termo {
   font-weight: 900 !important;
 }
 

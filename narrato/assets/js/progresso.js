@@ -193,12 +193,39 @@
   // ---------------------------------------------------------------------------
   // 3. ATUALIZAÇÃO DE INTERFACE (DOM) (#atualizacao-ui)
   // ---------------------------------------------------------------------------
+  function atualizarModalProgresso() {
+    var topicosLidos = getTopicosLidos();
+    var capsLidos = getCapitulosLidos();
+    var elMat = document.getElementById('modalProgressoMateriasCount');
+    var elCap = document.getElementById('modalProgressoCapitulosCount');
+    if (elMat) elMat.textContent = topicosLidos.length + ' / 50';
+    if (elCap) elCap.textContent = capsLidos.length + ' / 10';
+  }
+
   function atualizarTudo() {
     atualizarSumarioLateral();
     atualizarCardsHome();
     atualizarBotoesLidoGerais();
     atualizarAccordionCapitulos();
+    atualizarModalProgresso();
   }
+
+  window.abrirModalProgresso = function () {
+    var cfg = document.querySelector('details.configuracoes');
+    if (cfg) cfg.removeAttribute('open');
+    var m = document.getElementById('modalProgressoBackdrop');
+    if (!m) return;
+    atualizarModalProgresso();
+    m.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.fecharModalProgresso = function (e) {
+    if (e && e.target && e.target.closest && e.target.closest('.modal-scaffold-frame')) return;
+    var m = document.getElementById('modalProgressoBackdrop');
+    if (m) m.classList.remove('active');
+    document.body.style.overflow = '';
+  };
 
   function atualizarSumarioLateral() {
     var capsLidos = getCapitulosLidos();
@@ -257,11 +284,12 @@
     });
 
     // Atualiza cartões de tópicos na home
-    document.querySelectorAll('.topic-card[data-global-num]').forEach(function (card) {
+    document.querySelectorAll('.materia-card[data-global-num], .topic-card[data-global-num]').forEach(function (card) {
       var num = Number(card.getAttribute('data-global-num'));
       var lido = topicos.indexOf(num) > -1;
+      card.classList.toggle('materia-lida', lido);
       card.classList.toggle('topic-lido', lido);
-      var ind = card.querySelector('.topic-check-indicator');
+      var ind = card.querySelector('.materia-check-indicator, .topic-check-indicator');
       if (ind) ind.classList.toggle('checked', lido);
     });
   }
@@ -309,7 +337,10 @@
       narrato_capitulos_lidos: getCapitulosLidos(),
       narrato_capitulos_abertos: getCapitulosAbertos(),
       narrato_tema: localStorage.getItem('narrato-tema') || 'escuro',
-      narrato_font: localStorage.getItem('narrato-font') || 'dislexica'
+      narrato_font: localStorage.getItem('narrato-font') || 'dislexica',
+      narrato_font_size: localStorage.getItem('narrato-font-size') || '100',
+      narrato_acessibilidade_aberta: localStorage.getItem('narrato-acessibilidade-aberta') || '0',
+      narrato_sumario_recolhido: localStorage.getItem('narrato_sumario_recolhido') || '0'
     };
 
     var blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
@@ -349,6 +380,23 @@
         } else {
           document.documentElement.removeAttribute('data-font');
         }
+      }
+      if (dados.narrato_font_size) {
+        localStorage.setItem('narrato-font-size', String(dados.narrato_font_size));
+        document.documentElement.style.fontSize = dados.narrato_font_size + '%';
+      }
+      if (dados.narrato_acessibilidade_aberta !== undefined) {
+        localStorage.setItem('narrato-acessibilidade-aberta', String(dados.narrato_acessibilidade_aberta));
+        if (typeof window.toggleBarraAcessibilidade === 'function') {
+          window.toggleBarraAcessibilidade(dados.narrato_acessibilidade_aberta === '1');
+        }
+      }
+      if (dados.narrato_sumario_recolhido !== undefined) {
+        localStorage.setItem('narrato_sumario_recolhido', String(dados.narrato_sumario_recolhido));
+      }
+
+      if (typeof window.sincronizarBotoesTema === 'function') {
+        window.sincronizarBotoesTema();
       }
 
       atualizarTudo();
@@ -458,12 +506,15 @@
 
   // Interface Pública Global
   window.NarratoProgresso = {
+    getMateriasLidas: getTopicosLidos,
     getTopicosLidos: getTopicosLidos,
     getCapitulosLidos: getCapitulosLidos,
     getCapitulosAbertos: getCapitulosAbertos,
+    isMateriaLida: isTopicoLido,
     isTopicoLido: isTopicoLido,
     isCapituloLido: isCapituloLido,
     isCapituloAberto: isCapituloAberto,
+    toggleMateria: toggleTopico,
     toggleTopico: toggleTopico,
     toggleCapituloLido: toggleCapituloLido,
     toggleCapituloAberto: toggleCapituloAberto,

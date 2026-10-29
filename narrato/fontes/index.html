@@ -31,7 +31,12 @@
   <link rel="stylesheet" href="../assets/css/narrato.css">
   <link rel="stylesheet" href="../assets/css/componentes.css">
   <!-- Tema, Acessibilidade e Configurações do cabeçalho único NarrATO (tokens.css).
-     Gerencia: tema (escuro/claro), tipografia (disléxica/Barlow pesada), escala de fonte e menus. -->
+     Gerencia: fontes externas (Barlow e JetBrains Mono), tema (escuro/claro),
+     tipografia (disléxica/Barlow pesada), escala de fonte e menus. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <script>
   (function () {
     'use strict';
@@ -71,15 +76,20 @@
         btn.setAttribute('aria-pressed', String(claro));
         var txt = btn.querySelector('[data-tema-texto]');
         var icone = btn.querySelector('[data-tema-icone]');
-        if (txt) txt.textContent = claro ? 'Tema escuro' : 'Tema claro';
-        if (icone) icone.textContent = claro ? '🌙' : '☀️';
+        if (txt) txt.textContent = claro ? 'Tema claro' : 'Tema escuro';
+        if (icone) {
+          icone.classList.toggle('icone-banco--tema-claro', claro);
+          icone.classList.toggle('icone-banco--tema-escuro', !claro);
+        }
+        btn.setAttribute('title', claro ? 'Tema claro ativo. Clique para alternar para tema escuro.' : 'Tema escuro ativo. Clique para alternar para tema claro.');
       });
 
-      // 2. Toggle Único de Fonte
+      // 2. Toggle Único de Fonte (Identificação transparente do estado ativo)
       document.querySelectorAll('[data-toggle-fonte]').forEach(function (btn) {
         btn.setAttribute('aria-pressed', String(pesada));
         var txt = btn.querySelector('[data-fonte-texto]');
-        if (txt) txt.textContent = pesada ? 'Fonte Disléxica' : 'Fonte Pesada';
+        if (txt) txt.textContent = pesada ? 'Fonte Pesada' : 'Fonte Disléxica';
+        btn.setAttribute('title', pesada ? 'Fonte Pesada (Barlow) ativa. Clique para alternar para Fonte Disléxica.' : 'Fonte Disléxica (OpenDyslexic) ativa. Clique para alternar para Fonte Pesada.');
       });
 
       // Retrocompatibilidade
@@ -108,7 +118,14 @@
       if (gatilho) gatilho.setAttribute('aria-expanded', String(deveAbrir));
       var controles = document.getElementById('acessibilidadeControles');
       if (controles) controles.setAttribute('aria-hidden', String(!deveAbrir));
+      try {
+        localStorage.setItem('narrato-acessibilidade-aberta', deveAbrir ? '1' : '0');
+      } catch (err) {}
     }
+
+    // Exposição global para outros módulos (ex: progresso.js ao importar backup)
+    window.sincronizarBotoesTema = sincronizarBotoes;
+    window.toggleBarraAcessibilidade = toggleBarraAcessibilidade;
 
     document.addEventListener('click', function (e) {
       var alvo = e.target.closest ? e.target : null;
@@ -205,6 +222,9 @@
         document.querySelectorAll('details[data-acessibilidade], details[data-configuracoes]').forEach(function (det) {
           det.open = false;
         });
+        if (typeof window.fecharModalProgresso === 'function') {
+          window.fecharModalProgresso();
+        }
       }
     });
 
@@ -212,11 +232,12 @@
     function secaoAtual() {
       var caminho = location.pathname;
       var secao = /\/fontes\//.test(caminho) ? 'fontes'
-        : /\/glossario\//.test(caminho) ? 'glossario'
+        : (/\/vocab\//.test(caminho) || /\/glossario\//.test(caminho)) ? 'vocab'
         : /\/argamassa\//.test(caminho) ? 'argamassa' : 'caderno';
 
       document.querySelectorAll('.header-nav-link[data-secao]').forEach(function (a) {
-        if (a.getAttribute('data-secao') === secao) {
+        var s = a.getAttribute('data-secao');
+        if (s === secao) {
           a.setAttribute('aria-current', 'page');
         } else {
           a.removeAttribute('aria-current');
@@ -255,10 +276,12 @@
 
     function encontrarAlvoTooltip(node) {
       if (!node || node.nodeType !== 1) return null;
+      if (node.closest('.materia-card, .topic-card, .book-card, .vocab-card, .chapter-intro-prose, .card-prose, .card-heading, #btnAcessibilidadeGatilho, .acessibilidade-gatilho')) {
+        return null;
+      }
       var alvo = node.closest('[data-tooltip], [title]');
       if (!alvo) return null;
 
-      // Se tiver title nativo, migra para data-tooltip para suprimir a caixa nativa do Windows/OS
       if (alvo.hasAttribute('title')) {
         var val = alvo.getAttribute('title').trim();
         if (val) alvo.setAttribute('data-tooltip', val);
@@ -276,16 +299,13 @@
       var rect = el.getBoundingClientRect();
       var tipRect = tip.getBoundingClientRect();
 
-      // Posição padrão: 10px acima do elemento, centralizado
       var top = rect.top - tipRect.height - 10;
       var left = rect.left + (rect.width / 2) - (tipRect.width / 2);
 
-      // Se sair pelo topo da janela (ou elemento muito perto do topo), inverte para baixo
       if (top < 8) {
         top = rect.bottom + 10;
       }
 
-      // Clamping horizontal com margem de segurança de 12px
       var margem = 12;
       if (left < margem) {
         left = margem;
@@ -307,7 +327,6 @@
       targetAtivo = null;
     }
 
-    // Delegação global no document: intercepta qualquer elemento atual ou futuro
     document.addEventListener('mouseover', function (e) {
       var achado = encontrarAlvoTooltip(e.target);
       if (!achado) {
@@ -341,6 +360,13 @@
     window.addEventListener('scroll', esconderTooltip, { passive: true });
 
     document.addEventListener('DOMContentLoaded', function () {
+      // Restaura estado aberto/fechado da barra de acessibilidade se o usuário a deixou aberta
+      try {
+        if (localStorage.getItem('narrato-acessibilidade-aberta') === '1') {
+          toggleBarraAcessibilidade(true);
+        }
+      } catch (err) {}
+
       sincronizarBotoes();
       secaoAtual();
       alturaCabecalho();
@@ -371,58 +397,62 @@
 <header class="narrato-header">
   <a href="../index.html" class="header-brand" aria-label="NarrATO, início do Caderno de Encargos">
     <img src="../assets/svg/logo-narrato-white.svg" alt="NarrATO" class="brand-logo">
-    <span class="header-title-box">
-      <span class="header-subtitle">Cimento, tijolos e vigas de aço para construtores de histórias</span>
-    </span>
   </a>
-  <button type="button" class="cabecalho-menu" data-menu-alternar aria-expanded="false" aria-controls="cabecalhoGaveta">Menu</button>
+  <button type="button" class="cabecalho-menu" data-menu-alternar aria-expanded="false" aria-controls="cabecalhoGaveta"><span class="icone-banco icone-banco--menu icone-banco--antes" aria-hidden="true"></span>Menu</button>
   <div class="cabecalho-gaveta" id="cabecalhoGaveta">
     <nav class="header-nav" aria-label="Seções">
-      <a href="../index.html" class="header-nav-link" data-secao="caderno">Caderno de Encargos</a>
-      <a href="../argamassa/index.html" class="header-nav-link" data-secao="argamassa">Argamassa</a>
-      <a href="../fontes/index.html" class="header-nav-link" data-secao="fontes">Livros de Ordem</a>
-      <a href="../glossario/index.html" class="header-nav-link" data-secao="glossario">Vocabulário</a>
+      <a href="../index.html" class="header-nav-link" data-secao="caderno"><span class="icone-banco icone-banco--caderno icone-banco--antes" aria-hidden="true"></span>Caderno de Encargos</a>
+      <a href="../argamassa/index.html" class="header-nav-link" data-secao="argamassa"><span class="icone-banco icone-banco--argamassa icone-banco--antes" aria-hidden="true"></span>Argamassa</a>
+      <a href="../fontes/index.html" class="header-nav-link" data-secao="fontes"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Livros de Ordem</a>
+      <a href="../vocab/index.html" class="header-nav-link" data-secao="vocab"><span class="icone-banco icone-banco--vocab icone-banco--antes" aria-hidden="true"></span>Vocabulário</a>
     </nav>
-    <!-- Busca única do cabeçalho: matérias, livros e glossário em tempo real.
+
+    <!-- Na página Vocabulário, a busca desce para o hero centralizado; nas demais seções, fica no cabeçalho -->
+    
+    <!-- Busca única do cabeçalho: matérias, livros e vocabulário em tempo real.
      A lógica mora no caderno.js (index) e no narrato.js (páginas internas). -->
 <div class="omni-search-wrapper" data-omni-search role="search">
   <div class="omni-search-box">
     <label class="visualmente-oculto" for="omniSearchInput">Buscar no NarrATO</label>
+    <span class="icone-banco icone-banco--buscar" aria-hidden="true"></span>
     <input type="search" id="omniSearchInput" class="omni-search-input" placeholder="Buscar matérias, livros, verbetes" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()" autocomplete="off">
-    <button type="button" id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca" aria-label="Limpar busca" style="display:none;">✕</button>
+    <button type="button" id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca" aria-label="Limpar busca" style="display:none;"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
     <kbd class="omni-search-kbd">Ctrl+K</kbd>
   </div>
 
   <div id="omniDropdown" class="omni-dropdown">
     <div class="omni-tabs">
       <button type="button" class="omni-tab active" data-filter="todos" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
-      <button type="button" class="omni-tab" data-filter="topico" onclick="setOmniFilter('topico')">Matérias (<span id="countTopicos">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="materia" onclick="setOmniFilter('materia')">Matérias (<span id="countMaterias">0</span>)</button>
       <button type="button" class="omni-tab" data-filter="livro" onclick="setOmniFilter('livro')">Livros (<span id="countLivros">0</span>)</button>
-      <button type="button" class="omni-tab" data-filter="verbete" onclick="setOmniFilter('verbete')">Glossário (<span id="countVerbetes">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="verbete" onclick="setOmniFilter('verbete')">Vocabulário (<span id="countVerbetes">0</span>)</button>
     </div>
     <div id="omniResultsBody"></div>
   </div>
 </div>
 
+    
+
+    <div class="header-util-group" id="headerUtilGroup">
 
     <!-- Barra de Acessibilidade: Ícone internacional que expande horizontalmente ao clicar -->
     <div class="acessibilidade-wrapper" id="acessibilidadeWrapper" data-acessibilidade-wrapper>
       <button type="button" class="acessibilidade-gatilho" id="btnAcessibilidadeGatilho" aria-expanded="false" aria-label="Acessibilidade" title="Acessibilidade">
-        <span class="icone-acessibilidade" aria-hidden="true"></span>
+        <span class="icone-banco icone-banco--acessibilidade icone-acessibilidade" aria-hidden="true"></span>
         <span class="acessibilidade-rotulo-hover">Acessibilidade</span>
       </button>
 
       <div class="acessibilidade-controles" id="acessibilidadeControles" aria-hidden="true">
         <!-- 1. Tema: Sol no escuro / Lua no claro -->
         <button type="button" class="botao-acess-item" data-troca-tema aria-pressed="false" title="Alternar tema claro/escuro" aria-label="Alternar tema">
-          <span class="icone-tema" data-tema-icone aria-hidden="true">☀️</span>
+          <span class="icone-banco icone-banco--tema-claro icone-tema" data-tema-icone aria-hidden="true"></span>
           <span class="acess-item-rotulo" data-tema-texto>Tema claro</span>
         </button>
 
         <!-- 2. Toggle Único de Fonte: Disléxica vs Barlow Pesada -->
         <button type="button" class="botao-acess-item" data-toggle-fonte aria-pressed="false" title="Alternar tipografia: OpenDyslexic / Barlow Pesada" aria-label="Alternar fonte">
           <span class="icone-fonte" aria-hidden="true">Aa</span>
-          <span class="acess-item-rotulo" data-fonte-texto>Fonte Pesada</span>
+          <span class="acess-item-rotulo" data-fonte-texto>Fonte Disléxica</span>
         </button>
 
         <!-- 3. Controles de Tamanho de Fonte (A- / A+) -->
@@ -440,26 +470,95 @@
     <!-- Painel de Configurações: Engrenagem industrial entre Barra de Acessibilidade e ? -->
     <details class="configuracoes" data-configuracoes>
       <summary class="configuracoes-botao" aria-label="Configurações" title="Configurações">
-        <svg class="icone-engrenagem" viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
-          <path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3 1.61.22l2.49-1c.52.39 1.06.73 1.69.98l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-        </svg>
+        <span class="icone-banco icone-banco--configuracoes icone-engrenagem" aria-hidden="true"></span>
       </summary>
       <div class="configuracoes-painel">
-        <div class="painel-secao-rotulo">CONFIGURAÇÕES</div>
+        <div class="painel-secao-rotulo">Configurações</div>
         <div class="config-icones-linha" role="toolbar" aria-label="Ações de Progresso e Dados">
-          <button type="button" class="botao-icon-config" onclick="abrirModalProgresso()" data-tooltip="Gerenciar Progresso" aria-label="Gerenciar Progresso">💾</button>
-          <button type="button" class="botao-icon-config" data-exportar-progresso data-tooltip="Baixar Backup" aria-label="Baixar Backup">⬇</button>
-          <button type="button" class="botao-icon-config" data-importar-progresso data-tooltip="Restaurar Backup" aria-label="Restaurar Backup">⬆</button>
-          <button type="button" class="botao-icon-config botao-icon-config--perigo" data-resetar-progresso data-tooltip="Limpar Progresso" aria-label="Limpar Progresso">🗑</button>
+          <button type="button" class="botao-icon-config" onclick="abrirModalProgresso()" data-tooltip="Gerenciar Progresso" aria-label="Gerenciar Progresso"><span class="icone-banco icone-banco--progresso-gerenciar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config" data-exportar-progresso data-tooltip="Exportar progresso" aria-label="Exportar progresso"><span class="icone-banco icone-banco--progresso-exportar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config" data-importar-progresso data-tooltip="Importar progresso" aria-label="Importar progresso"><span class="icone-banco icone-banco--progresso-importar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config botao-icon-config--perigo" data-resetar-progresso data-tooltip="Limpar Progresso" aria-label="Limpar Progresso"><span class="icone-banco icone-banco--progresso-limpar" aria-hidden="true"></span></button>
         </div>
         <input type="file" id="inputImportarBackup" accept=".json" style="display:none" aria-hidden="true">
       </div>
     </details>
 
-    <a href="../index.html#entenda-o-narrato" class="header-ajuda" title="Entenda o NarrATO: como funciona, Licitação e Alvará" aria-label="Entenda o NarrATO: como funciona, Licitação e Alvará">?</a>
+    <a href="../index.html#entenda" class="header-ajuda" title="Entenda" aria-label="Entenda"><span class="icone-banco icone-banco--ajuda" aria-hidden="true"></span></a>
+    </div>
   </div>
 </header>
 <div class="faixa-fita" aria-hidden="true"></div>
+<!-- 5. MODAL DE GERENCIAMENTO DE PROGRESSO & BACKUP (#modalProgressoBackdrop) -->
+<div id="modalProgressoBackdrop" class="modal-scaffold-backdrop" onclick="fecharModalProgresso(event)">
+  <div class="modal-scaffold-frame" onclick="event.stopPropagation()" style="max-width:680px;">
+    <span class="scaffold-corner corner-tl"></span>
+    <span class="scaffold-corner corner-tr"></span>
+    <span class="scaffold-corner corner-bl"></span>
+    <span class="scaffold-corner corner-br"></span>
+
+    <div class="modal-scaffold-head">
+      <div class="modal-breadcrumbs">
+        <span>Configurações</span>
+        <span>›</span>
+        <span class="crumb-active">Progresso & Cópia de Segurança</span>
+      </div>
+      <button class="modal-close-btn" onclick="fecharModalProgresso()" title="Fechar (Esc ou clique fora)"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="modal-scaffold-body" id="modalProgressoBody">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1 style="font-size:1.5rem; margin:0 0 0.3rem 0; color:var(--tinta-titulo);"><span class="icone-banco icone-banco--progresso-gerenciar icone-banco--antes" aria-hidden="true"></span>Progresso do Canteiro</h1>
+          <p style="font-size:0.88rem; color:var(--tinta-suave); margin:0;">Seus dados ficam salvos localmente neste navegador.</p>
+        </div>
+        <span id="modalProgressoStatusBadge" class="cat-pill" style="font-size:0.75rem;">SINCRONIZADO</span>
+      </div>
+
+      <div class="modal-scaffold-box">
+        <span class="modal-box-label">ESTATÍSTICAS ATUAIS 📊</span>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-top:0.5rem;">
+          <div style="background:var(--superficie-afundada); padding:0.85rem 1rem; border-radius:0; border:1px solid var(--traco-regra);">
+            <div style="font-size:0.75rem; color:var(--tinta-suave); text-transform:uppercase; font-weight:700;">Matérias Lidas</div>
+            <div id="modalProgressoMateriasCount" style="font-size:1.6rem; font-weight:800; color:var(--acento); margin-top:0.2rem;">0 / 50</div>
+          </div>
+          <div style="background:var(--superficie-afundada); padding:0.85rem 1rem; border-radius:0; border:1px solid var(--traco-regra);">
+            <div style="font-size:0.75rem; color:var(--tinta-suave); text-transform:uppercase; font-weight:700;">Capítulos Concluídos</div>
+            <div id="modalProgressoCapitulosCount" style="font-size:1.6rem; font-weight:800; color:var(--tinta-titulo); margin-top:0.2rem;">0 / 10</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-scaffold-box">
+        <span class="modal-box-label">AÇÕES DE BACKUP & SEGURANÇA ⚙️</span>
+        <p style="font-size:0.88rem; line-height:1.6; color:var(--tinta-corpo); margin:0 0 1rem 0;">
+          Exporte uma cópia em arquivo JSON para guardar seu avanço ou transferir para outro dispositivo.
+        </p>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <button type="button" class="btn-resumo" data-exportar-progresso style="padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:700;">
+            <span class="icone-banco icone-banco--progresso-exportar icone-banco--antes" aria-hidden="true"></span>Exportar progresso
+          </button>
+          <button type="button" class="btn-resumo" data-importar-progresso style="padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:700; background:none; border:1px solid var(--traco-forte); color:var(--tinta-corpo);">
+            <span class="icone-banco icone-banco--progresso-importar icone-banco--antes" aria-hidden="true"></span>Importar progresso
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-scaffold-box" style="border-left: 3px solid var(--cor-tijolo-700);">
+        <span class="modal-box-label" style="color:var(--cor-tijolo-700);">ZONA DE RISCO ⚠️</span>
+        <p style="font-size:0.85rem; line-height:1.6; color:var(--tinta-suave); margin:0 0 0.75rem 0;">
+          Deseja zerar todo o histórico de leituras e capítulos concluídos? Esta ação não pode ser desfeita.
+        </p>
+        <div>
+          <button type="button" class="btn-resumo" data-resetar-progresso style="background:none; border:1px solid var(--cor-tijolo-700); color:var(--cor-tijolo-700); padding:0.5rem 1rem; font-size:0.82rem; font-weight:700;">
+            <span class="icone-banco icone-banco--progresso-limpar icone-banco--antes" aria-hidden="true"></span>Limpar Todo o Progresso
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -478,12 +577,12 @@
     <!-- STEAM TOOLBAR DAS FONTES -->
     <div class="steam-bar">
       <div class="steam-filters">
-        <button class="filter-pill active" data-cat="all" onclick="filtrarFontes('all', this)">Todos (29)</button>
-        <button class="filter-pill" data-cat="basilar" onclick="filtrarFontes('basilar', this)">Pedras Basilares (4)</button>
+        <button class="filter-pill active" data-cat="all" onclick="filtrarFontes('all', this)">Todos (33)</button>
+        <button class="filter-pill" data-cat="basilar" onclick="filtrarFontes('basilar', this)"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Pedras Basilares (4)</button>
         <button class="filter-pill" data-cat="caderno" onclick="filtrarFontes('caderno', this)">Caderno (24)</button>
-        <button class="filter-pill" data-cat="argamassa" onclick="filtrarFontes('argamassa', this)">Argamassa (1)</button>
+        <button class="filter-pill" data-cat="argamassa" onclick="filtrarFontes('argamassa', this)">Argamassa (5)</button>
       </div>
-      <div class="steam-counter" id="fontesCounter">Exibindo 29 de 29 tijolos</div>
+      <div class="steam-counter" id="fontesCounter">Exibindo 33 de 33 tijolos</div>
     </div>
 
     <!-- GRID DAS FONTES (29 LIVROS COM CAPAS E BOTÕES NÃO-QUEBRADOS) -->
@@ -502,10 +601,10 @@
         </div>
         <div class="book-foco">Forma arquetípica viva contra fórmulas mecânicas enrijecidas; o conflito em três níveis; a Ideia Governante que ancora o clímax sob máxima pressão moral.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 26 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>26 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('MCK-ST')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4jZhFVa" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('MCK-ST')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4jZhFVa" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -523,10 +622,10 @@
         </div>
         <div class="book-foco">A dramaturgia como ofício de carpintaria e marretadas conscientes na bancada; a trindade prática de ideia matriz, conflito e ação dramática no canteiro.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 32 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>32 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CMP-CR')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4m7WNwA" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CMP-CR')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4m7WNwA" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -544,10 +643,10 @@
         </div>
         <div class="book-foco">O paradigma clássico em três atos, incidentes incitantes e pontos de virada como esqueleto de sustentação do edifício cinematográfico.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 20 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>20 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('FLD-MR')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/3IprKNz" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('FLD-MR')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/3IprKNz" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -565,10 +664,10 @@
         </div>
         <div class="book-foco">Crescimento orgânico da trama que rompe esquemas geométricos mecânicos; a linha moral que vincula falha do personagem a cada batida do enredo.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 7 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>7 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('TRU-AH')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/3KVEBZc" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('TRU-AH')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/3KVEBZc" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -586,10 +685,10 @@
         </div>
         <div class="book-foco">A destruição da educação bancária; curiosidade epistemológica e a práxis libertadora que transforma a realidade concreta de cada Operari.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 2 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>2 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('FRE-PA')">Ver Ficha ↗</button>
-            <a href="https://link.amazon/B07DdyZ90" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('FRE-PA')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://link.amazon/B07DdyZ90" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -607,10 +706,10 @@
         </div>
         <div class="book-foco">A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 12 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>12 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('KNG-SE')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4rZ8b0D" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('KNG-SE')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4rZ8b0D" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -628,10 +727,10 @@
         </div>
         <div class="book-foco">O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 22 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>22 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CRB-AC')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4iWfeBB" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CRB-AC')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4iWfeBB" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -649,10 +748,10 @@
         </div>
         <div class="book-foco">O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 50 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>50 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BTH-RF')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4aNlfA2" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BTH-RF')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4aNlfA2" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -670,10 +769,10 @@
         </div>
         <div class="book-foco">Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 22 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>22 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CST-AP')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4t38Hdj" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CST-AP')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4t38Hdj" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -691,10 +790,10 @@
         </div>
         <div class="book-foco">Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 9 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>9 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SNY-SG')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/3F7bzTy" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SNY-SG')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/3F7bzTy" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -712,10 +811,10 @@
         </div>
         <div class="book-foco">Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 9 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>9 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SNY-SB')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/468B8yX" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SNY-SB')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/468B8yX" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -733,10 +832,10 @@
         </div>
         <div class="book-foco">Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 35 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>35 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('FLD-PS')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/44RFvvZ" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('FLD-PS')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/44RFvvZ" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -754,10 +853,10 @@
         </div>
         <div class="book-foco">Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 28 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>28 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('MCK-CH')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4odOYHa" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('MCK-CH')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4odOYHa" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -775,10 +874,10 @@
         </div>
         <div class="book-foco">Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 26 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>26 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('MCK-DL')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/3GPuMcZ" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('MCK-DL')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/3GPuMcZ" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -796,10 +895,10 @@
         </div>
         <div class="book-foco">Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 4 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>4 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BEL-DD')">Ver Ficha ↗</button>
-            <a href="https://link.amazon/B0c07yauk" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BEL-DD')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://link.amazon/B0c07yauk" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -817,10 +916,10 @@
         </div>
         <div class="book-foco">Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-ON')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4535rG0" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-ON')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4535rG0" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -838,10 +937,10 @@
         </div>
         <div class="book-foco">A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-CA')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/3SsoBy3" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-CA')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/3SsoBy3" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -859,10 +958,10 @@
         </div>
         <div class="book-foco">Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 25 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>25 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('TRU-AG')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/3TAicl9" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('TRU-AG')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/3TAicl9" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -880,10 +979,10 @@
         </div>
         <div class="book-foco">A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-SN')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4kG7cxA" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-SN')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4kG7cxA" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -901,10 +1000,10 @@
         </div>
         <div class="book-foco">Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 14 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>14 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('LIT-WW')">Ver Ficha ↗</button>
-            <a href="https://link.amazon/B0bJd8gQf" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('LIT-WW')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://link.amazon/B0bJd8gQf" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -922,10 +1021,10 @@
         </div>
         <div class="book-foco">Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 22 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>22 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SLB-AT')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4w6gFVN" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SLB-AT')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4w6gFVN" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -943,10 +1042,10 @@
         </div>
         <div class="book-foco">Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 50 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>50 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('LEI-FN')">Ver Ficha ↗</button>
-            <a href="https://link.amazon/B0fFW0BIn" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('LEI-FN')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://link.amazon/B0fFW0BIn" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -964,10 +1063,10 @@
         </div>
         <div class="book-foco">Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 2 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>2 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SMT-PW')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4dhesy2" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('SMT-PW')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4dhesy2" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -985,10 +1084,10 @@
         </div>
         <div class="book-foco">Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-WT')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/44K6Qjr" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-WT')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/44K6Qjr" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -1006,10 +1105,10 @@
         </div>
         <div class="book-foco">Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 2 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>2 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CHN-TM')">Ver Ficha ↗</button>
-            <a href="https://link.amazon/B0cUIhn5P" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CHN-TM')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://link.amazon/B0cUIhn5P" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -1027,10 +1126,10 @@
         </div>
         <div class="book-foco">Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-OW')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4nO2Uag" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-OW')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4nO2Uag" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -1048,10 +1147,10 @@
         </div>
         <div class="book-foco">Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-CB')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4eLxIUS" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-CB')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4eLxIUS" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -1069,10 +1168,10 @@
         </div>
         <div class="book-foco">Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-CW')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/4lVDh5G" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-CW')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/4lVDh5G" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -1090,10 +1189,94 @@
         </div>
         <div class="book-foco">Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax.</div>
         <div class="card-footer-row">
-          <span class="card-tag-count">📚 16 matérias</span>
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>16 matérias</span>
           <div class="card-btn-group">
-            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-SW')">Ver Ficha ↗</button>
-            <a href="https://amzn.to/46DCCBh" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('WEI-SW')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://amzn.to/46DCCBh" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
+          </div>
+        </div>
+      </article>
+      <article class="book-card " onclick="abrirModalFonte('BEN-AP')">
+        <div class="book-card-top">
+          <img src="../assets/images/capas/aprendizagem-baseada-em-projetos-william-bender.jpg" alt="Aprendizagem Baseada em Projetos: Educação Diferenciada para o Século XXI" class="book-cover" onerror="this.style.background='#222'">
+          <div class="book-card-info">
+            <div class="book-card-meta">
+              <span class="book-cat-badge cat-argamassa">Argamassa</span>
+              <span class="book-year">2014</span>
+            </div>
+            <div class="book-title">"Aprendizagem Baseada em Projetos: Educação Diferenciada para o Século XXI"</div>
+            <div class="book-author">William N. Bender</div>
+          </div>
+        </div>
+        <div class="book-foco">Toda a aquisição teórica converge para um artefato tangível: a construção da história do próprio Operari. Obstáculos de enredo tornam-se desafios investigados e resolvidos na prática.</div>
+        <div class="card-footer-row">
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>5 matérias</span>
+          <div class="card-btn-group">
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BEN-AP')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://www.amazon.com.br/dp/858429019X" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
+          </div>
+        </div>
+      </article>
+      <article class="book-card " onclick="abrirModalFonte('CST-UD')">
+        <div class="book-card-top">
+          <img src="../assets/images/capas/universal-design-for-learning-cast.jpg" alt="Universal Design for Learning: Theory and Practice" class="book-cover" onerror="this.style.background='#222'">
+          <div class="book-card-info">
+            <div class="book-card-meta">
+              <span class="book-cat-badge cat-argamassa">Argamassa</span>
+              <span class="book-year">2014</span>
+            </div>
+            <div class="book-title">"Universal Design for Learning: Theory and Practice"</div>
+            <div class="book-author">Anne Meyer, David H. Rose, David Gordon (CAST)</div>
+          </div>
+        </div>
+        <div class="book-foco">Acessibilidade cognitiva e desenho universal: múltiplos meios de engajamento, múltiplos meios de representação e múltiplos meios de ação/expressão para acolher a neurodiversidade.</div>
+        <div class="card-footer-row">
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>6 matérias</span>
+          <div class="card-btn-group">
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('CST-UD')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://www.amazon.com.br/dp/0989867702" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
+          </div>
+        </div>
+      </article>
+      <article class="book-card " onclick="abrirModalFonte('BRW-FC')">
+        <div class="book-card-top">
+          <img src="../assets/images/capas/fixe-o-conhecimento-peter-brown.jpg" alt="Fixe o Conhecimento: A Ciência da Aprendizagem Bem-Sucedida" class="book-cover" onerror="this.style.background='#222'">
+          <div class="book-card-info">
+            <div class="book-card-meta">
+              <span class="book-cat-badge cat-argamassa">Argamassa</span>
+              <span class="book-year">2014</span>
+            </div>
+            <div class="book-title">"Fixe o Conhecimento: A Ciência da Aprendizagem Bem-Sucedida"</div>
+            <div class="book-author">Peter C. Brown, Henry L. Roediger III, Mark A. McDaniel</div>
+          </div>
+        </div>
+        <div class="book-foco">Ciência cognitiva aplicada: esforço desejável, prática espaçada, intercalação e recuperação ativa como chaves da retenção de longa duração e domínio profundo.</div>
+        <div class="card-footer-row">
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>5 matérias</span>
+          <div class="card-btn-group">
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BRW-FC')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://www.amazon.com.br/dp/8550802774" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
+          </div>
+        </div>
+      </article>
+      <article class="book-card " onclick="abrirModalFonte('BAC-MA')">
+        <div class="book-card-top">
+          <img src="../assets/images/capas/metodologias-ativas-bacich-moran.jpg" alt="Metodologias Ativas para uma Educação Inovadora: Uma Abordagem Teórico-Prática" class="book-cover" onerror="this.style.background='#222'">
+          <div class="book-card-info">
+            <div class="book-card-meta">
+              <span class="book-cat-badge cat-argamassa">Argamassa</span>
+              <span class="book-year">2018</span>
+            </div>
+            <div class="book-title">"Metodologias Ativas para uma Educação Inovadora: Uma Abordagem Teórico-Prática"</div>
+            <div class="book-author">Lilian Bacich & José Moran</div>
+          </div>
+        </div>
+        <div class="book-foco">Sala de aula invertida e protagonismo discente: o conteúdo base é absorvido no ritmo autônomo do Operari; o Laboratório é dedicado a pitchings, rodadas de feedback e curadoria dialética.</div>
+        <div class="card-footer-row">
+          <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>6 matérias</span>
+          <div class="card-btn-group">
+            <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('BAC-MA')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+            <a href="https://www.amazon.com.br/dp/8584291153" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
           </div>
         </div>
       </article>
@@ -1104,7 +1287,7 @@
   <!-- MODAL DE DETALHES DA FONTE / LIVRO -->
   <div id="detailOverlay" class="detail-overlay" onclick="fecharModal(event)">
     <div class="detail-modal" style="max-width: 820px;" onclick="event.stopPropagation()">
-      <button class="close-modal-btn" onclick="fecharModal()" title="Fechar (Esc)">✕</button>
+      <button class="close-modal-btn" onclick="fecharModal()" title="Fechar (Esc)"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
       <div id="modalContent"></div>
     </div>
   </div>
@@ -1129,7 +1312,7 @@
 
       <!-- Bloco dos Financiadores Públicos -->
       <div class="fomento-block fomento-financiamento">
-        <span class="fomento-sublabel">FINANCIADA POR</span>
+        <span class="fomento-sublabel">V. 1.0. FINANCIADA POR</span>
         <div class="fomento-seals-grid">
           <span class="fomento-seal-item" data-tooltip="PNAB • Política Nacional Aldir Blanc">
             <img src="../assets/svg/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal">
@@ -1158,9 +1341,9 @@
 
   <!-- BANCO DE DADOS CLIENT-SIDE DAS FONTES -->
   <script>
-    window.FONTES_DB = [{"id": "MCK-ST", "slug": "story-robert-mckee", "autor": "Robert McKee", "obra": "Story: Substância, Estrutura, Estilo e os Princípios da Escrita de Roteiro", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1997, "link": "https://amzn.to/4jZhFVa", "foco": "Forma arquetípica viva contra fórmulas mecânicas enrijecidas; o conflito em três níveis; a Ideia Governante que ancora o clímax sob máxima pressão moral.", "topicos": ["T01", "T02", "T03", "T05", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T14", "T15", "T17", "T18", "T19", "T22", "T23", "T31", "T32", "T33", "T35", "T41", "T47", "T48", "T50"], "citacoesQtd": 52, "capa": "assets/images/capas/story-robert-mckee.jpg", "amazon_url": "https://amzn.to/4jZhFVa"}, {"id": "CMP-CR", "slug": "da-criacao-ao-roteiro-doc-comparato", "autor": "Doc Comparato", "obra": "Da Criação ao Roteiro", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1983, "link": "https://amzn.to/4m7WNwA", "foco": "A dramaturgia como ofício de carpintaria e marretadas conscientes na bancada; a trindade prática de ideia matriz, conflito e ação dramática no canteiro.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T11", "T14", "T19", "T21", "T22", "T23", "T24", "T25", "T26", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T37", "T39", "T41", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 64, "capa": "assets/images/capas/da-criacao-ao-roteiro-doc-comparato.jpg", "amazon_url": "https://amzn.to/4m7WNwA"}, {"id": "FLD-MR", "slug": "manual-do-roteiro-syd-field", "autor": "Syd Field", "obra": "Manual do Roteiro / Screenplay", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1979, "link": "https://amzn.to/3IprKNz", "foco": "O paradigma clássico em três atos, incidentes incitantes e pontos de virada como esqueleto de sustentação do edifício cinematográfico.", "topicos": ["T01", "T02", "T08", "T14", "T16", "T17", "T18", "T19", "T20", "T24", "T35", "T38", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T49"], "citacoesQtd": 40, "capa": "assets/images/capas/manual-do-roteiro-syd-field.jpg", "amazon_url": "https://amzn.to/3IprKNz"}, {"id": "TRU-AH", "slug": "anatomia-da-historia-john-truby", "autor": "John Truby", "obra": "Anatomia da História: 22 Passos Para se Tornar um Mestre", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 2007, "link": "https://amzn.to/3KVEBZc", "foco": "Crescimento orgânico da trama que rompe esquemas geométricos mecânicos; a linha moral que vincula falha do personagem a cada batida do enredo.", "topicos": ["T02", "T03", "T04", "T11", "T12", "T13", "T21"], "citacoesQtd": 14, "capa": "assets/images/capas/anatomia-da-historia-john-truby.jpg", "amazon_url": "https://amzn.to/3KVEBZc"}, {"id": "FRE-PA", "slug": "pedagogia-da-autonomia-paulo-freire", "autor": "Paulo Freire", "obra": "Pedagogia da Autonomia: Saberes Necessários à Prática Educativa", "categoria": "ppp", "catNome": "Argamassa", "ano": 1996, "link": "https://link.amazon/B07DdyZ90", "foco": "A destruição da educação bancária; curiosidade epistemológica e a práxis libertadora que transforma a realidade concreta de cada Operari.", "topicos": ["T48", "T50"], "citacoesQtd": 4, "capa": "assets/images/capas/pedagogia-da-autonomia-paulo-freire.jpg", "amazon_url": "https://link.amazon/B07DdyZ90"}, {"id": "KNG-SE", "slug": "sobre-a-escrita-stephen-king", "autor": "Stephen King", "obra": "Sobre a Escrita: A Arte em Memórias", "categoria": "roteiro", "catNome": "Caderno", "ano": 2000, "link": "https://amzn.to/4rZ8b0D", "foco": "A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto.", "topicos": ["T13", "T15", "T32", "T33", "T34", "T37", "T39", "T42", "T43", "T44", "T45", "T49"], "citacoesQtd": 24, "capa": "assets/images/capas/sobre-a-escrita-stephen-king.jpg", "amazon_url": "https://amzn.to/4rZ8b0D"}, {"id": "CRB-AC", "slug": "the-art-of-character-david-corbett", "autor": "David Corbett", "obra": "The Art of Character", "categoria": "roteiro", "catNome": "Caderno", "ano": 2013, "link": "https://amzn.to/4iWfeBB", "foco": "O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio.", "topicos": ["T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 44, "capa": "assets/images/capas/the-art-of-character-david-corbett.jpg", "amazon_url": "https://amzn.to/4iWfeBB"}, {"id": "BTH-RF", "slug": "retorica-da-ficcao-wayne-booth", "autor": "Wayne C. Booth", "obra": "A Retórica da Ficção", "categoria": "roteiro", "catNome": "Caderno", "ano": 1961, "link": "https://amzn.to/4aNlfA2", "foco": "O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T22", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T36", "T37", "T38", "T39", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 100, "capa": "assets/images/capas/retorica-da-ficcao-wayne-booth.jpg", "amazon_url": "https://amzn.to/4aNlfA2"}, {"id": "CST-AP", "slug": "the-art-of-perspective-christopher-castellani", "autor": "Christopher Castellani", "obra": "The Art of Perspective: Who Tells the Story", "categoria": "roteiro", "catNome": "Caderno", "ano": 2016, "link": "https://amzn.to/4t38Hdj", "foco": "Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal.", "topicos": ["T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 44, "capa": "assets/images/capas/the-art-of-perspective-christopher-castellani.jpg", "amazon_url": "https://amzn.to/4t38Hdj"}, {"id": "SNY-SG", "slug": "salve-o-gato-blake-snyder", "autor": "Blake Snyder", "obra": "Salve o Gato! (Save the Cat!)", "categoria": "roteiro", "catNome": "Caderno", "ano": 2005, "link": "https://amzn.to/3F7bzTy", "foco": "Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial.", "topicos": ["T04", "T12", "T16", "T20", "T36", "T38", "T40", "T46", "T47"], "citacoesQtd": 18, "capa": "assets/images/capas/salve-o-gato-blake-snyder.jpg", "amazon_url": "https://amzn.to/3F7bzTy"}, {"id": "SNY-SB", "slug": "salve-o-gato-strikes-back-blake-snyder", "autor": "Blake Snyder", "obra": "Salve o Gato! Strikes Back", "categoria": "roteiro", "catNome": "Caderno", "ano": 2009, "link": "https://amzn.to/468B8yX", "foco": "Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática.", "topicos": ["T04", "T12", "T16", "T20", "T36", "T38", "T40", "T46", "T47"], "citacoesQtd": 18, "capa": "assets/images/capas/salve-o-gato-strikes-back-blake-snyder.jpg", "amazon_url": "https://amzn.to/468B8yX"}, {"id": "FLD-PS", "slug": "screenwriters-problem-solver-syd-field", "autor": "Syd Field", "obra": "The Screenwriter's Problem Solver", "categoria": "roteiro", "catNome": "Caderno", "ano": 1998, "link": "https://amzn.to/44RFvvZ", "foco": "Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados.", "topicos": ["T01", "T02", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T35", "T38", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T49"], "citacoesQtd": 70, "capa": "assets/images/capas/screenwriters-problem-solver-syd-field.jpg", "amazon_url": "https://amzn.to/44RFvvZ"}, {"id": "MCK-CH", "slug": "character-robert-mckee", "autor": "Robert McKee", "obra": "Character: The Art of Role and Cast Design", "categoria": "roteiro", "catNome": "Caderno", "ano": 2020, "link": "https://amzn.to/4odOYHa", "foco": "Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica.", "topicos": ["T01", "T02", "T03", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T17", "T18", "T19", "T22", "T23", "T27", "T31", "T32", "T33", "T35", "T41", "T47", "T48", "T50"], "citacoesQtd": 56, "capa": "assets/images/capas/character-robert-mckee.jpg", "amazon_url": "https://amzn.to/4odOYHa"}, {"id": "MCK-DL", "slug": "dialogo-robert-mckee", "autor": "Robert McKee", "obra": "Diálogo: A Arte da Ação Verbal", "categoria": "roteiro", "catNome": "Caderno", "ano": 2016, "link": "https://amzn.to/3GPuMcZ", "foco": "Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas.", "topicos": ["T01", "T02", "T03", "T05", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T14", "T15", "T17", "T18", "T19", "T22", "T23", "T31", "T32", "T33", "T35", "T41", "T47", "T48", "T50"], "citacoesQtd": 52, "capa": "assets/images/capas/dialogo-robert-mckee.jpg", "amazon_url": "https://amzn.to/3GPuMcZ"}, {"id": "BEL-DD", "slug": "how-to-write-dazzling-dialogue-james-scott-bell", "autor": "James Scott Bell", "obra": "How to Write Dazzling Dialogue", "categoria": "roteiro", "catNome": "Caderno", "ano": 2014, "link": "https://link.amazon/B0c07yauk", "foco": "Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.", "topicos": ["T31", "T32", "T33", "T34"], "citacoesQtd": 8, "capa": "assets/images/capas/how-to-write-dazzling-dialogue-james-scott-bell.jpg", "amazon_url": "https://link.amazon/B0c07yauk"}, {"id": "WEI-ON", "slug": "outlining-your-novel-km-weiland", "autor": "K. M. Weiland", "obra": "Outlining Your Novel", "categoria": "roteiro", "catNome": "Caderno", "ano": 2011, "link": "https://amzn.to/4535rG0", "foco": "Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/outlining-your-novel-km-weiland.jpg", "amazon_url": "https://amzn.to/4535rG0"}, {"id": "WEI-CA", "slug": "creating-character-arcs-km-weiland", "autor": "K. M. Weiland", "obra": "Creating Character Arcs", "categoria": "roteiro", "catNome": "Caderno", "ano": 2016, "link": "https://amzn.to/3SsoBy3", "foco": "A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/creating-character-arcs-km-weiland.jpg", "amazon_url": "https://amzn.to/3SsoBy3"}, {"id": "TRU-AG", "slug": "the-anatomy-of-genres-john-truby", "autor": "John Truby", "obra": "The Anatomy of Genres", "categoria": "roteiro", "catNome": "Caderno", "ano": 2022, "link": "https://amzn.to/3TAicl9", "foco": "Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra.", "topicos": ["T02", "T03", "T04", "T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 50, "capa": "assets/images/capas/the-anatomy-of-genres-john-truby.jpg", "amazon_url": "https://amzn.to/3TAicl9"}, {"id": "WEI-SN", "slug": "structuring-your-novel-km-weiland", "autor": "K. M. Weiland", "obra": "Structuring Your Novel", "categoria": "roteiro", "catNome": "Caderno", "ano": 2013, "link": "https://amzn.to/4kG7cxA", "foco": "A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/structuring-your-novel-km-weiland.jpg", "amazon_url": "https://amzn.to/4kG7cxA"}, {"id": "LIT-WW", "slug": "write-worlds-stant-litore", "autor": "Stant Litore", "obra": "Write Worlds Your Readers Won't Forget", "categoria": "roteiro", "catNome": "Caderno", "ano": 2017, "link": "https://link.amazon/B0bJd8gQf", "foco": "Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista.", "topicos": ["T09", "T10", "T21", "T22", "T25", "T31", "T32", "T33", "T34", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 28, "capa": "assets/images/capas/write-worlds-stant-litore.jpg", "amazon_url": "https://link.amazon/B0bJd8gQf"}, {"id": "SLB-AT", "slug": "the-art-of-time-in-fiction-joan-silber", "autor": "Joan Silber", "obra": "The Art of Time in Fiction", "categoria": "roteiro", "catNome": "Caderno", "ano": 2009, "link": "https://amzn.to/4w6gFVN", "foco": "Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor.", "topicos": ["T06", "T07", "T08", "T10", "T11", "T12", "T13", "T15", "T21", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T41", "T42", "T43", "T44", "T45"], "citacoesQtd": 44, "capa": "assets/images/capas/the-art-of-time-in-fiction-joan-silber.jpg", "amazon_url": "https://amzn.to/4w6gFVN"}, {"id": "LEI-FN", "slug": "o-foco-narrativo-ligia-chiappini", "autor": "Ligia Chiappini Moraes Leite", "obra": "O Foco Narrativo", "categoria": "roteiro", "catNome": "Caderno", "ano": 1985, "link": "https://link.amazon/B0fFW0BIn", "foco": "Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa.", "topicos": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21", "T22", "T23", "T24", "T25", "T26", "T27", "T28", "T29", "T30", "T31", "T32", "T33", "T34", "T35", "T36", "T37", "T38", "T39", "T40", "T41", "T42", "T43", "T44", "T45", "T46", "T47", "T48", "T49", "T50"], "citacoesQtd": 100, "capa": "assets/images/capas/o-foco-narrativo-ligia-chiappini.jpg", "amazon_url": "https://link.amazon/B0fFW0BIn"}, {"id": "SMT-PW", "slug": "psychology-workbook-for-writers-darian-smith", "autor": "Darian Smith", "obra": "Psychology Workbook for Writers", "categoria": "roteiro", "catNome": "Caderno", "ano": 2015, "link": "https://amzn.to/4dhesy2", "foco": "Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas.", "topicos": ["T09", "T10"], "citacoesQtd": 4, "capa": "assets/images/capas/psychology-workbook-for-writers-darian-smith.jpg", "amazon_url": "https://amzn.to/4dhesy2"}, {"id": "WEI-WT", "slug": "writing-your-storys-theme-km-weiland", "autor": "K. M. Weiland", "obra": "Writing Your Story's Theme", "categoria": "roteiro", "catNome": "Caderno", "ano": 2020, "link": "https://amzn.to/44K6Qjr", "foco": "Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/writing-your-storys-theme-km-weiland.jpg", "amazon_url": "https://amzn.to/44K6Qjr"}, {"id": "CHN-TM", "slug": "transparent-minds-dorrit-cohn", "autor": "Dorrit Claire Cohn", "obra": "Transparent Minds", "categoria": "roteiro", "catNome": "Caderno", "ano": 1978, "link": "https://link.amazon/B0cUIhn5P", "foco": "Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese.", "topicos": ["T27", "T29"], "citacoesQtd": 4, "capa": "assets/images/capas/transparent-minds-dorrit-cohn.jpg", "amazon_url": "https://link.amazon/B0cUIhn5P"}, {"id": "WEI-OW", "slug": "outlining-your-novel-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Outlining Your Novel Workbook", "categoria": "roteiro", "catNome": "Caderno", "ano": 2014, "link": "https://amzn.to/4nO2Uag", "foco": "Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/outlining-your-novel-workbook-km-weiland.jpg", "amazon_url": "https://amzn.to/4nO2Uag"}, {"id": "WEI-CB", "slug": "conquering-writers-block-km-weiland", "autor": "K. M. Weiland", "obra": "Conquering Writer's Block and Summoning Inspiration", "categoria": "roteiro", "catNome": "Caderno", "ano": 2018, "link": "https://amzn.to/4eLxIUS", "foco": "Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/conquering-writers-block-km-weiland.jpg", "amazon_url": "https://amzn.to/4eLxIUS"}, {"id": "WEI-CW", "slug": "creating-character-arcs-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Creating Character Arcs Workbook", "categoria": "roteiro", "catNome": "Caderno", "ano": 2017, "link": "https://amzn.to/4lVDh5G", "foco": "Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/creating-character-arcs-workbook-km-weiland.jpg", "amazon_url": "https://amzn.to/4lVDh5G"}, {"id": "WEI-SW", "slug": "structuring-your-novel-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Structuring Your Novel Workbook", "categoria": "roteiro", "catNome": "Caderno", "ano": 2014, "link": "https://amzn.to/46DCCBh", "foco": "Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax.", "topicos": ["T06", "T07", "T09", "T11", "T15", "T16", "T17", "T18", "T20", "T36", "T37", "T38", "T39", "T40", "T42", "T43"], "citacoesQtd": 32, "capa": "assets/images/capas/structuring-your-novel-workbook-km-weiland.jpg", "amazon_url": "https://amzn.to/46DCCBh"}];
-    window.TOPICOS_SLUGS = {"T01": "t01-forma-vs-formula", "T02": "t02-trindade-indissociavel", "T03": "t03-conflito-como-motor", "T04": "t04-pre-moldado-vs-organico", "T05": "t05-substancia-estilo-e-tatica", "T06": "t06-caracterizacao-vs-carater", "T07": "t07-desejo-vs-prioridade", "T08": "t08-acao-e-personagem", "T09": "t09-fios-desencapados", "T10": "t10-aterramento", "T11": "t11-tema-vs-assunto", "T12": "t12-genero-e-tom", "T13": "t13-natureza-do-genero", "T14": "t14-ideia-governante-vs-argumento-moral", "T15": "t15-guerra-de-crencas", "T16": "t16-estrutura-do-enredo", "T17": "t17-causa-e-efeito", "T18": "t18-tres-atos-industriais", "T19": "t19-trenas-e-tramas", "T20": "t20-entre-a-prancheta-e-a-picareta", "T21": "t21-topografia-narrativa", "T22": "t22-tempo-dramatico", "T23": "t23-geografia-civilizatoria", "T24": "t24-cronogramas-e-outras-gramas", "T25": "t25-niveis-espiralados", "T26": "t26-pontos-de-vista", "T27": "t27-entre-agencia-e-urgencia", "T28": "t28-voos-em-vaos", "T29": "t29-voz-ativa", "T30": "t30-fina-fachada-espelhada", "T31": "t31-acao-verbal", "T32": "t32-nenhum-outdoor-e-transparente", "T33": "t33-rubricas-e-incisos", "T34": "t34-sinfonia-das-britadeiras", "T35": "t35-betoneira-engessada-e-outros-vicios-de-dialogo", "T36": "t36-obras-diferentes-demandam-ferramentas-diferentes", "T37": "t37-tripe-da-regua-de-nivel", "T38": "t38-sem-mapa-nao-ha-recalculo-de-rota", "T39": "t39-prancheta-tablet-ou-quadro-camurca", "T40": "t40-canteiro-cercado-ou-mutirao", "T41": "t41-so-se-esculpe-tendo-algo-concreto", "T42": "t42-distanciamento", "T43": "t43-use-a-motosserra-sem-se-machucar", "T44": "t44-retrofit-narrativo", "T45": "t45-engenheiro-de-obra-pronta-aponta-voce-decide-o-reparo", "T46": "t46-canteiro-colaborativo", "T47": "t47-pa-de-prata", "T48": "t48-martelinho-de-ouro", "T49": "t49-chave-de-diamante", "T50": "t50-alvara-narrato-certificacao-em-engenharia-narratologica"};
-    window.LIVROS_CONEXOES = {"MCK-ST": {"descricao_oficial": "Considerado a bíblia mundial dos roteiristas e contadores de histórias, Story investiga a substância interior da dramaturgia, rejeitando fórmulas mecânicas e maniqueísmos em favor de formas arquetípicas vivas e universais. McKee disseca os três níveis de conflito, a orquestração do elenco e a Ideia Governante que ancora o clímax sob máxima pressão moral.", "posicionamento": "No Canteiro do NarrATO, McKee fornece a viga mestra da forma viva contra a fórmula morta. É a nossa bússola para garantir que o enredo sirva à verdade moral do personagem, e não a truques baratos de mercado.", "consensos": [{"id": "CMP-CR", "obra": "Da Criação ao Roteiro", "autor": "Doc Comparato"}, {"id": "TRU-AH", "obra": "Anatomia da História", "autor": "John Truby"}, {"id": "FLD-MR", "obra": "Manual do Roteiro", "autor": "Syd Field"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato! (Estrutura mecânica em minutos)", "autor": "Blake Snyder"}], "tags": ["#forma-vs-formula", "#conflito-tres-niveis", "#ideia-governante", "#arquetipo", "#climax", "#subtexto"]}, "CMP-CR": {"descricao_oficial": "Clássico brasileiro definitivo sobre a carpintaria do roteiro audiovisual e transmidiático. Doc Comparato aborda a criação não como iluminação mística, mas como ofício braçal de marretadas conscientes na bancada, detalhando a trindade da ideia matriz, do conflito e da ação dramática.", "posicionamento": "Comparato é o nosso mestre de obras brasileiro. Traz para o canteiro o rigor artesanal da feitura, a visão pé-no-chão e o pragmatismo de quem sabe que texto é alvenaria que precisa suportar a prova de carga.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}, {"id": "FLD-MR", "obra": "Manual do Roteiro", "autor": "Syd Field"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#ideia-matriz", "#acao-dramatica", "#conflito", "#carpintaria", "#cena"]}, "FLD-MR": {"descricao_oficial": "A pedra fundamental da teoria do roteiro moderno. Syd Field sistematizou o paradigma clássico em três atos, estabelecendo os conceitos fundamentais de incidente incitante, pontos de virada (plot points) e o nó dramático que sustenta o meio da narrativa.", "posicionamento": "Field é a régua de alinhamento estrutural do NarrATO. Seu paradigma é utilizado como andaime provisório para garantir o compasso da narrativa, sem torná-lo uma camisa de força.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}, {"id": "CMP-CR", "obra": "Da Criação ao Roteiro", "autor": "Doc Comparato"}], "dissensos": [{"id": "TRU-AH", "obra": "Anatomia da História (Crítica aos 3 atos)", "autor": "John Truby"}], "tags": ["#paradigma-tres-atos", "#ponto-de-virada", "#incidente-incitante", "#midpoint"]}, "TRU-AH": {"descricao_oficial": "Truby revoluciona a dramaturgia ao propor uma abordagem orgânica e biológica, rejeitando a geometria mecânica dos 3 atos. Seus 22 passos se fundam inteiramente na cura da fraqueza moral e psicológica do protagonista, orquestrada por uma rede viva de personagens.", "posicionamento": "No NarrATO, Truby representa a biologia narrativa. Ele nos ensina que o enredo não é uma pista de obstáculos externa, mas o espelho sismográfico da alma fraturada do personagem.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "FLD-MR", "obra": "Manual do Roteiro (Estrutura mecânica)", "autor": "Syd Field"}, {"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#abordagem-organica", "#fraqueza-moral", "#rede-personagens", "#auto-revelacao"]}, "FRE-PA": {"descricao_oficial": "A destruição da educação bancária; curiosidade epistemológica e a práxis libertadora que transforma a realidade concreta de cada Operari. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Argamassa.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "KNG-SE": {"descricao_oficial": "A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "CRB-AC": {"descricao_oficial": "O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "BTH-RF": {"descricao_oficial": "O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "CST-AP": {"descricao_oficial": "Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SNY-SG": {"descricao_oficial": "Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "TRU-AH", "obra": "Anatomia da História", "autor": "John Truby"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SNY-SB": {"descricao_oficial": "Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "FLD-PS": {"descricao_oficial": "Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "MCK-CH": {"descricao_oficial": "Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "MCK-DL": {"descricao_oficial": "Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "BEL-DD": {"descricao_oficial": "Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-ON": {"descricao_oficial": "Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-CA": {"descricao_oficial": "A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "TRU-AG": {"descricao_oficial": "Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-SN": {"descricao_oficial": "A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "LIT-WW": {"descricao_oficial": "Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SLB-AT": {"descricao_oficial": "Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "LEI-FN": {"descricao_oficial": "Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SMT-PW": {"descricao_oficial": "Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-WT": {"descricao_oficial": "Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "CHN-TM": {"descricao_oficial": "Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-OW": {"descricao_oficial": "Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-CB": {"descricao_oficial": "Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-CW": {"descricao_oficial": "Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-SW": {"descricao_oficial": "Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}};
+    window.FONTES_DB = [{"id": "MCK-ST", "slug": "story-robert-mckee", "autor": "Robert McKee", "obra": "Story: Substância, Estrutura, Estilo e os Princípios da Escrita de Roteiro", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1997, "link": "https://amzn.to/4jZhFVa", "foco": "Forma arquetípica viva contra fórmulas mecânicas enrijecidas; o conflito em três níveis; a Ideia Governante que ancora o clímax sob máxima pressão moral.", "topicos": ["M01", "M02", "M03", "M05", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M14", "M15", "M17", "M18", "M19", "M22", "M23", "M31", "M32", "M33", "M35", "M41", "M47", "M48", "M50"], "citacoesQtd": 52, "capa": "assets/images/capas/story-robert-mckee.jpg", "amazon_url": "https://amzn.to/4jZhFVa", "materias": ["M01", "M02", "M03", "M05", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M14", "M15", "M17", "M18", "M19", "M22", "M23", "M31", "M32", "M33", "M35", "M41", "M47", "M48", "M50"]}, {"id": "CMP-CR", "slug": "da-criacao-ao-roteiro-doc-comparato", "autor": "Doc Comparato", "obra": "Da Criação ao Roteiro", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1983, "link": "https://amzn.to/4m7WNwA", "foco": "A dramaturgia como ofício de carpintaria e marretadas conscientes na bancada; a trindade prática de ideia matriz, conflito e ação dramática no canteiro.", "topicos": ["M01", "M02", "M03", "M04", "M05", "M11", "M14", "M19", "M21", "M22", "M23", "M24", "M25", "M26", "M28", "M29", "M30", "M31", "M32", "M33", "M34", "M35", "M37", "M39", "M41", "M44", "M45", "M46", "M47", "M48", "M49", "M50"], "citacoesQtd": 64, "capa": "assets/images/capas/da-criacao-ao-roteiro-doc-comparato.jpg", "amazon_url": "https://amzn.to/4m7WNwA", "materias": ["M01", "M02", "M03", "M04", "M05", "M11", "M14", "M19", "M21", "M22", "M23", "M24", "M25", "M26", "M28", "M29", "M30", "M31", "M32", "M33", "M34", "M35", "M37", "M39", "M41", "M44", "M45", "M46", "M47", "M48", "M49", "M50"]}, {"id": "FLD-MR", "slug": "manual-do-roteiro-syd-field", "autor": "Syd Field", "obra": "Manual do Roteiro / Screenplay", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 1979, "link": "https://amzn.to/3IprKNz", "foco": "O paradigma clássico em três atos, incidentes incitantes e pontos de virada como esqueleto de sustentação do edifício cinematográfico.", "topicos": ["M01", "M02", "M08", "M14", "M16", "M17", "M18", "M19", "M20", "M24", "M35", "M38", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M49"], "citacoesQtd": 40, "capa": "assets/images/capas/manual-do-roteiro-syd-field.jpg", "amazon_url": "https://amzn.to/3IprKNz", "materias": ["M01", "M02", "M08", "M14", "M16", "M17", "M18", "M19", "M20", "M24", "M35", "M38", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M49"]}, {"id": "TRU-AH", "slug": "anatomia-da-historia-john-truby", "autor": "John Truby", "obra": "Anatomia da História: 22 Passos Para se Tornar um Mestre", "categoria": "basilar", "catNome": "Pedra Basilar", "ano": 2007, "link": "https://amzn.to/3KVEBZc", "foco": "Crescimento orgânico da trama que rompe esquemas geométricos mecânicos; a linha moral que vincula falha do personagem a cada batida do enredo.", "topicos": ["M02", "M03", "M04", "M11", "M12", "M13", "M21"], "citacoesQtd": 14, "capa": "assets/images/capas/anatomia-da-historia-john-truby.jpg", "amazon_url": "https://amzn.to/3KVEBZc", "materias": ["M02", "M03", "M04", "M11", "M12", "M13", "M21"]}, {"id": "FRE-PA", "slug": "pedagogia-da-autonomia-paulo-freire", "autor": "Paulo Freire", "obra": "Pedagogia da Autonomia: Saberes Necessários à Prática Educativa", "categoria": "ppp", "catNome": "Argamassa", "ano": 1996, "link": "https://link.amazon/B07DdyZ90", "foco": "A destruição da educação bancária; curiosidade epistemológica e a práxis libertadora que transforma a realidade concreta de cada Operari.", "topicos": ["M48", "M50"], "citacoesQtd": 4, "capa": "assets/images/capas/pedagogia-da-autonomia-paulo-freire.jpg", "amazon_url": "https://link.amazon/B07DdyZ90", "materias": ["M48", "M50"]}, {"id": "KNG-SE", "slug": "sobre-a-escrita-stephen-king", "autor": "Stephen King", "obra": "Sobre a Escrita: A Arte em Memórias", "categoria": "roteiro", "catNome": "Caderno", "ano": 2000, "link": "https://amzn.to/4rZ8b0D", "foco": "A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto.", "topicos": ["M13", "M15", "M32", "M33", "M34", "M37", "M39", "M42", "M43", "M44", "M45", "M49"], "citacoesQtd": 24, "capa": "assets/images/capas/sobre-a-escrita-stephen-king.jpg", "amazon_url": "https://amzn.to/4rZ8b0D", "materias": ["M13", "M15", "M32", "M33", "M34", "M37", "M39", "M42", "M43", "M44", "M45", "M49"]}, {"id": "CRB-AC", "slug": "the-art-of-character-david-corbett", "autor": "David Corbett", "obra": "The Art of Character", "categoria": "roteiro", "catNome": "Caderno", "ano": 2013, "link": "https://amzn.to/4iWfeBB", "foco": "O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio.", "topicos": ["M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"], "citacoesQtd": 44, "capa": "assets/images/capas/the-art-of-character-david-corbett.jpg", "amazon_url": "https://amzn.to/4iWfeBB", "materias": ["M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"]}, {"id": "BTH-RF", "slug": "retorica-da-ficcao-wayne-booth", "autor": "Wayne C. Booth", "obra": "A Retórica da Ficção", "categoria": "roteiro", "catNome": "Caderno", "ano": 1961, "link": "https://amzn.to/4aNlfA2", "foco": "O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia.", "topicos": ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M16", "M17", "M18", "M19", "M20", "M21", "M22", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M31", "M32", "M33", "M34", "M35", "M36", "M37", "M38", "M39", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M47", "M48", "M49", "M50"], "citacoesQtd": 100, "capa": "assets/images/capas/retorica-da-ficcao-wayne-booth.jpg", "amazon_url": "https://amzn.to/4aNlfA2", "materias": ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M16", "M17", "M18", "M19", "M20", "M21", "M22", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M31", "M32", "M33", "M34", "M35", "M36", "M37", "M38", "M39", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M47", "M48", "M49", "M50"]}, {"id": "CST-AP", "slug": "the-art-of-perspective-christopher-castellani", "autor": "Christopher Castellani", "obra": "The Art of Perspective: Who Tells the Story", "categoria": "roteiro", "catNome": "Caderno", "ano": 2016, "link": "https://amzn.to/4t38Hdj", "foco": "Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal.", "topicos": ["M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"], "citacoesQtd": 44, "capa": "assets/images/capas/the-art-of-perspective-christopher-castellani.jpg", "amazon_url": "https://amzn.to/4t38Hdj", "materias": ["M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"]}, {"id": "SNY-SG", "slug": "salve-o-gato-blake-snyder", "autor": "Blake Snyder", "obra": "Salve o Gato! (Save the Cat!)", "categoria": "roteiro", "catNome": "Caderno", "ano": 2005, "link": "https://amzn.to/3F7bzTy", "foco": "Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial.", "topicos": ["M04", "M12", "M16", "M20", "M36", "M38", "M40", "M46", "M47"], "citacoesQtd": 18, "capa": "assets/images/capas/salve-o-gato-blake-snyder.jpg", "amazon_url": "https://amzn.to/3F7bzTy", "materias": ["M04", "M12", "M16", "M20", "M36", "M38", "M40", "M46", "M47"]}, {"id": "SNY-SB", "slug": "salve-o-gato-strikes-back-blake-snyder", "autor": "Blake Snyder", "obra": "Salve o Gato! Strikes Back", "categoria": "roteiro", "catNome": "Caderno", "ano": 2009, "link": "https://amzn.to/468B8yX", "foco": "Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática.", "topicos": ["M04", "M12", "M16", "M20", "M36", "M38", "M40", "M46", "M47"], "citacoesQtd": 18, "capa": "assets/images/capas/salve-o-gato-strikes-back-blake-snyder.jpg", "amazon_url": "https://amzn.to/468B8yX", "materias": ["M04", "M12", "M16", "M20", "M36", "M38", "M40", "M46", "M47"]}, {"id": "FLD-PS", "slug": "screenwriters-problem-solver-syd-field", "autor": "Syd Field", "obra": "The Screenwriter's Problem Solver", "categoria": "roteiro", "catNome": "Caderno", "ano": 1998, "link": "https://amzn.to/44RFvvZ", "foco": "Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados.", "topicos": ["M01", "M02", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M14", "M15", "M16", "M17", "M18", "M19", "M20", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M35", "M38", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M49"], "citacoesQtd": 70, "capa": "assets/images/capas/screenwriters-problem-solver-syd-field.jpg", "amazon_url": "https://amzn.to/44RFvvZ", "materias": ["M01", "M02", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M14", "M15", "M16", "M17", "M18", "M19", "M20", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M35", "M38", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M49"]}, {"id": "MCK-CH", "slug": "character-robert-mckee", "autor": "Robert McKee", "obra": "Character: The Art of Role and Cast Design", "categoria": "roteiro", "catNome": "Caderno", "ano": 2020, "link": "https://amzn.to/4odOYHa", "foco": "Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica.", "topicos": ["M01", "M02", "M03", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M17", "M18", "M19", "M22", "M23", "M27", "M31", "M32", "M33", "M35", "M41", "M47", "M48", "M50"], "citacoesQtd": 56, "capa": "assets/images/capas/character-robert-mckee.jpg", "amazon_url": "https://amzn.to/4odOYHa", "materias": ["M01", "M02", "M03", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M17", "M18", "M19", "M22", "M23", "M27", "M31", "M32", "M33", "M35", "M41", "M47", "M48", "M50"]}, {"id": "MCK-DL", "slug": "dialogo-robert-mckee", "autor": "Robert McKee", "obra": "Diálogo: A Arte da Ação Verbal", "categoria": "roteiro", "catNome": "Caderno", "ano": 2016, "link": "https://amzn.to/3GPuMcZ", "foco": "Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas.", "topicos": ["M01", "M02", "M03", "M05", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M14", "M15", "M17", "M18", "M19", "M22", "M23", "M31", "M32", "M33", "M35", "M41", "M47", "M48", "M50"], "citacoesQtd": 52, "capa": "assets/images/capas/dialogo-robert-mckee.jpg", "amazon_url": "https://amzn.to/3GPuMcZ", "materias": ["M01", "M02", "M03", "M05", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M14", "M15", "M17", "M18", "M19", "M22", "M23", "M31", "M32", "M33", "M35", "M41", "M47", "M48", "M50"]}, {"id": "BEL-DD", "slug": "how-to-write-dazzling-dialogue-james-scott-bell", "autor": "James Scott Bell", "obra": "How to Write Dazzling Dialogue", "categoria": "roteiro", "catNome": "Caderno", "ano": 2014, "link": "https://link.amazon/B0c07yauk", "foco": "Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva.", "topicos": ["M31", "M32", "M33", "M34"], "citacoesQtd": 8, "capa": "assets/images/capas/how-to-write-dazzling-dialogue-james-scott-bell.jpg", "amazon_url": "https://link.amazon/B0c07yauk", "materias": ["M31", "M32", "M33", "M34"]}, {"id": "WEI-ON", "slug": "outlining-your-novel-km-weiland", "autor": "K. M. Weiland", "obra": "Outlining Your Novel", "categoria": "roteiro", "catNome": "Caderno", "ano": 2011, "link": "https://amzn.to/4535rG0", "foco": "Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/outlining-your-novel-km-weiland.jpg", "amazon_url": "https://amzn.to/4535rG0", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "WEI-CA", "slug": "creating-character-arcs-km-weiland", "autor": "K. M. Weiland", "obra": "Creating Character Arcs", "categoria": "roteiro", "catNome": "Caderno", "ano": 2016, "link": "https://amzn.to/3SsoBy3", "foco": "A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/creating-character-arcs-km-weiland.jpg", "amazon_url": "https://amzn.to/3SsoBy3", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "TRU-AG", "slug": "the-anatomy-of-genres-john-truby", "autor": "John Truby", "obra": "The Anatomy of Genres", "categoria": "roteiro", "catNome": "Caderno", "ano": 2022, "link": "https://amzn.to/3TAicl9", "foco": "Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra.", "topicos": ["M02", "M03", "M04", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"], "citacoesQtd": 50, "capa": "assets/images/capas/the-anatomy-of-genres-john-truby.jpg", "amazon_url": "https://amzn.to/3TAicl9", "materias": ["M02", "M03", "M04", "M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"]}, {"id": "WEI-SN", "slug": "structuring-your-novel-km-weiland", "autor": "K. M. Weiland", "obra": "Structuring Your Novel", "categoria": "roteiro", "catNome": "Caderno", "ano": 2013, "link": "https://amzn.to/4kG7cxA", "foco": "A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/structuring-your-novel-km-weiland.jpg", "amazon_url": "https://amzn.to/4kG7cxA", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "LIT-WW", "slug": "write-worlds-stant-litore", "autor": "Stant Litore", "obra": "Write Worlds Your Readers Won't Forget", "categoria": "roteiro", "catNome": "Caderno", "ano": 2017, "link": "https://link.amazon/B0bJd8gQf", "foco": "Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista.", "topicos": ["M09", "M10", "M21", "M22", "M25", "M31", "M32", "M33", "M34", "M41", "M42", "M43", "M44", "M45"], "citacoesQtd": 28, "capa": "assets/images/capas/write-worlds-stant-litore.jpg", "amazon_url": "https://link.amazon/B0bJd8gQf", "materias": ["M09", "M10", "M21", "M22", "M25", "M31", "M32", "M33", "M34", "M41", "M42", "M43", "M44", "M45"]}, {"id": "SLB-AT", "slug": "the-art-of-time-in-fiction-joan-silber", "autor": "Joan Silber", "obra": "The Art of Time in Fiction", "categoria": "roteiro", "catNome": "Caderno", "ano": 2009, "link": "https://amzn.to/4w6gFVN", "foco": "Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor.", "topicos": ["M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"], "citacoesQtd": 44, "capa": "assets/images/capas/the-art-of-time-in-fiction-joan-silber.jpg", "amazon_url": "https://amzn.to/4w6gFVN", "materias": ["M06", "M07", "M08", "M10", "M11", "M12", "M13", "M15", "M21", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M41", "M42", "M43", "M44", "M45"]}, {"id": "LEI-FN", "slug": "o-foco-narrativo-ligia-chiappini", "autor": "Ligia Chiappini Moraes Leite", "obra": "O Foco Narrativo", "categoria": "roteiro", "catNome": "Caderno", "ano": 1985, "link": "https://link.amazon/B0fFW0BIn", "foco": "Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa.", "topicos": ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M16", "M17", "M18", "M19", "M20", "M21", "M22", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M31", "M32", "M33", "M34", "M35", "M36", "M37", "M38", "M39", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M47", "M48", "M49", "M50"], "citacoesQtd": 100, "capa": "assets/images/capas/o-foco-narrativo-ligia-chiappini.jpg", "amazon_url": "https://link.amazon/B0fFW0BIn", "materias": ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M16", "M17", "M18", "M19", "M20", "M21", "M22", "M23", "M24", "M25", "M26", "M27", "M28", "M29", "M30", "M31", "M32", "M33", "M34", "M35", "M36", "M37", "M38", "M39", "M40", "M41", "M42", "M43", "M44", "M45", "M46", "M47", "M48", "M49", "M50"]}, {"id": "SMT-PW", "slug": "psychology-workbook-for-writers-darian-smith", "autor": "Darian Smith", "obra": "Psychology Workbook for Writers", "categoria": "roteiro", "catNome": "Caderno", "ano": 2015, "link": "https://amzn.to/4dhesy2", "foco": "Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas.", "topicos": ["M09", "M10"], "citacoesQtd": 4, "capa": "assets/images/capas/psychology-workbook-for-writers-darian-smith.jpg", "amazon_url": "https://amzn.to/4dhesy2", "materias": ["M09", "M10"]}, {"id": "WEI-WT", "slug": "writing-your-storys-theme-km-weiland", "autor": "K. M. Weiland", "obra": "Writing Your Story's Theme", "categoria": "roteiro", "catNome": "Caderno", "ano": 2020, "link": "https://amzn.to/44K6Qjr", "foco": "Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/writing-your-storys-theme-km-weiland.jpg", "amazon_url": "https://amzn.to/44K6Qjr", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "CHN-TM", "slug": "transparent-minds-dorrit-cohn", "autor": "Dorrit Claire Cohn", "obra": "Transparent Minds", "categoria": "roteiro", "catNome": "Caderno", "ano": 1978, "link": "https://link.amazon/B0cUIhn5P", "foco": "Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese.", "topicos": ["M27", "M29"], "citacoesQtd": 4, "capa": "assets/images/capas/transparent-minds-dorrit-cohn.jpg", "amazon_url": "https://link.amazon/B0cUIhn5P", "materias": ["M27", "M29"]}, {"id": "WEI-OW", "slug": "outlining-your-novel-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Outlining Your Novel Workbook", "categoria": "roteiro", "catNome": "Caderno", "ano": 2014, "link": "https://amzn.to/4nO2Uag", "foco": "Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/outlining-your-novel-workbook-km-weiland.jpg", "amazon_url": "https://amzn.to/4nO2Uag", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "WEI-CB", "slug": "conquering-writers-block-km-weiland", "autor": "K. M. Weiland", "obra": "Conquering Writer's Block and Summoning Inspiration", "categoria": "roteiro", "catNome": "Caderno", "ano": 2018, "link": "https://amzn.to/4eLxIUS", "foco": "Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/conquering-writers-block-km-weiland.jpg", "amazon_url": "https://amzn.to/4eLxIUS", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "WEI-CW", "slug": "creating-character-arcs-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Creating Character Arcs Workbook", "categoria": "roteiro", "catNome": "Caderno", "ano": 2017, "link": "https://amzn.to/4lVDh5G", "foco": "Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/creating-character-arcs-workbook-km-weiland.jpg", "amazon_url": "https://amzn.to/4lVDh5G", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "WEI-SW", "slug": "structuring-your-novel-workbook-km-weiland", "autor": "K. M. Weiland", "obra": "Structuring Your Novel Workbook", "categoria": "roteiro", "catNome": "Caderno", "ano": 2014, "link": "https://amzn.to/46DCCBh", "foco": "Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax.", "topicos": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"], "citacoesQtd": 32, "capa": "assets/images/capas/structuring-your-novel-workbook-km-weiland.jpg", "amazon_url": "https://amzn.to/46DCCBh", "materias": ["M06", "M07", "M09", "M11", "M15", "M16", "M17", "M18", "M20", "M36", "M37", "M38", "M39", "M40", "M42", "M43"]}, {"id": "BEN-AP", "slug": "aprendizagem-baseada-em-projetos-william-bender", "autor": "William N. Bender", "obra": "Aprendizagem Baseada em Projetos: Educação Diferenciada para o Século XXI", "categoria": "ppp", "catNome": "Argamassa", "ano": 2014, "link": "https://www.amazon.com.br/dp/858429019X", "foco": "Toda a aquisição teórica converge para um artefato tangível: a construção da história do próprio Operari. Obstáculos de enredo tornam-se desafios investigados e resolvidos na prática.", "topicos": ["M01", "M05", "M10", "M20", "M50"], "citacoesQtd": 1, "capa": "assets/images/capas/aprendizagem-baseada-em-projetos-william-bender.jpg", "amazon_url": "https://www.amazon.com.br/dp/858429019X", "materias": ["M01", "M05", "M10", "M20", "M50"]}, {"id": "CST-UD", "slug": "universal-design-for-learning-cast", "autor": "Anne Meyer, David H. Rose, David Gordon (CAST)", "obra": "Universal Design for Learning: Theory and Practice", "categoria": "ppp", "catNome": "Argamassa", "ano": 2014, "link": "https://www.amazon.com.br/dp/0989867702", "foco": "Acessibilidade cognitiva e desenho universal: múltiplos meios de engajamento, múltiplos meios de representação e múltiplos meios de ação/expressão para acolher a neurodiversidade.", "topicos": ["M01", "M07", "M15", "M25", "M35", "M50"], "citacoesQtd": 1, "capa": "assets/images/capas/universal-design-for-learning-cast.jpg", "amazon_url": "https://www.amazon.com.br/dp/0989867702", "materias": ["M01", "M07", "M15", "M25", "M35", "M50"]}, {"id": "BRW-FC", "slug": "fixe-o-conhecimento-peter-brown", "autor": "Peter C. Brown, Henry L. Roediger III, Mark A. McDaniel", "obra": "Fixe o Conhecimento: A Ciência da Aprendizagem Bem-Sucedida", "categoria": "ppp", "catNome": "Argamassa", "ano": 2014, "link": "https://www.amazon.com.br/dp/8550802774", "foco": "Ciência cognitiva aplicada: esforço desejável, prática espaçada, intercalação e recuperação ativa como chaves da retenção de longa duração e domínio profundo.", "topicos": ["M03", "M08", "M18", "M28", "M48"], "citacoesQtd": 1, "capa": "assets/images/capas/fixe-o-conhecimento-peter-brown.jpg", "amazon_url": "https://www.amazon.com.br/dp/8550802774", "materias": ["M03", "M08", "M18", "M28", "M48"]}, {"id": "BAC-MA", "slug": "metodologias-ativas-bacich-moran", "autor": "Lilian Bacich & José Moran", "obra": "Metodologias Ativas para uma Educação Inovadora: Uma Abordagem Teórico-Prática", "categoria": "ppp", "catNome": "Argamassa", "ano": 2018, "link": "https://www.amazon.com.br/dp/8584291153", "foco": "Sala de aula invertida e protagonismo discente: o conteúdo base é absorvido no ritmo autônomo do Operari; o Laboratório é dedicado a pitchings, rodadas de feedback e curadoria dialética.", "topicos": ["M02", "M12", "M22", "M32", "M42", "M46"], "citacoesQtd": 1, "capa": "assets/images/capas/metodologias-ativas-bacich-moran.jpg", "amazon_url": "https://www.amazon.com.br/dp/8584291153", "materias": ["M02", "M12", "M22", "M32", "M42", "M46"]}];
+    window.TOPICOS_SLUGS = {"INTRO01": "intro01-planta-baixa", "M00": "intro10-laboratorio", "T00": "intro10-laboratorio", "INTRO02": "intro02-personagens", "INTRO03": "intro03-fachada", "INTRO04": "intro04-alvenaria", "INTRO05": "intro05-topografia", "INTRO06": "intro06-janelas", "INTRO07": "intro07-cimento", "INTRO08": "intro08-maquinario", "INTRO09": "intro09-vistoria", "INTRO10": "intro10-laboratorio", "M01": "m01-forma-vs-formula", "T01": "m01-forma-vs-formula", "M02": "m02-trindade-indissociavel", "T02": "m02-trindade-indissociavel", "M03": "m03-conflito-como-motor", "T03": "m03-conflito-como-motor", "M04": "m04-pre-moldado-vs-organico", "T04": "m04-pre-moldado-vs-organico", "M05": "m05-substancia-estilo-e-tatica", "T05": "m05-substancia-estilo-e-tatica", "M06": "m06-caracterizacao-vs-carater", "T06": "m06-caracterizacao-vs-carater", "M07": "m07-desejo-vs-prioridade", "T07": "m07-desejo-vs-prioridade", "M08": "m08-acao-e-personagem", "T08": "m08-acao-e-personagem", "M09": "m09-fios-desencapados", "T09": "m09-fios-desencapados", "M10": "m10-aterramento", "T10": "m10-aterramento", "M11": "m11-tema-vs-assunto", "T11": "m11-tema-vs-assunto", "M12": "m12-genero-e-tom", "T12": "m12-genero-e-tom", "M13": "m13-natureza-do-genero", "T13": "m13-natureza-do-genero", "M14": "m14-ideia-governante-vs-argumento-moral", "T14": "m14-ideia-governante-vs-argumento-moral", "M15": "m15-guerra-de-crencas", "T15": "m15-guerra-de-crencas", "M16": "m16-estrutura-do-enredo", "T16": "m16-estrutura-do-enredo", "M17": "m17-causa-e-efeito", "T17": "m17-causa-e-efeito", "M18": "m18-tres-atos-industriais", "T18": "m18-tres-atos-industriais", "M19": "m19-trenas-e-tramas", "T19": "m19-trenas-e-tramas", "M20": "m20-entre-a-prancheta-e-a-picareta", "T20": "m20-entre-a-prancheta-e-a-picareta", "M21": "m21-topografia-narrativa", "T21": "m21-topografia-narrativa", "M22": "m22-tempo-dramatico", "T22": "m22-tempo-dramatico", "M23": "m23-geografia-civilizatoria", "T23": "m23-geografia-civilizatoria", "M24": "m24-cronogramas-e-outras-gramas", "T24": "m24-cronogramas-e-outras-gramas", "M25": "m25-niveis-espiralados", "T25": "m25-niveis-espiralados", "M26": "m26-pontos-de-vista", "T26": "m26-pontos-de-vista", "M27": "m27-entre-agencia-e-urgencia", "T27": "m27-entre-agencia-e-urgencia", "M28": "m28-voos-em-vaos", "T28": "m28-voos-em-vaos", "M29": "m29-voz-ativa", "T29": "m29-voz-ativa", "M30": "m30-fina-fachada-espelhada", "T30": "m30-fina-fachada-espelhada", "M31": "m31-acao-verbal", "T31": "m31-acao-verbal", "M32": "m32-nenhum-outdoor-e-transparente", "T32": "m32-nenhum-outdoor-e-transparente", "M33": "m33-rubricas-e-incisos", "T33": "m33-rubricas-e-incisos", "M34": "m34-sinfonia-das-britadeiras", "T34": "m34-sinfonia-das-britadeiras", "M35": "m35-betoneira-engessada-e-outros-vicios-de-dialogo", "T35": "m35-betoneira-engessada-e-outros-vicios-de-dialogo", "M36": "m36-obras-diferentes-demandam-ferramentas-diferentes", "T36": "m36-obras-diferentes-demandam-ferramentas-diferentes", "M37": "m37-tripe-da-regua-de-nivel", "T37": "m37-tripe-da-regua-de-nivel", "M38": "m38-sem-mapa-nao-ha-recalculo-de-rota", "T38": "m38-sem-mapa-nao-ha-recalculo-de-rota", "M39": "m39-prancheta-tablet-ou-quadro-camurca", "T39": "m39-prancheta-tablet-ou-quadro-camurca", "M40": "m40-canteiro-cercado-ou-mutirao", "T40": "m40-canteiro-cercado-ou-mutirao", "M41": "m41-so-se-esculpe-tendo-algo-concreto", "T41": "m41-so-se-esculpe-tendo-algo-concreto", "M42": "m42-distanciamento", "T42": "m42-distanciamento", "M43": "m43-use-a-motosserra-sem-se-machucar", "T43": "m43-use-a-motosserra-sem-se-machucar", "M44": "m44-retrofit-narrativo", "T44": "m44-retrofit-narrativo", "M45": "m45-engenheiro-de-obra-pronta-aponta-voce-decide-o-reparo", "T45": "m45-engenheiro-de-obra-pronta-aponta-voce-decide-o-reparo", "M46": "m46-canteiro-colaborativo", "T46": "m46-canteiro-colaborativo", "M47": "m47-pa-de-prata", "T47": "m47-pa-de-prata", "M48": "m48-martelinho-de-ouro", "T48": "m48-martelinho-de-ouro", "M49": "m49-chave-de-diamante", "T49": "m49-chave-de-diamante", "M50": "m50-alvara-narrato-certificacao-em-engenharia-narratologica", "T50": "m50-alvara-narrato-certificacao-em-engenharia-narratologica"};
+    window.LIVROS_CONEXOES = {"MCK-ST": {"descricao_oficial": "Considerado a bíblia mundial dos roteiristas e contadores de histórias, Story investiga a substância interior da dramaturgia, rejeitando fórmulas mecânicas e maniqueísmos em favor de formas arquetípicas vivas e universais. McKee disseca os três níveis de conflito, a orquestração do elenco e a Ideia Governante que ancora o clímax sob máxima pressão moral.", "posicionamento": "No Canteiro do NarrATO, McKee fornece a viga mestra da forma viva contra a fórmula morta. É a nossa bússola para garantir que o enredo sirva à verdade moral do personagem, e não a truques baratos de mercado.", "consensos": [{"id": "CMP-CR", "obra": "Da Criação ao Roteiro", "autor": "Doc Comparato"}, {"id": "TRU-AH", "obra": "Anatomia da História", "autor": "John Truby"}, {"id": "FLD-MR", "obra": "Manual do Roteiro", "autor": "Syd Field"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato! (Estrutura mecânica em minutos)", "autor": "Blake Snyder"}], "tags": ["#forma-vs-formula", "#conflito-tres-niveis", "#ideia-governante", "#arquetipo", "#climax", "#subtexto"]}, "CMP-CR": {"descricao_oficial": "Clássico brasileiro definitivo sobre a carpintaria do roteiro audiovisual e transmidiático. Doc Comparato aborda a criação não como iluminação mística, mas como ofício braçal de marretadas conscientes na bancada, detalhando a trindade da ideia matriz, do conflito e da ação dramática.", "posicionamento": "Comparato é o nosso mestre de obras brasileiro. Traz para o canteiro o rigor artesanal da feitura, a visão pé-no-chão e o pragmatismo de quem sabe que texto é alvenaria que precisa suportar a prova de carga.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}, {"id": "FLD-MR", "obra": "Manual do Roteiro", "autor": "Syd Field"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#ideia-matriz", "#acao-dramatica", "#conflito", "#carpintaria", "#cena"]}, "FLD-MR": {"descricao_oficial": "A pedra fundamental da teoria do roteiro moderno. Syd Field sistematizou o paradigma clássico em três atos, estabelecendo os conceitos fundamentais de incidente incitante, pontos de virada (plot points) e o nó dramático que sustenta o meio da narrativa.", "posicionamento": "Field é a régua de alinhamento estrutural do NarrATO. Seu paradigma é utilizado como andaime provisório para garantir o compasso da narrativa, sem torná-lo uma camisa de força.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}, {"id": "CMP-CR", "obra": "Da Criação ao Roteiro", "autor": "Doc Comparato"}], "dissensos": [{"id": "TRU-AH", "obra": "Anatomia da História (Crítica aos 3 atos)", "autor": "John Truby"}], "tags": ["#paradigma-tres-atos", "#ponto-de-virada", "#incidente-incitante", "#midpoint"]}, "TRU-AH": {"descricao_oficial": "Truby revoluciona a dramaturgia ao propor uma abordagem orgânica e biológica, rejeitando a geometria mecânica dos 3 atos. Seus 22 passos se fundam inteiramente na cura da fraqueza moral e psicológica do protagonista, orquestrada por uma rede viva de personagens.", "posicionamento": "No NarrATO, Truby representa a biologia narrativa. Ele nos ensina que o enredo não é uma pista de obstáculos externa, mas o espelho sismográfico da alma fraturada do personagem.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "FLD-MR", "obra": "Manual do Roteiro (Estrutura mecânica)", "autor": "Syd Field"}, {"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#abordagem-organica", "#fraqueza-moral", "#rede-personagens", "#auto-revelacao"]}, "FRE-PA": {"descricao_oficial": "Obra basilar da pedagogia crítica de Paulo Freire. Defende que ensinar não é transferir conhecimento, mas criar as possibilidades para a sua produção ou construção. Introduz os conceitos de autonomia, curiosidade epistemológica, dialogicidade e práxis contra o ensino bancário.", "posicionamento": "No Canteiro do NarrATO, Freire é a viga mestra da formação de cada Operari: rejeitamos manuais dogmáticos e receitas pré-moldadas em favor da emancipação crítica e da autoria consciente.", "consensos": [{"id": "BEN-AP", "obra": "Aprendizagem Baseada em Projetos", "autor": "William N. Bender"}, {"id": "BAC-MA", "obra": "Metodologias Ativas", "autor": "Lilian Bacich & José Moran"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato! (Transmissão de fórmulas bancárias)", "autor": "Blake Snyder"}], "tags": ["#autonomia", "#praxis", "#dialogicidade", "#curiosidade-epistemologica", "#ensino-bancario"]}, "BEN-AP": {"descricao_oficial": "Guia fundamental da Aprendizagem Baseada em Projetos (PBL). Estabelece que o aprendizado autêntico ocorre quando os estudantes confrontam problemas reais e significativos, agindo cooperativamente na investigação e na construção de artefatos concretos.", "posicionamento": "No NarrATO, o PBL rege o canteiro e a Folha Milimetrada: cada conceito de roteiro só é validado quando posto a serviço da resolução de um nó dramático real na história do próprio Operari.", "consensos": [{"id": "FRE-PA", "obra": "Pedagogia da Autonomia", "autor": "Paulo Freire"}, {"id": "BAC-MA", "obra": "Metodologias Ativas", "autor": "Lilian Bacich & José Moran"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato! (Receitas mecânicas prontas)", "autor": "Blake Snyder"}], "tags": ["#pbl", "#folha-milimetrada", "#canteiro", "#diario-de-obra", "#resolucao-de-problemas"]}, "CST-UD": {"descricao_oficial": "Apresentação definitiva da teoria e prática do Desenho Universal para a Aprendizagem (DUA) pelo CAST. Propõe a eliminação sistemática de barreiras curriculares através de múltiplos meios de engajamento, múltiplos meios de representação e múltiplos meios de ação e expressão.", "posicionamento": "No NarrATO, o DUA garante acessibilidade cognitiva total: Semantic Line Breaks (SLB), tipografia alternativa (OpenDyslexic), videoaulas no YouTube e laboratório assíncrono para acolher a neurodiversidade.", "consensos": [{"id": "FRE-PA", "obra": "Pedagogia da Autonomia", "autor": "Paulo Freire"}], "dissensos": [], "tags": ["#dua", "#alvara", "#canteiro", "#laboratorio", "#acessibilidade-cognitiva", "#neurodiversidade"]}, "BRW-FC": {"descricao_oficial": "Baseado em descobertas fundamentais da psicologia cognitiva e da neurociência, Brown, Roediger e McDaniel demonstram que a aprendizagem duradoura exige esforço desejável: recuperação ativa, prática espaçada, intercalação e testes práticos frequentes.", "posicionamento": "No NarrATO, combate a ilusão de fluência passiva. O Diário de Obra e as checagens na Folha Milimetrada forçam o Operari a resgatar e justificar ativamente cada decisão estrutural sob esforço consciente.", "consensos": [{"id": "MCK-ST", "obra": "Story (Rigor e disciplina estrutural)", "autor": "Robert McKee"}], "dissensos": [], "tags": ["#inovacao-cognitiva", "#diario-de-obra", "#folha-milimetrada", "#esforco-desejavel", "#recuperacao-ativa"]}, "BAC-MA": {"descricao_oficial": "Panorama abrangente das metodologias ativas e da sala de aula invertida no Brasil. Examina modelos pedagógicos centrados no estudante, integração curricular prática, mediação docente qualificada e uso intencional da tecnologia.", "posicionamento": "No NarrATO, fundamenta a dinâmica do Laboratório e da Curadoria Dialética. O Mestre de Obras atua como mediador crítico enquanto os Operari refinam coletivamente suas obras em bancada viva.", "consensos": [{"id": "BEN-AP", "obra": "Aprendizagem Baseada em Projetos", "autor": "William N. Bender"}, {"id": "FRE-PA", "obra": "Pedagogia da Autonomia", "autor": "Paulo Freire"}], "dissensos": [], "tags": ["#metodologias-ativas", "#laboratorio", "#curadoria-dialetica", "#sala-de-aula-invertida", "#protagonismo"]}, "KNG-SE": {"descricao_oficial": "A caixa de ferramentas do escritor operário; corte de gordura verbal, eliminação impiedosa de advérbios e respeito ao diálogo direto. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "CRB-AC": {"descricao_oficial": "O abismo entre o papel social da caracterização e os segredos inconfessáveis do caráter; a voltagem gerada pela resistência do meio. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "BTH-RF": {"descricao_oficial": "O autor implícito, o narrador não-confiável e as estratégias de cumplicidade ética e dramática entre emissor e plateia. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "CST-AP": {"descricao_oficial": "Abertura de vãos e janelas narrativas; modulação precisa entre foco interno, testemunha e perspectiva multifocal. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SNY-SG": {"descricao_oficial": "Os 15 batimentos do Beat Sheet como gabarito de controle de carga; o Midpoint e a noite escura da alma na arquitetura comercial. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "TRU-AH", "obra": "Anatomia da História", "autor": "John Truby"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SNY-SB": {"descricao_oficial": "Diagnóstico de falhas de sustentação e técnicas de correção estrutural para peças com frouxidão dramática. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "FLD-PS": {"descricao_oficial": "Vistoria e reparos cirúrgicos: identificação e conserto de rachaduras no enredo, perda de ritmo e arcos estagnados. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "MCK-CH": {"descricao_oficial": "Design de elenco em constelação; polaridades morais, funções dramáticas e distribuição balanceada de carga psicológica. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "MCK-DL": {"descricao_oficial": "Ação verbal como cimento estrutural; o subtexto em camadas e o diálogo como combate de vontades implícitas. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "BEL-DD": {"descricao_oficial": "Ritmo, cortes secos e compressão de falas para manter a tração contínua da cena sem gordura expositiva. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-ON": {"descricao_oficial": "Metodologia de prancheta e delineamento prévio para conciliar liberdade inventiva com fundações de alvenaria inquebráveis. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-CA": {"descricao_oficial": "A Mentira em que o Personagem Acredita, a Ferida Primordial (Fantasma) e a colisão libertadora com a Verdade. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "TRU-AG": {"descricao_oficial": "Fachadas temáticas e contratos estéticos: como combinar gêneros narrativos sem desmoronar as regras de mundo da obra. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-SN": {"descricao_oficial": "A engenharia do micro e macroenredo: cenas e sequências (Scene and Sequel) como unidades celulares da ação. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "LIT-WW": {"descricao_oficial": "Topografia e cenografia dramática: o espaço físico como força antagonista viva e espelho das dores do protagonista. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SLB-AT": {"descricao_oficial": "Arquitetura cronológica: manipulação de andamento, elipses, saltos temporais e tempo subjetivo na experiência do leitor. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "LEI-FN": {"descricao_oficial": "Teoria crítica do ponto de vista e posições do narrador; distâncias psíquicas e ângulos de incidência da luz narrativa. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "SMT-PW": {"descricao_oficial": "Fiação psicológica: mecanismos de defesa, tipos de personalidade e reações viscerais a traumas. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-WT": {"descricao_oficial": "Fachada e tema: o argumento ético que perpassa cada escolha dos personagens sem cair no moralismo vazio. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "CHN-TM": {"descricao_oficial": "Modos de representação da consciência interior na ficção: monólogo autônomo, discurso indireto livre e psicossíntese. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-OW": {"descricao_oficial": "Caderno prático de prancheta com exercícios passo a passo para escoramento de arcos e capítulos. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-CB": {"descricao_oficial": "Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-CW": {"descricao_oficial": "Bancada prática de testes para traçar os vetores positivos, neutros e negativos de evolução do avatar. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}, "WEI-SW": {"descricao_oficial": "Exercícios práticos de alvenaria para montagem modular de batimentos, sequências e clímax. Uma obra nuclear para a fundamentação prática do canteiro narratológico.", "posicionamento": "Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.", "consensos": [{"id": "MCK-ST", "obra": "Story", "autor": "Robert McKee"}], "dissensos": [{"id": "SNY-SG", "obra": "Salve o Gato!", "autor": "Blake Snyder"}], "tags": ["#estrutura", "#personagem", "#cena", "#conflito"]}};
 
     let filtroFontesAtivo = 'all';
 
@@ -1201,10 +1384,10 @@
           </div>
           <div class="book-foco">${item.foco}</div>
           <div class="card-footer-row">
-            <span class="card-tag-count">📚 ${item.topicos.length} matérias</span>
+            <span class="card-tag-count"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>${item.topicos.length} matérias</span>
             <div class="card-btn-group">
-              <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('${item.id}')">Ver Ficha ↗</button>
-              <a href="${item.amazon_url || item.link}" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir →</a>
+              <button class="card-btn btn-ficha" onclick="event.stopPropagation(); abrirModalFonte('${item.id}')">Ver Ficha<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></button>
+              <a href="${item.amazon_url || item.link}" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" onclick="event.stopPropagation()">Adquirir<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a>
             </div>
           </div>
         </article>
@@ -1245,21 +1428,21 @@
       
       const topicosLinks = item.topicos.map(tId => {
         const slug = window.TOPICOS_SLUGS[tId] || '';
-        const href = slug ? `../topicos/${slug}.html` : `../index.html#${tId.toLowerCase()}`;
-        return `<a href="${href}" class="topic-pill">${tId} ↗</a>`;
+        const href = slug ? `../materias/${slug}.html` : `../index.html#${tId.toLowerCase()}`;
+        return `<a href="${href}" class="topic-pill">${tId}<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a>`;
       }).join(' ');
 
       const tagsLinks = (conex.tags || []).map(t => {
         const slug = t.replace('#', '').trim();
-        return `<a href="../glossario/index.html#${slug}" class="topic-pill">${t} ↗</a>`;
+        return `<a href="../vocab/index.html#${slug}" class="topic-pill">${t}<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a>`;
       }).join(' ');
 
       const consensosHtml = (conex.consensos && conex.consensos.length > 0)
-        ? conex.consensos.map(c => `<div class="dialogue-item" onclick="abrirModalFonte('${c.id}')">🤝 <strong>"${c.obra}"</strong> (${c.autor}) ↗</div>`).join('')
+        ? conex.consensos.map(c => `<div class="dialogue-item" onclick="abrirModalFonte('${c.id}')">🤝 <strong>"${c.obra}"</strong> (${c.autor})<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></div>`).join('')
         : '<div style="font-size:0.75rem; color:color-mix(in srgb, var(--tinta-papel) 70%, transparent);">Nenhum consenso mapeado diretamente.</div>';
 
       const dissensosHtml = (conex.dissensos && conex.dissensos.length > 0)
-        ? conex.dissensos.map(d => `<div class="dialogue-item" onclick="abrirModalFonte('${d.id}')">🥊 <strong>"${d.obra}"</strong> (${d.autor}) ↗</div>`).join('')
+        ? conex.dissensos.map(d => `<div class="dialogue-item" onclick="abrirModalFonte('${d.id}')">🥊 <strong>"${d.obra}"</strong> (${d.autor})<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></div>`).join('')
         : '<div style="font-size:0.75rem; color:color-mix(in srgb, var(--tinta-papel) 70%, transparent);">Nenhum dissenso antagônico direto.</div>';
 
       const coverSrc = item.capa ? `../${item.capa}` : '../assets/images/capas/story-robert-mckee.jpg';
@@ -1273,19 +1456,19 @@
             <div class="single-book-author">por ${item.autor}</div>
             <div class="single-book-actions">
               <a href="${item.amazon_url || item.link}" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" style="font-size:0.85rem; padding:0.5rem 1.1rem;">
-                Adquirir Exemplar Oficial →
+                Adquirir Exemplar Oficial<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span>
               </a>
             </div>
           </div>
         </div>
 
         <div class="single-section">
-          <h3 class="single-section-title">📄 Descrição Oficial</h3>
+          <h3 class="single-section-title"><span class="icone-banco icone-banco--documento icone-banco--antes" aria-hidden="true"></span>Descrição Oficial</h3>
           <div class="single-section-body">${conex.descricao_oficial}</div>
         </div>
 
         <div class="single-section">
-          <h3 class="single-section-title">🧭 Posicionamento no Canteiro</h3>
+          <h3 class="single-section-title"><span class="icone-banco icone-banco--posicionamento icone-banco--antes" aria-hidden="true"></span>Posicionamento no Canteiro</h3>
           <div class="single-section-body">${conex.posicionamento}</div>
         </div>
 
@@ -1304,12 +1487,12 @@
         </div>
 
         <div class="single-section">
-          <h3 class="single-section-title">🔍 Mencionado em</h3>
+          <h3 class="single-section-title"><span class="icone-banco icone-banco--mencoes icone-banco--antes" aria-hidden="true"></span>Mencionado em</h3>
           <div class="badges-cloud">${topicosLinks}</div>
         </div>
 
         <div class="single-section">
-          <h3 class="single-section-title">🏷️ Tags Relacionadas</h3>
+          <h3 class="single-section-title"><span class="icone-banco icone-banco--tags icone-banco--antes" aria-hidden="true"></span>Tags Relacionadas</h3>
           <div class="badges-cloud">${tagsLinks}</div>
         </div>
       `;
@@ -1353,7 +1536,7 @@
           Desenvolvedores de audiovisual, jogos e soluções web.
         </p>
         <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
-          poligonalhub@gmail.com ↗
+          poligonalhub@gmail.com<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span>
         </a>
       </div>
 
@@ -1365,7 +1548,7 @@
           <ul class="poligonal-footer-nav">
             <li><a href="/" data-root-link>Home</a></li>
             <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
-            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo)<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
             <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
           </ul>
         </div>
@@ -1374,10 +1557,10 @@
         <div class="poligonal-footer-col">
           <h4 class="poligonal-footer-heading">Comunidade</h4>
           <ul class="poligonal-footer-nav">
-            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
-            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
-            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
-            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
           </ul>
         </div>
       </div>
@@ -1397,6 +1580,7 @@
 </footer>
 
   <script src="../assets/js/omni-index.js"></script>
+  <script src="../assets/js/progresso.js"></script>
   <script src="../assets/js/narrato.js"></script>
   <script src="../../shared/hub-footer.js"></script>
 </body>

@@ -52,13 +52,13 @@
    * @param {number} globalNum - Número de 1 a 50 da matéria
    */
   window.abrirMateriaLeitura = function (globalNum) {
-    if (!window.TOPICOS_DB || !Array.isArray(window.TOPICOS_DB)) return;
+    if (!(window.MATERIAS_DB || window.TOPICOS_DB) || !Array.isArray((window.MATERIAS_DB || window.TOPICOS_DB))) return;
 
-    const idx = window.TOPICOS_DB.findIndex(t => t.numero === globalNum);
+    const idx = (window.MATERIAS_DB || window.TOPICOS_DB).findIndex(t => t.numero === globalNum);
     if (idx === -1) return;
 
     materiaAtivaIdx = idx;
-    const t = window.TOPICOS_DB[idx];
+    const t = (window.MATERIAS_DB || window.TOPICOS_DB)[idx];
     const capNum = t.capitulo_num;
     const num02 = String(t.numero).padStart(2, '0');
     const cap02 = String(capNum).padStart(2, '0');
@@ -120,7 +120,7 @@
 
     if (btnPrev && titlePrev) {
       if (idx > 0) {
-        const prevT = window.TOPICOS_DB[idx - 1];
+        const prevT = (window.MATERIAS_DB || window.TOPICOS_DB)[idx - 1];
         const prevCap02 = String(prevT.capitulo_num || 1).padStart(2, '0');
         const prevNum02 = String(prevT.numero).padStart(2, '0');
         btnPrev.style.visibility = 'visible';
@@ -133,8 +133,8 @@
     }
 
     if (btnNext && titleNext) {
-      if (idx < window.TOPICOS_DB.length - 1) {
-        const nextT = window.TOPICOS_DB[idx + 1];
+      if (idx < (window.MATERIAS_DB || window.TOPICOS_DB).length - 1) {
+        const nextT = (window.MATERIAS_DB || window.TOPICOS_DB)[idx + 1];
         const nextCap02 = String(nextT.capitulo_num || 1).padStart(2, '0');
         const nextNum02 = String(nextT.numero).padStart(2, '0');
         btnNext.style.visibility = 'visible';
@@ -197,8 +197,8 @@
    */
   window.navegarMateriaLeitura = function (delta) {
     const nextIdx = materiaAtivaIdx + delta;
-    if (nextIdx >= 0 && nextIdx < window.TOPICOS_DB.length) {
-      window.abrirMateriaLeitura(window.TOPICOS_DB[nextIdx].numero);
+    if (nextIdx >= 0 && nextIdx < (window.MATERIAS_DB || window.TOPICOS_DB).length) {
+      window.abrirMateriaLeitura((window.MATERIAS_DB || window.TOPICOS_DB)[nextIdx].numero);
     }
   };
 
@@ -206,8 +206,8 @@
    * Alterna a marcação de lida da matéria ativa através do módulo progresso.js.
    */
   window.toggleMateriaLidaAtiva = function () {
-    if (!window.TOPICOS_DB || materiaAtivaIdx < 0 || materiaAtivaIdx >= window.TOPICOS_DB.length) return;
-    const t = window.TOPICOS_DB[materiaAtivaIdx];
+    if (!(window.MATERIAS_DB || window.TOPICOS_DB) || materiaAtivaIdx < 0 || materiaAtivaIdx >= (window.MATERIAS_DB || window.TOPICOS_DB).length) return;
+    const t = (window.MATERIAS_DB || window.TOPICOS_DB)[materiaAtivaIdx];
     const num = t.numero;
 
     if (window.NarratoProgresso && typeof window.NarratoProgresso.toggleTopico === 'function') {
@@ -228,7 +228,7 @@
     btn.setAttribute('aria-pressed', String(isLido));
     if (isLido) {
       btn.classList.add('lido');
-      txt.textContent = '✓ Matéria lida';
+      txt.textContent = 'Matéria lida';
     } else {
       btn.classList.remove('lido');
       txt.textContent = 'Marcar como lida';
@@ -246,7 +246,7 @@
 
   /* =========================================================================
      [@anchor: #03-modais-flutuantes] [Voltar: #top]
-     MODAIS FLUTUANTES: FONTES (#F-{slug}), GLOSSÁRIO (#V-{slug}) E ONBOARDING
+     MODAIS FLUTUANTES: FONTES (#F-{slug}), VOCABULÁRIO (#V-{slug}) E ONBOARDING
      ========================================================================= */
 
   window.abrirModalFonte = function (slug) {
@@ -291,15 +291,16 @@
       elAssuntosList.innerHTML = '';
       const citadosEm = b.mencionada_em || [1, 2, 3];
       citadosEm.forEach(num => {
-        if (!window.TOPICOS_DB) return;
-        const top = window.TOPICOS_DB.find(t => t.numero === num);
+        if (!(window.MATERIAS_DB || window.TOPICOS_DB)) return;
+        const top = (window.MATERIAS_DB || window.TOPICOS_DB).find(t => t.numero === num);
         if (top) {
           const capN = top.capitulo_num;
           const assN = ((top.numero - 1) % 5) + 1;
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'tag-chip';
-          btn.textContent = `Matéria ${String(top.numero).padStart(2, '0')} (Cap. ${String(capN).padStart(2, '0')}) ↗`;
+          btn.textContent = `Matéria ${String(top.numero).padStart(2, '0')} (Cap. ${String(capN).padStart(2, '0')})`;
+          btn.insertAdjacentHTML('beforeend', '<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span>');
           btn.onclick = () => window.abrirMateriaLeitura(num);
           elAssuntosList.appendChild(btn);
         }
@@ -311,7 +312,8 @@
       (b.tags || ['narratologia', 'roteiro']).forEach(tg => {
         const chip = document.createElement('span');
         chip.className = 'tag-chip';
-        chip.textContent = `🏷️ ${tg}`;
+        chip.textContent = tg;
+        chip.insertAdjacentHTML('afterbegin', '<span class="icone-banco icone-banco--tags icone-banco--antes" aria-hidden="true"></span>');
         chip.onclick = () => window.abrirModalVerbete(tg);
         elTagsList.appendChild(chip);
       });
@@ -333,8 +335,8 @@
   };
 
   window.abrirModalVerbete = function (slug) {
-    if (!window.GLOSSARIO_DB) return;
-    const v = window.GLOSSARIO_DB[slug] || {
+    if (!window.VOCAB_DB) return;
+    const v = window.VOCAB_DB[slug] || {
       slug: slug,
       termo: slug,
       dominioNome: "Canteiro",
@@ -358,7 +360,8 @@
       (v.tags || ['canteiro']).forEach(tg => {
         const chip = document.createElement('span');
         chip.className = 'tag-chip';
-        chip.textContent = `🏷️ ${tg}`;
+        chip.textContent = tg;
+        chip.insertAdjacentHTML('afterbegin', '<span class="icone-banco icone-banco--tags icone-banco--antes" aria-hidden="true"></span>');
         chip.onclick = () => window.abrirModalVerbete(tg);
         elTags.appendChild(chip);
       });
@@ -385,7 +388,7 @@
     if (modalBackdrop) modalBackdrop.classList.add('active');
     document.body.style.overflow = 'hidden';
     try {
-      history.replaceState(null, '', '#entenda-o-narrato');
+      history.replaceState(null, '', '#entenda');
     } catch (e) {}
   };
 
@@ -393,6 +396,15 @@
     if (e && e.target && e.target.closest && e.target.closest('.modal-scaffold-frame')) return;
     fecharTodosModais();
   };
+
+  // Intercepta clique no botão Entenda (?) quando estiver na página do Caderno
+  document.addEventListener('click', function (e) {
+    const btnAjuda = e.target.closest && e.target.closest('.header-ajuda');
+    if (btnAjuda && document.getElementById('modalOnboardingBackdrop')) {
+      e.preventDefault();
+      window.abrirModalOnboarding();
+    }
+  });
 
   window.abrirModalProgresso = function () {
     fecharTodosModais();
@@ -439,7 +451,7 @@
     }
 
     // Matérias no padrão c01m46, c10m46 ou c01m01
-    const mCM = hash.match(/^#c(\d{1,2})m(\d{1,2})$/i);
+    const mCM = hash.match(/^#c(\d{1,2})[mtMT](\d{1,2})$/i);
     if (mCM) {
       const c = parseInt(mCM[1], 10);
       const m = parseInt(mCM[2], 10);
@@ -471,14 +483,14 @@
       return;
     }
 
-    // Verbetes do glossário: #V-operari
+    // Verbetes do vocabulário: #V-operari
     if (hash.startsWith('#V-') || hash.startsWith('#v-')) {
       window.abrirModalVerbete(hash.substring(3));
       return;
     }
 
     // Onboarding
-    if (hash === '#entenda-o-narrato' || hash === '#onboarding') {
+    if (hash === '#entenda' || hash === '#entenda-o-narrato' || hash === '#onboarding') {
       window.abrirModalOnboarding();
       return;
     }
@@ -486,9 +498,24 @@
     const cleanH = hash.replace('#', '').toLowerCase();
 
     // Roteamento para páginas de seção
-    const secoes = { argamassa: 'argamassa/', bibliografia: 'fontes/', fontes: 'fontes/', glossario: 'glossario/' };
+    const secoes = { argamassa: 'argamassa/', bibliografia: 'fontes/', fontes: 'fontes/', vocab: 'vocab/', vocabulario: 'vocab/', glossario: 'vocab/', entenda: 'entenda/' };
     if (secoes[cleanH]) {
       location.replace(secoes[cleanH] + 'index.html');
+      return;
+    }
+
+    // Introdução do capítulo via variável intro00 (#intro00, #intro00-cap-01, #intro-01)
+    const mIntro = cleanH.match(/^intro(00)?(-cap)?-?(\d{1,2})?/);
+    if (mIntro) {
+      const capNum = parseInt(mIntro[3] || '1', 10);
+      if (viewMateria && !viewMateria.hidden) {
+        window.fecharMateriaLeitura();
+      }
+      if (window.NarratoProgresso && typeof window.NarratoProgresso.abrirCapitulo === 'function') {
+        window.NarratoProgresso.abrirCapitulo(capNum);
+      }
+      const el = document.getElementById(`intro00-cap-${String(capNum).padStart(2, '0')}`) || document.getElementById(`capitulo-${String(capNum).padStart(2, '0')}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
@@ -510,7 +537,7 @@
       return;
     }
 
-    if (window.GLOSSARIO_DB && window.GLOSSARIO_DB[cleanH]) {
+    if (window.VOCAB_DB && window.VOCAB_DB[cleanH]) {
       window.abrirModalVerbete(cleanH);
       return;
     }
@@ -585,22 +612,24 @@
       return titleMatch || subMatch || descMatch || idMatch || kwMatch;
     });
 
-    const totalMat = matches.filter(m => m.type === 'topico').length;
+    const totalMat = matches.filter(m => m.type === 'materia' || m.type === 'topico').length;
     const totalLiv = matches.filter(m => m.type === 'livro').length;
     const totalVer = matches.filter(m => m.type === 'verbete').length;
 
     const countTodos = document.getElementById('countTodos');
     const countTopicos = document.getElementById('countTopicos');
+    const countMaterias = document.getElementById('countMaterias');
     const countLivros = document.getElementById('countLivros');
     const countVerbetes = document.getElementById('countVerbetes');
     if (countTodos) countTodos.innerText = matches.length;
     if (countTopicos) countTopicos.innerText = totalMat;
+    if (countMaterias) countMaterias.innerText = totalMat;
     if (countLivros) countLivros.innerText = totalLiv;
     if (countVerbetes) countVerbetes.innerText = totalVer;
 
     let displayMatches = matches;
     if (currentOmniFilter !== 'todos') {
-      displayMatches = matches.filter(m => m.type === currentOmniFilter);
+      displayMatches = matches.filter(m => m.type === currentOmniFilter || (currentOmniFilter === 'materia' && m.type === 'topico') || (currentOmniFilter === 'topico' && m.type === 'materia'));
     }
 
     if (displayMatches.length === 0) {
@@ -609,12 +638,12 @@
     }
 
     let html = '';
-    const topicosList = displayMatches.filter(m => m.type === 'topico');
+    const topicosList = displayMatches.filter(m => m.type === 'materia' || m.type === 'topico');
     const livrosList = displayMatches.filter(m => m.type === 'livro');
     const verbetesList = displayMatches.filter(m => m.type === 'verbete');
 
-    if (topicosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'topico')) {
-      html += `<div class="omni-group-title">🏗️ Matérias do Caderno (${topicosList.length})</div>`;
+    if (topicosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'topico' || currentOmniFilter === 'materia')) {
+      html += `<div class="omni-group-title"><span class="icone-banco icone-banco--materia icone-banco--antes" aria-hidden="true"></span>Matérias do Caderno (${topicosList.length})</div>`;
       topicosList.slice(0, 6).forEach(item => {
         const num = item.numero || (parseInt(item.id.replace(/[^0-9]/g, ''), 10) || 1);
         html += `
@@ -631,7 +660,7 @@
     }
 
     if (livrosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'livro')) {
-      html += `<div class="omni-group-title">📚 Obras & Bibliografia (${livrosList.length})</div>`;
+      html += `<div class="omni-group-title"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Obras & Bibliografia (${livrosList.length})</div>`;
       livrosList.slice(0, 6).forEach(item => {
         html += `
           <div class="omni-item" onclick="abrirModalFonte('${item.slug}'); closeOmniDropdown();">
@@ -647,7 +676,7 @@
     }
 
     if (verbetesList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'verbete')) {
-      html += `<div class="omni-group-title">📖 Glossário & Jargão (${verbetesList.length})</div>`;
+      html += `<div class="omni-group-title"><span class="icone-banco icone-banco--vocab icone-banco--antes" aria-hidden="true"></span>Vocabulário & Jargão (${verbetesList.length})</div>`;
       verbetesList.slice(0, 6).forEach(item => {
         const rawSlug = item.ancora || item.slug || (item.title.split('•')[0].replace('#', '').trim());
         html += `
@@ -774,7 +803,8 @@
     if (!container) return;
     const recolhido = container.classList.toggle('sumario-recolhido');
     if (btn) {
-      btn.textContent = recolhido ? '▶' : '◀';
+      const seta = btn.querySelector('.icone-banco');
+      if (seta) seta.classList.toggle('icone-banco--voltar', !recolhido);
       btn.title = recolhido ? 'Expandir Sumário' : 'Recolher Sumário (Modo Foco)';
     }
     try {

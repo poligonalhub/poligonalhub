@@ -15,7 +15,7 @@
    - #10-responsividade-mobile  : Regras de responsividade mobile
    - #11-views-caderno          : Views do Caderno de Encargos
    - #12-views-bibliografia     : Views de Bibliografia e Acervo
-   - #13-views-glossario        : Views de Glossário e Verbetes
+   - #13-views-vocab            : Views de Vocabulário e Verbetes
    - #14-banner-capitulo        : Banners de capítulo e faixas
    ========================================================================== */
 
@@ -122,10 +122,10 @@
       --font-serif:     var(--fonte-leitura);
 
       /* forma */
-      --r-sm:           var(--raio-1);
-      --r-md:           var(--raio-2);
-      --r-lg:           var(--raio-3);
-      --r-full:         var(--raio-pilula);
+      --r-sm:           0;
+      --r-md:           0;
+      --r-lg:           0;
+      --r-full:         0;
       --shadow-sm:      var(--sombra-baixa);
       --shadow-lg:      var(--sombra-alta);
 
@@ -167,23 +167,6 @@
       max-width: 100vw;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-image: url('../images/textura-concreto-opt.jpg'), url('../images/textura-concreto.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.13;
-      mix-blend-mode: screen;
-      filter: contrast(1.18) brightness(0.84);
-    }
 
     .hazard-stripe {
       width: 100%;
@@ -410,8 +393,7 @@
       justify-content: center;
       overflow: hidden;
       z-index: 10;
-      background: linear-gradient(180deg, rgba(20, 20, 22, 0.74) 0%, rgba(20, 20, 22, 0.88) 70%, var(--papel) 100%),
-                  url('../images/textura-concreto-opt.jpg') center center / cover no-repeat;
+      background: linear-gradient(180deg, rgba(20, 20, 22, 0.74) 0%, rgba(20, 20, 22, 0.88) 70%, var(--papel) 100%);
       border-bottom: 1px solid var(--regra-forte);
       text-align: center;
       padding: 2rem 1.5rem;
@@ -617,6 +599,70 @@
       border-color: var(--ouro-capacete);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    }
+
+        .filter-pill.pill-fundamentos { border-color: rgba(245, 158, 11, 0.35); }
+    .filter-pill.pill-fundamentos.active {
+      background: #F59E0B;
+      color: #141416;
+      border-color: #F59E0B;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+    }
+
+    .filter-pill.pill-personagens { border-color: rgba(236, 72, 153, 0.35); }
+    .filter-pill.pill-personagens.active {
+      background: #EC4899;
+      color: #141416;
+      border-color: #EC4899;
+      box-shadow: 0 4px 16px rgba(236, 72, 153, 0.35);
+    }
+
+    .filter-pill.pill-genero { border-color: rgba(139, 92, 246, 0.35); }
+    .filter-pill.pill-genero.active {
+      background: #8B5CF6;
+      color: #141416;
+      border-color: #8B5CF6;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+    }
+
+    .filter-pill.pill-enredo { border-color: rgba(234, 88, 12, 0.35); }
+    .filter-pill.pill-enredo.active {
+      background: #EA580C;
+      color: #141416;
+      border-color: #EA580C;
+      box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35);
+    }
+
+    .filter-pill.pill-tempoespaco { border-color: rgba(99, 102, 241, 0.35); }
+    .filter-pill.pill-tempoespaco.active {
+      background: #6366F1;
+      color: #141416;
+      border-color: #6366F1;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+    }
+
+    .filter-pill.pill-pdv { border-color: rgba(20, 184, 166, 0.35); }
+    .filter-pill.pill-pdv.active {
+      background: #14B8A6;
+      color: #141416;
+      border-color: #14B8A6;
+      box-shadow: 0 4px 16px rgba(20, 184, 166, 0.35);
+    }
+
+    .filter-pill.pill-dialogo { border-color: rgba(234, 179, 8, 0.35); }
+    .filter-pill.pill-dialogo.active {
+      background: #EAB308;
+      color: #141416;
+      border-color: #EAB308;
+      box-shadow: 0 4px 16px rgba(234, 179, 8, 0.35);
+    }
+
+    .filter-pill.pill-laboratorio { border-color: rgba(167, 139, 250, 0.35); }
+    .filter-pill.pill-laboratorio.active {
+      background: #A78BFA;
+      color: #141416;
+      border-color: #A78BFA;
+      box-shadow: 0 4px 16px rgba(167, 139, 250, 0.35);
     }
 
     .filter-pill.pill-consenso { border-color: rgba(255, 178, 1, 0.35); }
@@ -1067,6 +1113,47 @@
 
     .axis-badge:active {
       transform: scale(0.97);
+    }
+
+        .axis-badge.fundamentos {
+      background: rgba(245, 158, 11, 0.16);
+      color: #FBBF24;
+      border: 1.5px solid #F59E0B;
+    }
+    .axis-badge.personagens {
+      background: rgba(236, 72, 153, 0.18);
+      color: #F472B6;
+      border: 1.5px solid #EC4899;
+    }
+    .axis-badge.genero {
+      background: rgba(139, 92, 246, 0.18);
+      color: #DDD6FE;
+      border: 1.5px solid #8B5CF6;
+    }
+    .axis-badge.enredo {
+      background: rgba(234, 88, 12, 0.18);
+      color: #FB923C;
+      border: 1.5px solid #EA580C;
+    }
+    .axis-badge.tempoespaco {
+      background: rgba(99, 102, 241, 0.18);
+      color: #A5B4FC;
+      border: 1.5px solid #6366F1;
+    }
+    .axis-badge.pdv {
+      background: rgba(20, 184, 166, 0.18);
+      color: #5EEAD4;
+      border: 1.5px solid #14B8A6;
+    }
+    .axis-badge.dialogo {
+      background: rgba(234, 179, 8, 0.18);
+      color: #FDE047;
+      border: 1.5px solid #EAB308;
+    }
+    .axis-badge.laboratorio {
+      background: rgba(167, 139, 250, 0.18);
+      color: #C4B5FD;
+      border: 1.5px solid #A78BFA;
     }
 
     .axis-badge.consenso {
@@ -2987,33 +3074,33 @@
     }
 
     /* ==========================================================================
-       [@anchor: #13-views-glossario] [Voltar: #top]
-       VIEW 5: GLOSSÁRIO HUB (GLOSSÁRIO + BARRA DE TAGS INFERIOR)
+       [@anchor: #13-views-vocab] [Voltar: #top]
+       VIEW 5: VOCABULÁRIO HUB (VOCAB + BARRA DE TAGS INFERIOR)
        ========================================================================== */
-    .gloss-header {
+    .vocab-header {
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--borda);
       padding-bottom: 1.5rem;
     }
-    .gloss-sub {
+    .vocab-sub {
       font-size: 0.92rem;
       color: var(--tinta-suave);
     }
-    .gloss-grid {
+    .vocab-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
       gap: 1.25rem;
     }
-    .gloss-card {
+    .vocab-card {
       cursor: pointer;
     }
-    .gloss-card:hover {
+    .vocab-card:hover {
       box-shadow: 0 6px 20px rgba(0,0,0,0.5);
     }
-    .gloss-card-ancora {
+    .vocab-card-ancora {
       font-weight: 700;
     }
-    .gloss-card-def {
+    .vocab-card-def {
       flex: 1;
     }
     .tag-narrato {
@@ -3598,3 +3685,43 @@
 .header-nav-btn.cta-licitacao .cta-arrow {
   font-size: 0.8rem;
 }
+
+/* Tags de Categorias dos 10 Capítulos */
+.materia-tarja-identidade {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  flex-wrap: wrap;
+}
+
+.materia-categoria-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--fonte-tecnica, 'JetBrains Mono', monospace);
+  letter-spacing: 0.02em;
+  padding: 0.12rem 0.50rem;
+  border-radius: var(--raio-1, 4px);
+  background: rgba(20, 20, 22, 0.85);
+  border: 1px solid currentColor;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.materia-categoria-tag.tag-fundamentos { color: #FBBF24; border-color: #F59E0B; }
+.materia-categoria-tag.tag-personagens { color: #F472B6; border-color: #EC4899; }
+.materia-categoria-tag.tag-genero { color: #DDD6FE; border-color: #8B5CF6; }
+.materia-categoria-tag.tag-enredo { color: #FB923C; border-color: #EA580C; }
+.materia-categoria-tag.tag-tempoespaco { color: #A5B4FC; border-color: #6366F1; }
+.materia-categoria-tag.tag-pdv { color: #5EEAD4; border-color: #14B8A6; }
+.materia-categoria-tag.tag-dialogo { color: #FDE047; border-color: #EAB308; }
+.materia-categoria-tag.tag-metodos { color: #7DD3FC; border-color: #38BDF8; }
+.materia-categoria-tag.tag-reescrita { color: #6EE7B7; border-color: #34D399; }
+.materia-categoria-tag.tag-laboratorio,
+.materia-categoria-tag.tag-coletivo { color: #C4B5FD; border-color: #A78BFA; }
+
+/* Preservado: Consenso e Dissenso (legado em reserva) */
+.materia-categoria-tag.tag-consenso { color: #FFB201; border-color: #FFB201; }
+.materia-categoria-tag.tag-dissenso { color: #FCA5A5; border-color: #F87171; }

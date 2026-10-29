@@ -99,7 +99,6 @@
       display: flex;
       align-items: center;
       gap: 0.45rem;
-      margin-left: auto;
       flex-shrink: 0;
     }
     .header-icon-btn {
@@ -609,7 +608,7 @@
       justify-content: space-between;
       padding: 0.85rem 1.5rem;
       position: sticky;
-      top: 0;
+      top: 8px;
       z-index: 20;
     }
     .modal-breadcrumbs {

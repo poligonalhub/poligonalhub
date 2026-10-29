@@ -105,7 +105,7 @@
 
       chapterBlocks.forEach(block => {
         let visibleInBlock = 0;
-        const cards = block.querySelectorAll('.glass-card');
+        const cards = block.querySelectorAll('.glass-card, .materia-card');
 
         cards.forEach(card => {
           const id = card.getAttribute('data-id').toLowerCase();
@@ -141,11 +141,19 @@
         if (activeEixo !== 'all' || currentQuery) {
           feedbackBar.style.display = 'flex';
           const nomesEixos = {
-            'consenso': '⚖️ Consenso',
-            'dissenso': '🥊 Dissenso',
+            'fundamentos': '🗺️ Fundamentos',
+            'personagens': '🔌 Personagens',
+            'genero': '🏠 Gênero',
+            'enredo': '🧱 Enredo',
+            'tempoespaco': '⏳ TempoEspaço',
+            'pdv': '🪟 PDV',
+            'dialogo': '💬 Diálogo',
             'metodos': '📐 Métodos',
             'reescrita': '🪚 Reescrita',
-            'coletivo': '🤝 Coletivo'
+            'laboratorio': '🤝 Laboratório',
+            'coletivo': '🤝 Laboratório',
+            'consenso': '⚖️ Consenso',
+            'dissenso': '🥊 Dissenso'
           };
           let partes = [];
           if (activeEixo !== 'all') partes.push(`eixo <strong>${nomesEixos[activeEixo] || activeEixo}</strong>`);
@@ -599,7 +607,7 @@
           <div class="biblio-header-row">
             <span class="biblio-author">${l.autor}</span>
             <a href="${l.link}" target="_blank" rel="noopener noreferrer" class="biblio-amazon-btn" title="Comprar obra na Amazon">
-              <span>Comprar ↗</span>
+              <span>Comprar</span><span class="icone-banco icone-banco--link-externo" aria-hidden="true"></span>
             </a>
           </div>
           <a href="${l.link}" target="_blank" rel="noopener noreferrer" class="biblio-book-title-link" title="Comprar obra na Amazon">
@@ -629,9 +637,9 @@
       drawerTitle.textContent = item.titulo;
       drawerProse.textContent = item.assunto;
 
-      const badgeClass = item.eixo_classe || 'consenso';
-      const badgeIcon = item.eixo_icone || '⚖️';
-      const badgeName = item.eixo || 'Consenso';
+      const badgeClass = item.eixo_classe || 'fundamentos';
+      const badgeIcon = item.eixo_icone || '🗺️';
+      const badgeName = item.eixo || 'Fundamentos';
       drawerAxisBadge.className = `axis-badge ${badgeClass}`;
       drawerAxisBadge.textContent = `${badgeIcon} ${badgeName}`;
 
@@ -646,11 +654,11 @@
       const slug = item.slug || ('t' + item.numero.toString().padStart(2, '0'));
       const drawerAssuntoLink = document.getElementById('drawerAssuntoLink') || document.getElementById('drawerMemorialLink');
       if (drawerAssuntoLink) {
-        drawerAssuntoLink.href = `topicos/${slug}.html`;
+        drawerAssuntoLink.href = `materias/${slug}.html`;
       }
       const drawerAssuntoTopLink = document.getElementById('drawerAssuntoTopLink') || document.getElementById('drawerMemorialTopLink');
       if (drawerAssuntoTopLink) {
-        drawerAssuntoTopLink.href = `topicos/${slug}.html`;
+        drawerAssuntoTopLink.href = `materias/${slug}.html`;
       }
 
       // Atualização dos controles de navegação
@@ -766,6 +774,9 @@
       } else if (savedFont === 'dislexica' || savedFont === 'dyslexic') {
         document.documentElement.removeAttribute('data-font');
       }
+      if (typeof window.sincronizarBotoesTema === 'function') {
+        window.sincronizarBotoesTema();
+      }
     }
 
     if (fontToggleBtn) {
@@ -774,6 +785,9 @@
         const next = isPesada ? 'dislexica' : 'pesada';
         setStorage('narrato-font', next);
         applyFontVariant(next);
+        if (typeof window.sincronizarBotoesTema === 'function') {
+          window.sincronizarBotoesTema();
+        }
         showToast(next === 'pesada' ? 'Fonte Pesada (Barlow) ativada 👁️' : 'Tipografia Oficial: OpenDyslexic ativada 🔤');
       });
     }
@@ -794,7 +808,7 @@ let currentOmniFilter = 'todos';
 
 function getPathPrefix() {
   const p = window.location.pathname;
-  if (p.includes('/topicos/') || p.includes('/fontes/') || p.includes('/glossario/') || p.includes('/argamassa/')) {
+  if ((p.includes('/materias/') || p.includes('/topicos/')) || p.includes('/fontes/') || (p.includes('/vocab/') || p.includes('/glossario/')) || p.includes('/argamassa/')) {
     return '../';
   }
   return '';
@@ -837,8 +851,8 @@ function navigateToOmniItem(type, id, slug) {
   const prefix = getPathPrefix();
   closeOmniDropdown();
 
-  if (type === 'topico') {
-    window.location.href = prefix + 'topicos/' + slug + '.html';
+  if (type === 'topico' || type === 'materia') {
+    window.location.href = prefix + 'materias/' + slug + '.html';
   } else if (type === 'livro') {
     if (window.location.pathname.includes('/fontes/')) {
       if (typeof abrirModalFonte === 'function') {
@@ -848,13 +862,13 @@ function navigateToOmniItem(type, id, slug) {
     }
     window.location.href = prefix + 'fontes/index.html#' + id;
   } else if (type === 'verbete') {
-    if (window.location.pathname.includes('/glossario/')) {
+    if ((window.location.pathname.includes('/vocab/') || window.location.pathname.includes('/glossario/'))) {
       if (typeof abrirModalVerbete === 'function') {
         abrirModalVerbete(id);
         return;
       }
     }
-    window.location.href = prefix + 'glossario/index.html#' + id;
+    window.location.href = prefix + 'vocab/index.html#' + id;
   }
 }
 
@@ -878,22 +892,24 @@ function handleOmniSearch(query) {
   const index = window.OMNI_INDEX || [];
   let matches = index.filter(item => (item.keywords || '').includes(q));
 
-  const totalMat = matches.filter(m => m.type === 'topico').length;
+  const totalMat = matches.filter(m => m.type === 'materia' || m.type === 'topico').length;
   const totalLiv = matches.filter(m => m.type === 'livro').length;
   const totalVer = matches.filter(m => m.type === 'verbete').length;
 
   const countTodos = document.getElementById('countTodos');
   const countTopicos = document.getElementById('countTopicos');
+  const countMaterias = document.getElementById('countMaterias');
   const countLivros = document.getElementById('countLivros');
   const countVerbetes = document.getElementById('countVerbetes');
 
   if (countTodos) countTodos.innerText = matches.length;
   if (countTopicos) countTopicos.innerText = totalMat;
+  if (countMaterias) countMaterias.innerText = totalMat;
   if (countLivros) countLivros.innerText = totalLiv;
   if (countVerbetes) countVerbetes.innerText = totalVer;
 
   if (currentOmniFilter !== 'todos') {
-    matches = matches.filter(m => m.type === currentOmniFilter);
+    matches = matches.filter(m => m.type === currentOmniFilter || (currentOmniFilter === 'materia' && m.type === 'topico') || (currentOmniFilter === 'topico' && m.type === 'materia'));
   }
 
   if (matches.length === 0) {
@@ -902,15 +918,15 @@ function handleOmniSearch(query) {
   }
 
   let html = '';
-  const topicosList = matches.filter(m => m.type === 'topico');
+  const topicosList = matches.filter(m => m.type === 'materia' || m.type === 'topico');
   const livrosList = matches.filter(m => m.type === 'livro');
   const verbetesList = matches.filter(m => m.type === 'verbete');
 
-  if (topicosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'topico')) {
-    html += `<div class="omni-group-title">🏗️ Matérias do Caderno (${topicosList.length})</div>`;
+  if (topicosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'topico' || currentOmniFilter === 'materia')) {
+    html += `<div class="omni-group-title"><span class="icone-banco icone-banco--materia icone-banco--antes" aria-hidden="true"></span>Matérias do Caderno (${topicosList.length})</div>`;
     topicosList.slice(0, 5).forEach(item => {
       html += `
-        <div class="omni-item" onclick="navigateToOmniItem('topico', '${item.id}', '${item.slug}')">
+        <div class="omni-item" onclick="navigateToOmniItem('materia', '${item.id}', '${item.slug}')">
           <span class="omni-item-badge badge-mat">${item.id}</span>
           <div class="omni-item-content">
             <div class="omni-item-title">${item.title}</div>
@@ -923,7 +939,7 @@ function handleOmniSearch(query) {
   }
 
   if (livrosList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'livro')) {
-    html += `<div class="omni-group-title">📚 Obras & Bibliografia (${livrosList.length})</div>`;
+    html += `<div class="omni-group-title"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Obras & Bibliografia (${livrosList.length})</div>`;
     livrosList.slice(0, 5).forEach(item => {
       html += `
         <div class="omni-item" onclick="navigateToOmniItem('livro', '${item.id}', '${item.slug}')">
@@ -939,7 +955,7 @@ function handleOmniSearch(query) {
   }
 
   if (verbetesList.length > 0 && (currentOmniFilter === 'todos' || currentOmniFilter === 'verbete')) {
-    html += `<div class="omni-group-title">📖 Glossário & Tags (${verbetesList.length})</div>`;
+    html += `<div class="omni-group-title"><span class="icone-banco icone-banco--vocab icone-banco--antes" aria-hidden="true"></span>Vocabulário & Tags (${verbetesList.length})</div>`;
     verbetesList.slice(0, 5).forEach(item => {
       const rawSlug = item.ancora || (item.title.split('•')[0].replace('#', '').trim());
       html += `
@@ -1096,7 +1112,17 @@ function resetarProgressoUsuario() {
 
 // Onboarding Navigation
 function abrirOnboarding() {
-  window.location.href = 'entenda/index.html';
+  if (typeof window.abrirModalOnboarding === 'function' && document.getElementById('modalOnboardingBackdrop')) {
+    window.abrirModalOnboarding();
+  } else {
+    const isSubdir = window.location.pathname.includes('/argamassa/') || 
+                     window.location.pathname.includes('/fontes/') || 
+                     (window.location.pathname.includes('/vocab/') || window.location.pathname.includes('/glossario/')) || 
+                     window.location.pathname.includes('/materias/') ||
+                     window.location.pathname.includes('/entenda/');
+    const prefix = isSubdir ? '../' : '';
+    window.location.href = prefix + 'index.html#entenda';
+  }
 }
 
 // Inicializar restauração ao carregar página

@@ -31,7 +31,12 @@
   <link rel="stylesheet" href="../assets/css/narrato.css">
   <link rel="stylesheet" href="../assets/css/componentes.css">
   <!-- Tema, Acessibilidade e Configurações do cabeçalho único NarrATO (tokens.css).
-     Gerencia: tema (escuro/claro), tipografia (disléxica/Barlow pesada), escala de fonte e menus. -->
+     Gerencia: fontes externas (Barlow e JetBrains Mono), tema (escuro/claro),
+     tipografia (disléxica/Barlow pesada), escala de fonte e menus. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <script>
   (function () {
     'use strict';
@@ -71,15 +76,20 @@
         btn.setAttribute('aria-pressed', String(claro));
         var txt = btn.querySelector('[data-tema-texto]');
         var icone = btn.querySelector('[data-tema-icone]');
-        if (txt) txt.textContent = claro ? 'Tema escuro' : 'Tema claro';
-        if (icone) icone.textContent = claro ? '🌙' : '☀️';
+        if (txt) txt.textContent = claro ? 'Tema claro' : 'Tema escuro';
+        if (icone) {
+          icone.classList.toggle('icone-banco--tema-claro', claro);
+          icone.classList.toggle('icone-banco--tema-escuro', !claro);
+        }
+        btn.setAttribute('title', claro ? 'Tema claro ativo. Clique para alternar para tema escuro.' : 'Tema escuro ativo. Clique para alternar para tema claro.');
       });
 
-      // 2. Toggle Único de Fonte
+      // 2. Toggle Único de Fonte (Identificação transparente do estado ativo)
       document.querySelectorAll('[data-toggle-fonte]').forEach(function (btn) {
         btn.setAttribute('aria-pressed', String(pesada));
         var txt = btn.querySelector('[data-fonte-texto]');
-        if (txt) txt.textContent = pesada ? 'Fonte Disléxica' : 'Fonte Pesada';
+        if (txt) txt.textContent = pesada ? 'Fonte Pesada' : 'Fonte Disléxica';
+        btn.setAttribute('title', pesada ? 'Fonte Pesada (Barlow) ativa. Clique para alternar para Fonte Disléxica.' : 'Fonte Disléxica (OpenDyslexic) ativa. Clique para alternar para Fonte Pesada.');
       });
 
       // Retrocompatibilidade
@@ -108,7 +118,14 @@
       if (gatilho) gatilho.setAttribute('aria-expanded', String(deveAbrir));
       var controles = document.getElementById('acessibilidadeControles');
       if (controles) controles.setAttribute('aria-hidden', String(!deveAbrir));
+      try {
+        localStorage.setItem('narrato-acessibilidade-aberta', deveAbrir ? '1' : '0');
+      } catch (err) {}
     }
+
+    // Exposição global para outros módulos (ex: progresso.js ao importar backup)
+    window.sincronizarBotoesTema = sincronizarBotoes;
+    window.toggleBarraAcessibilidade = toggleBarraAcessibilidade;
 
     document.addEventListener('click', function (e) {
       var alvo = e.target.closest ? e.target : null;
@@ -205,6 +222,9 @@
         document.querySelectorAll('details[data-acessibilidade], details[data-configuracoes]').forEach(function (det) {
           det.open = false;
         });
+        if (typeof window.fecharModalProgresso === 'function') {
+          window.fecharModalProgresso();
+        }
       }
     });
 
@@ -212,11 +232,12 @@
     function secaoAtual() {
       var caminho = location.pathname;
       var secao = /\/fontes\//.test(caminho) ? 'fontes'
-        : /\/glossario\//.test(caminho) ? 'glossario'
+        : (/\/vocab\//.test(caminho) || /\/glossario\//.test(caminho)) ? 'vocab'
         : /\/argamassa\//.test(caminho) ? 'argamassa' : 'caderno';
 
       document.querySelectorAll('.header-nav-link[data-secao]').forEach(function (a) {
-        if (a.getAttribute('data-secao') === secao) {
+        var s = a.getAttribute('data-secao');
+        if (s === secao) {
           a.setAttribute('aria-current', 'page');
         } else {
           a.removeAttribute('aria-current');
@@ -255,10 +276,12 @@
 
     function encontrarAlvoTooltip(node) {
       if (!node || node.nodeType !== 1) return null;
+      if (node.closest('.materia-card, .topic-card, .book-card, .vocab-card, .chapter-intro-prose, .card-prose, .card-heading, #btnAcessibilidadeGatilho, .acessibilidade-gatilho')) {
+        return null;
+      }
       var alvo = node.closest('[data-tooltip], [title]');
       if (!alvo) return null;
 
-      // Se tiver title nativo, migra para data-tooltip para suprimir a caixa nativa do Windows/OS
       if (alvo.hasAttribute('title')) {
         var val = alvo.getAttribute('title').trim();
         if (val) alvo.setAttribute('data-tooltip', val);
@@ -276,16 +299,13 @@
       var rect = el.getBoundingClientRect();
       var tipRect = tip.getBoundingClientRect();
 
-      // Posição padrão: 10px acima do elemento, centralizado
       var top = rect.top - tipRect.height - 10;
       var left = rect.left + (rect.width / 2) - (tipRect.width / 2);
 
-      // Se sair pelo topo da janela (ou elemento muito perto do topo), inverte para baixo
       if (top < 8) {
         top = rect.bottom + 10;
       }
 
-      // Clamping horizontal com margem de segurança de 12px
       var margem = 12;
       if (left < margem) {
         left = margem;
@@ -307,7 +327,6 @@
       targetAtivo = null;
     }
 
-    // Delegação global no document: intercepta qualquer elemento atual ou futuro
     document.addEventListener('mouseover', function (e) {
       var achado = encontrarAlvoTooltip(e.target);
       if (!achado) {
@@ -341,6 +360,13 @@
     window.addEventListener('scroll', esconderTooltip, { passive: true });
 
     document.addEventListener('DOMContentLoaded', function () {
+      // Restaura estado aberto/fechado da barra de acessibilidade se o usuário a deixou aberta
+      try {
+        if (localStorage.getItem('narrato-acessibilidade-aberta') === '1') {
+          toggleBarraAcessibilidade(true);
+        }
+      } catch (err) {}
+
       sincronizarBotoes();
       secaoAtual();
       alturaCabecalho();
@@ -371,58 +397,62 @@
 <header class="narrato-header">
   <a href="../index.html" class="header-brand" aria-label="NarrATO, início do Caderno de Encargos">
     <img src="../assets/svg/logo-narrato-white.svg" alt="NarrATO" class="brand-logo">
-    <span class="header-title-box">
-      <span class="header-subtitle">Cimento, tijolos e vigas de aço para construtores de histórias</span>
-    </span>
   </a>
-  <button type="button" class="cabecalho-menu" data-menu-alternar aria-expanded="false" aria-controls="cabecalhoGaveta">Menu</button>
+  <button type="button" class="cabecalho-menu" data-menu-alternar aria-expanded="false" aria-controls="cabecalhoGaveta"><span class="icone-banco icone-banco--menu icone-banco--antes" aria-hidden="true"></span>Menu</button>
   <div class="cabecalho-gaveta" id="cabecalhoGaveta">
     <nav class="header-nav" aria-label="Seções">
-      <a href="../index.html" class="header-nav-link" data-secao="caderno">Caderno de Encargos</a>
-      <a href="../argamassa/index.html" class="header-nav-link" data-secao="argamassa">Argamassa</a>
-      <a href="../fontes/index.html" class="header-nav-link" data-secao="fontes">Livros de Ordem</a>
-      <a href="../glossario/index.html" class="header-nav-link" data-secao="glossario">Vocabulário</a>
+      <a href="../index.html" class="header-nav-link" data-secao="caderno"><span class="icone-banco icone-banco--caderno icone-banco--antes" aria-hidden="true"></span>Caderno de Encargos</a>
+      <a href="../argamassa/index.html" class="header-nav-link" data-secao="argamassa"><span class="icone-banco icone-banco--argamassa icone-banco--antes" aria-hidden="true"></span>Argamassa</a>
+      <a href="../fontes/index.html" class="header-nav-link" data-secao="fontes"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Livros de Ordem</a>
+      <a href="../vocab/index.html" class="header-nav-link" data-secao="vocab"><span class="icone-banco icone-banco--vocab icone-banco--antes" aria-hidden="true"></span>Vocabulário</a>
     </nav>
-    <!-- Busca única do cabeçalho: matérias, livros e glossário em tempo real.
+
+    <!-- Na página Vocabulário, a busca desce para o hero centralizado; nas demais seções, fica no cabeçalho -->
+    
+    <!-- Busca única do cabeçalho: matérias, livros e vocabulário em tempo real.
      A lógica mora no caderno.js (index) e no narrato.js (páginas internas). -->
 <div class="omni-search-wrapper" data-omni-search role="search">
   <div class="omni-search-box">
     <label class="visualmente-oculto" for="omniSearchInput">Buscar no NarrATO</label>
+    <span class="icone-banco icone-banco--buscar" aria-hidden="true"></span>
     <input type="search" id="omniSearchInput" class="omni-search-input" placeholder="Buscar matérias, livros, verbetes" oninput="handleOmniSearch(this.value)" onfocus="handleOmniFocus()" autocomplete="off">
-    <button type="button" id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca" aria-label="Limpar busca" style="display:none;">✕</button>
+    <button type="button" id="omniClearBtn" class="omni-search-clear" onclick="clearOmniSearch()" title="Limpar busca" aria-label="Limpar busca" style="display:none;"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
     <kbd class="omni-search-kbd">Ctrl+K</kbd>
   </div>
 
   <div id="omniDropdown" class="omni-dropdown">
     <div class="omni-tabs">
       <button type="button" class="omni-tab active" data-filter="todos" onclick="setOmniFilter('todos')">Todos (<span id="countTodos">0</span>)</button>
-      <button type="button" class="omni-tab" data-filter="topico" onclick="setOmniFilter('topico')">Matérias (<span id="countTopicos">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="materia" onclick="setOmniFilter('materia')">Matérias (<span id="countMaterias">0</span>)</button>
       <button type="button" class="omni-tab" data-filter="livro" onclick="setOmniFilter('livro')">Livros (<span id="countLivros">0</span>)</button>
-      <button type="button" class="omni-tab" data-filter="verbete" onclick="setOmniFilter('verbete')">Glossário (<span id="countVerbetes">0</span>)</button>
+      <button type="button" class="omni-tab" data-filter="verbete" onclick="setOmniFilter('verbete')">Vocabulário (<span id="countVerbetes">0</span>)</button>
     </div>
     <div id="omniResultsBody"></div>
   </div>
 </div>
 
+    
+
+    <div class="header-util-group" id="headerUtilGroup">
 
     <!-- Barra de Acessibilidade: Ícone internacional que expande horizontalmente ao clicar -->
     <div class="acessibilidade-wrapper" id="acessibilidadeWrapper" data-acessibilidade-wrapper>
       <button type="button" class="acessibilidade-gatilho" id="btnAcessibilidadeGatilho" aria-expanded="false" aria-label="Acessibilidade" title="Acessibilidade">
-        <span class="icone-acessibilidade" aria-hidden="true"></span>
+        <span class="icone-banco icone-banco--acessibilidade icone-acessibilidade" aria-hidden="true"></span>
         <span class="acessibilidade-rotulo-hover">Acessibilidade</span>
       </button>
 
       <div class="acessibilidade-controles" id="acessibilidadeControles" aria-hidden="true">
         <!-- 1. Tema: Sol no escuro / Lua no claro -->
         <button type="button" class="botao-acess-item" data-troca-tema aria-pressed="false" title="Alternar tema claro/escuro" aria-label="Alternar tema">
-          <span class="icone-tema" data-tema-icone aria-hidden="true">☀️</span>
+          <span class="icone-banco icone-banco--tema-claro icone-tema" data-tema-icone aria-hidden="true"></span>
           <span class="acess-item-rotulo" data-tema-texto>Tema claro</span>
         </button>
 
         <!-- 2. Toggle Único de Fonte: Disléxica vs Barlow Pesada -->
         <button type="button" class="botao-acess-item" data-toggle-fonte aria-pressed="false" title="Alternar tipografia: OpenDyslexic / Barlow Pesada" aria-label="Alternar fonte">
           <span class="icone-fonte" aria-hidden="true">Aa</span>
-          <span class="acess-item-rotulo" data-fonte-texto>Fonte Pesada</span>
+          <span class="acess-item-rotulo" data-fonte-texto>Fonte Disléxica</span>
         </button>
 
         <!-- 3. Controles de Tamanho de Fonte (A- / A+) -->
@@ -440,26 +470,95 @@
     <!-- Painel de Configurações: Engrenagem industrial entre Barra de Acessibilidade e ? -->
     <details class="configuracoes" data-configuracoes>
       <summary class="configuracoes-botao" aria-label="Configurações" title="Configurações">
-        <svg class="icone-engrenagem" viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
-          <path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3 1.61.22l2.49-1c.52.39 1.06.73 1.69.98l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-        </svg>
+        <span class="icone-banco icone-banco--configuracoes icone-engrenagem" aria-hidden="true"></span>
       </summary>
       <div class="configuracoes-painel">
-        <div class="painel-secao-rotulo">CONFIGURAÇÕES</div>
+        <div class="painel-secao-rotulo">Configurações</div>
         <div class="config-icones-linha" role="toolbar" aria-label="Ações de Progresso e Dados">
-          <button type="button" class="botao-icon-config" onclick="abrirModalProgresso()" data-tooltip="Gerenciar Progresso" aria-label="Gerenciar Progresso">💾</button>
-          <button type="button" class="botao-icon-config" data-exportar-progresso data-tooltip="Baixar Backup" aria-label="Baixar Backup">⬇</button>
-          <button type="button" class="botao-icon-config" data-importar-progresso data-tooltip="Restaurar Backup" aria-label="Restaurar Backup">⬆</button>
-          <button type="button" class="botao-icon-config botao-icon-config--perigo" data-resetar-progresso data-tooltip="Limpar Progresso" aria-label="Limpar Progresso">🗑</button>
+          <button type="button" class="botao-icon-config" onclick="abrirModalProgresso()" data-tooltip="Gerenciar Progresso" aria-label="Gerenciar Progresso"><span class="icone-banco icone-banco--progresso-gerenciar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config" data-exportar-progresso data-tooltip="Exportar progresso" aria-label="Exportar progresso"><span class="icone-banco icone-banco--progresso-exportar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config" data-importar-progresso data-tooltip="Importar progresso" aria-label="Importar progresso"><span class="icone-banco icone-banco--progresso-importar" aria-hidden="true"></span></button>
+          <button type="button" class="botao-icon-config botao-icon-config--perigo" data-resetar-progresso data-tooltip="Limpar Progresso" aria-label="Limpar Progresso"><span class="icone-banco icone-banco--progresso-limpar" aria-hidden="true"></span></button>
         </div>
         <input type="file" id="inputImportarBackup" accept=".json" style="display:none" aria-hidden="true">
       </div>
     </details>
 
-    <a href="../index.html#entenda-o-narrato" class="header-ajuda" title="Entenda o NarrATO: como funciona, Licitação e Alvará" aria-label="Entenda o NarrATO: como funciona, Licitação e Alvará">?</a>
+    <a href="../index.html#entenda" class="header-ajuda" title="Entenda" aria-label="Entenda"><span class="icone-banco icone-banco--ajuda" aria-hidden="true"></span></a>
+    </div>
   </div>
 </header>
 <div class="faixa-fita" aria-hidden="true"></div>
+<!-- 5. MODAL DE GERENCIAMENTO DE PROGRESSO & BACKUP (#modalProgressoBackdrop) -->
+<div id="modalProgressoBackdrop" class="modal-scaffold-backdrop" onclick="fecharModalProgresso(event)">
+  <div class="modal-scaffold-frame" onclick="event.stopPropagation()" style="max-width:680px;">
+    <span class="scaffold-corner corner-tl"></span>
+    <span class="scaffold-corner corner-tr"></span>
+    <span class="scaffold-corner corner-bl"></span>
+    <span class="scaffold-corner corner-br"></span>
+
+    <div class="modal-scaffold-head">
+      <div class="modal-breadcrumbs">
+        <span>Configurações</span>
+        <span>›</span>
+        <span class="crumb-active">Progresso & Cópia de Segurança</span>
+      </div>
+      <button class="modal-close-btn" onclick="fecharModalProgresso()" title="Fechar (Esc ou clique fora)"><span class="icone-banco icone-banco--fechar" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="modal-scaffold-body" id="modalProgressoBody">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1 style="font-size:1.5rem; margin:0 0 0.3rem 0; color:var(--tinta-titulo);"><span class="icone-banco icone-banco--progresso-gerenciar icone-banco--antes" aria-hidden="true"></span>Progresso do Canteiro</h1>
+          <p style="font-size:0.88rem; color:var(--tinta-suave); margin:0;">Seus dados ficam salvos localmente neste navegador.</p>
+        </div>
+        <span id="modalProgressoStatusBadge" class="cat-pill" style="font-size:0.75rem;">SINCRONIZADO</span>
+      </div>
+
+      <div class="modal-scaffold-box">
+        <span class="modal-box-label">ESTATÍSTICAS ATUAIS 📊</span>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-top:0.5rem;">
+          <div style="background:var(--superficie-afundada); padding:0.85rem 1rem; border-radius:0; border:1px solid var(--traco-regra);">
+            <div style="font-size:0.75rem; color:var(--tinta-suave); text-transform:uppercase; font-weight:700;">Matérias Lidas</div>
+            <div id="modalProgressoMateriasCount" style="font-size:1.6rem; font-weight:800; color:var(--acento); margin-top:0.2rem;">0 / 50</div>
+          </div>
+          <div style="background:var(--superficie-afundada); padding:0.85rem 1rem; border-radius:0; border:1px solid var(--traco-regra);">
+            <div style="font-size:0.75rem; color:var(--tinta-suave); text-transform:uppercase; font-weight:700;">Capítulos Concluídos</div>
+            <div id="modalProgressoCapitulosCount" style="font-size:1.6rem; font-weight:800; color:var(--tinta-titulo); margin-top:0.2rem;">0 / 10</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-scaffold-box">
+        <span class="modal-box-label">AÇÕES DE BACKUP & SEGURANÇA ⚙️</span>
+        <p style="font-size:0.88rem; line-height:1.6; color:var(--tinta-corpo); margin:0 0 1rem 0;">
+          Exporte uma cópia em arquivo JSON para guardar seu avanço ou transferir para outro dispositivo.
+        </p>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <button type="button" class="btn-resumo" data-exportar-progresso style="padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:700;">
+            <span class="icone-banco icone-banco--progresso-exportar icone-banco--antes" aria-hidden="true"></span>Exportar progresso
+          </button>
+          <button type="button" class="btn-resumo" data-importar-progresso style="padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:700; background:none; border:1px solid var(--traco-forte); color:var(--tinta-corpo);">
+            <span class="icone-banco icone-banco--progresso-importar icone-banco--antes" aria-hidden="true"></span>Importar progresso
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-scaffold-box" style="border-left: 3px solid var(--cor-tijolo-700);">
+        <span class="modal-box-label" style="color:var(--cor-tijolo-700);">ZONA DE RISCO ⚠️</span>
+        <p style="font-size:0.85rem; line-height:1.6; color:var(--tinta-suave); margin:0 0 0.75rem 0;">
+          Deseja zerar todo o histórico de leituras e capítulos concluídos? Esta ação não pode ser desfeita.
+        </p>
+        <div>
+          <button type="button" class="btn-resumo" data-resetar-progresso style="background:none; border:1px solid var(--cor-tijolo-700); color:var(--cor-tijolo-700); padding:0.5rem 1rem; font-size:0.82rem; font-weight:700;">
+            <span class="icone-banco icone-banco--progresso-limpar icone-banco--antes" aria-hidden="true"></span>Limpar Todo o Progresso
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -468,7 +567,7 @@
     <div class="breadcrumb-nav">
       <a href="../index.html" class="breadcrumb-link">Caderno de Encargos</a>
       <span class="breadcrumb-sep">›</span>
-      <a href="index.html" class="breadcrumb-link">📚 Bibliografia</a>
+      <a href="index.html" class="breadcrumb-link"><span class="icone-banco icone-banco--livro icone-banco--antes" aria-hidden="true"></span>Bibliografia</a>
       <span class="breadcrumb-sep">›</span>
       <span class="breadcrumb-current">"Conquering Writer's Block and Summoning Inspiration"</span>
     </div>
@@ -482,7 +581,7 @@
         <div class="single-book-author">por K. M. Weiland</div>
         <div class="single-book-actions">
           <a href="https://amzn.to/4eLxIUS" target="_blank" rel="noopener noreferrer" class="card-btn btn-buy" style="font-size:0.85rem; padding:0.6rem 1.25rem;">
-            Adquirir Exemplar Oficial →
+            Adquirir Exemplar Oficial<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span>
           </a>
         </div>
       </div>
@@ -490,37 +589,37 @@
 
     <!-- SEÇÕES DA FICHA DA OBRA -->
     <div class="single-section">
-      <h2 class="single-section-title">📄 Descrição Oficial</h2>
+      <h2 class="single-section-title"><span class="icone-banco icone-banco--documento icone-banco--antes" aria-hidden="true"></span>Descrição Oficial</h2>
       <div class="single-section-body">Desobstrução de dutos criativos: desarmando o perfeccionismo paralisante e reativando a tração prática da escrita. Uma obra nuclear para a fundamentação prática do canteiro narratológico.</div>
     </div>
 
     <div class="single-section">
-      <h2 class="single-section-title">🧭 Posicionamento no Canteiro</h2>
+      <h2 class="single-section-title"><span class="icone-banco icone-banco--posicionamento icone-banco--antes" aria-hidden="true"></span>Posicionamento no Canteiro</h2>
       <div class="single-section-body">Contribui como ferramenta técnica especializada para aprofundamento das matérias de Caderno.</div>
     </div>
 
     <div class="single-section">
-      <h2 class="single-section-title">⚖️ Matriz Dialética entre Obras</h2>
+      <h2 class="single-section-title">Matriz Dialética entre Obras</h2>
       <div class="dialogue-grid">
         <div class="dialogue-box consenso">
-          <div class="dialogue-title consenso-title">🤝 Em Consenso com:</div>
-          <div><div class="dialogue-item"><a href="index.html" style="color:inherit; text-decoration:none;">🤝 <strong>"Story"</strong> (Robert McKee) ↗</a></div></div>
+          <div class="dialogue-title consenso-title">Em consenso com</div>
+          <div><div class="dialogue-item"><a href="index.html" style="color:inherit; text-decoration:none;"><strong>"Story"</strong> (Robert McKee)<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a></div></div>
         </div>
         <div class="dialogue-box dissenso">
-          <div class="dialogue-title dissenso-title">🥊 Em Dissenso com:</div>
-          <div><div class="dialogue-item"><a href="index.html" style="color:inherit; text-decoration:none;">🥊 <strong>"Salve o Gato!"</strong> (Blake Snyder) ↗</a></div></div>
+          <div class="dialogue-title dissenso-title">Em dissenso com</div>
+          <div><div class="dialogue-item"><a href="index.html" style="color:inherit; text-decoration:none;"><strong>"Salve o Gato!"</strong> (Blake Snyder)<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a></div></div>
         </div>
       </div>
     </div>
 
     <div class="single-section">
-      <h2 class="single-section-title">🔍 Mencionado em</h2>
-      <div class="badges-cloud"><a href="../materias/t06-caracterizacao-vs-carater.html" class="topic-pill">T06 ↗</a><a href="../materias/t07-desejo-vs-prioridade.html" class="topic-pill">T07 ↗</a><a href="../materias/t09-fios-desencapados.html" class="topic-pill">T09 ↗</a><a href="../materias/t11-tema-vs-assunto.html" class="topic-pill">T11 ↗</a><a href="../materias/t15-guerra-de-crencas.html" class="topic-pill">T15 ↗</a><a href="../materias/t16-estrutura-do-enredo.html" class="topic-pill">T16 ↗</a><a href="../materias/t17-causa-e-efeito.html" class="topic-pill">T17 ↗</a><a href="../materias/t18-tres-atos-industriais.html" class="topic-pill">T18 ↗</a><a href="../materias/t20-entre-a-prancheta-e-a-picareta.html" class="topic-pill">T20 ↗</a><a href="../materias/t36-obras-diferentes-demandam-ferramentas-diferentes.html" class="topic-pill">T36 ↗</a><a href="../materias/t37-tripe-da-regua-de-nivel.html" class="topic-pill">T37 ↗</a><a href="../materias/t38-sem-mapa-nao-ha-recalculo-de-rota.html" class="topic-pill">T38 ↗</a><a href="../materias/t39-prancheta-tablet-ou-quadro-camurca.html" class="topic-pill">T39 ↗</a><a href="../materias/t40-canteiro-cercado-ou-mutirao.html" class="topic-pill">T40 ↗</a><a href="../materias/t42-distanciamento.html" class="topic-pill">T42 ↗</a><a href="../materias/t43-use-a-motosserra-sem-se-machucar.html" class="topic-pill">T43 ↗</a></div>
+      <h2 class="single-section-title"><span class="icone-banco icone-banco--mencoes icone-banco--antes" aria-hidden="true"></span>Mencionado em</h2>
+      <div class="badges-cloud"><a href="../materias/m06-caracterizacao-vs-carater.html" class="topic-pill">M06<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m07-desejo-vs-prioridade.html" class="topic-pill">M07<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m09-fios-desencapados.html" class="topic-pill">M09<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m11-tema-vs-assunto.html" class="topic-pill">M11<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m15-guerra-de-crencas.html" class="topic-pill">M15<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m16-estrutura-do-enredo.html" class="topic-pill">M16<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m17-causa-e-efeito.html" class="topic-pill">M17<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m18-tres-atos-industriais.html" class="topic-pill">M18<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m20-entre-a-prancheta-e-a-picareta.html" class="topic-pill">M20<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m36-obras-diferentes-demandam-ferramentas-diferentes.html" class="topic-pill">M36<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m37-tripe-da-regua-de-nivel.html" class="topic-pill">M37<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m38-sem-mapa-nao-ha-recalculo-de-rota.html" class="topic-pill">M38<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m39-prancheta-tablet-ou-quadro-camurca.html" class="topic-pill">M39<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m40-canteiro-cercado-ou-mutirao.html" class="topic-pill">M40<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m42-distanciamento.html" class="topic-pill">M42<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../materias/m43-use-a-motosserra-sem-se-machucar.html" class="topic-pill">M43<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a></div>
     </div>
 
     <div class="single-section">
-      <h2 class="single-section-title">🏷️ Tags Relacionadas</h2>
-      <div class="badges-cloud"><a href="../glossario/index.html#estrutura" class="topic-pill">#estrutura ↗</a><a href="../glossario/index.html#personagem" class="topic-pill">#personagem ↗</a><a href="../glossario/index.html#cena" class="topic-pill">#cena ↗</a><a href="../glossario/index.html#conflito" class="topic-pill">#conflito ↗</a></div>
+      <h2 class="single-section-title"><span class="icone-banco icone-banco--tags icone-banco--antes" aria-hidden="true"></span>Tags Relacionadas</h2>
+      <div class="badges-cloud"><a href="../vocab/index.html#estrutura" class="topic-pill">#estrutura<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../vocab/index.html#personagem" class="topic-pill">#personagem<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../vocab/index.html#cena" class="topic-pill">#cena<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a><a href="../vocab/index.html#conflito" class="topic-pill">#conflito<span class="icone-banco icone-banco--seta icone-banco--depois" aria-hidden="true"></span></a></div>
     </div>
 
   </main>
@@ -545,7 +644,7 @@
 
       <!-- Bloco dos Financiadores Públicos -->
       <div class="fomento-block fomento-financiamento">
-        <span class="fomento-sublabel">FINANCIADA POR</span>
+        <span class="fomento-sublabel">V. 1.0. FINANCIADA POR</span>
         <div class="fomento-seals-grid">
           <span class="fomento-seal-item" data-tooltip="PNAB • Política Nacional Aldir Blanc">
             <img src="../assets/svg/PNAB.svg" alt="Política Nacional Aldir Blanc" class="fomento-seal">
@@ -589,7 +688,7 @@
           Desenvolvedores de audiovisual, jogos e soluções web.
         </p>
         <a href="mailto:poligonalhub@gmail.com" class="poligonal-footer-email">
-          poligonalhub@gmail.com ↗
+          poligonalhub@gmail.com<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span>
         </a>
       </div>
 
@@ -601,7 +700,7 @@
           <ul class="poligonal-footer-nav">
             <li><a href="/" data-root-link>Home</a></li>
             <li><a href="/#servicos" data-root-link="#servicos">Serviços</a></li>
-            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo) ↗</a></li>
+            <li><a href="https://poligonal.substack.com/" target="_blank" rel="noopener noreferrer">Substack (Fluxo)<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
             <li><a href="/contato.html" data-root-link="contato.html">Contato &amp; Parcerias</a></li>
           </ul>
         </div>
@@ -610,10 +709,10 @@
         <div class="poligonal-footer-col">
           <h4 class="poligonal-footer-heading">Comunidade</h4>
           <ul class="poligonal-footer-nav">
-            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se ↗</a></li>
-            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord ↗</a></li>
-            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube ↗</a></li>
-            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+            <li><a href="https://apoia.se/poligonal" target="_blank" rel="noopener noreferrer" class="poligonal-footer-accent">Apoia-se<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+            <li><a href="https://discord.gg/kSCNNdFaQE" target="_blank" rel="noopener noreferrer">Discord<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+            <li><a href="https://www.youtube.com/@poligonalhub" target="_blank" rel="noopener noreferrer">YouTube<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
+            <li><a href="https://www.instagram.com/poligonalhub" target="_blank" rel="noopener noreferrer">Instagram<span class="icone-banco icone-banco--link-externo icone-banco--depois" aria-hidden="true"></span></a></li>
           </ul>
         </div>
       </div>
@@ -633,6 +732,7 @@
 </footer>
 
   <script src="../assets/js/omni-index.js"></script>
+  <script src="../assets/js/progresso.js"></script>
   <script src="../assets/js/narrato.js"></script>
   <script src="../../shared/hub-footer.js"></script>
 </body>
