@@ -7,10 +7,6 @@
 
 const POLIGONAL_DEFAULT_COMPARISONS = {
     // --- OCUPAR E RESISTIR ---
-    'Ocupar e Resistir': {
-        similar: 'Projeto síntese: une defesa de torre tática com armadilhas, ciclo agrícola comunitário diurno e combate noturno em um assentamento popular.',
-        differs: 'Estética 100% autoral inspirada em quadrinhos nordestinos contemporâneos (Regis Soares e Paulo Moreira) e temática de luta popular por reforma agrária e urbana no Brasil.'
-    },
     'Orcs Must Die': {
         similar: 'Posicionamento estratégico de defesas físicas e armadilhas para conter ondas sucessivas de invasores em rotas de entrada.',
         differs: 'Substitui a fantasia medieval cômica pela luta por moradia real no Nordeste brasileiro, integrando ciclo agrícola diurno de agroecologia inexistente em OMD.'
@@ -33,25 +29,21 @@ const POLIGONAL_DEFAULT_COMPARISONS = {
     },
 
     // --- PARANOIDE ---
-    'PARANOIDE': {
-        similar: 'O jogo principal: destruição de circuitos eletrônicos literais sob a vigilância sádica e humilhante da IA D.E.N.T.O.',
-        differs: 'Foco em desestabilizar a segurança psicológica do jogador através de interferências na interface, inversão de tela e blackouts propositais.'
-    },
     'Portal': {
-        similar: 'Presença opressiva e onipresente de uma inteligência artificial sarcástica que monitora, zomba e manipula o ambiente de teste.',
-        differs: 'Mecânica central de arcade clássico (Breakout/Arkanoid) com componentes de placas-mãe reais, sem puzzles em primeira pessoa tridimensionais.'
+        similar: 'Presença opressiva e onipresente de uma inteligência artificial sarcástica que monitora, humilha e manipula o ambiente de testes laboratoriais.',
+        differs: 'Ao invés de puzzles 3D em primeira pessoa com física de portais, o foco é na velocidade frenética e precisão de rebatimento arcade em circuitos elétricos reais.'
     },
     'Arkanoid': {
-        similar: 'A base clássica de física de rebatimento: controle de palheta, ângulo de ricochete do disco e eliminação de blocos em grade.',
-        differs: 'A IA sabota ativamente o jogador (inverte controles, escurece monitores, altera física), transformando um teste de reflexos em duelo psicológico.'
+        similar: 'A fundação clássica de física de rebatimento: controle de palheta, ângulo de ricochete do disco e eliminação de blocos em grade.',
+        differs: 'Subverte o clássico com sabotagens ativas da IA (inversão de comandos, telas apagadas e física adulterada), transformando reflexos em duelo psicológico contínuo.'
     },
 
     // --- PROFANADORES ---
-    'Profanadores': {
-        similar: 'Metroidvania de horror cósmico nordesteampunk ambientado na Paraíba colonial e nos manguezais assombrados.',
-        differs: 'Combate cooperativo local assimétrico com alternância estratégica entre Benedita e Balthazar e arquitetura barroca paraibana autêntica.'
-    },
     'SOTN': {
+        similar: 'Estrutura labiríntica não-linear de mapa, progressão por destravamento de habilidades e atmosfera gótica decadente.',
+        differs: 'Substitui a iconografia transilvânica por entidades dos mangues e casarões coloniais paraibanos, com sistema cooperativo entre dois heróis complementares.'
+    },
+    'Symphony of the Night': {
         similar: 'Estrutura labiríntica não-linear de mapa, progressão por destravamento de habilidades e atmosfera gótica decadente.',
         differs: 'Substitui a iconografia transilvânica por entidades dos mangues e casarões coloniais paraibanos, com sistema cooperativo entre dois heróis complementares.'
     },
@@ -73,10 +65,6 @@ const POLIGONAL_DEFAULT_COMPARISONS = {
     },
 
     // --- CARCARAH! ---
-    'Carcarah!': {
-        similar: 'Ação visceral em terceira pessoa no sertão distópico, alternando lâminas e armas de fogo sob delírio febril.',
-        differs: 'Estética brutalista sertaneja com direção de arte em tons de terra e ciano neon, acompanhando o colapso psicológico do herói Parahyba.'
-    },
     'Returnal': {
         similar: 'Ritmo implacável de combate em 3ª pessoa, atmosfera alucinatória e ciclos de mortes integrados ao trauma psicológico.',
         differs: 'Ambientação sertaneja pós-apocalíptica brasileira, armas artesanais forjadas em ferro bruto e combate coreografado de curta distância.'
@@ -106,6 +94,7 @@ window.createPoligonalRadar = function(options) {
         angleLineColor = 'rgba(255, 255, 255, 0.15)',
         pointLabelColor = '#cbd5e1',
         fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        bodyFontFamily = "var(--theme-font-body, 'Inter', system-ui, -apple-system, sans-serif)",
         pointLabelFontSize = window.innerWidth < 640 ? 11 : 12,
         legendFontSize = 12,
         legendPosition = 'bottom',
@@ -127,14 +116,14 @@ window.createPoligonalRadar = function(options) {
         return null;
     }
 
-    // Backup dos estilos originais e vinculação de comparações padrão
-    datasets.forEach(ds => {
+    // Backup dos estilos originais e vinculação de comparações padrão (exclusivo para jogos correlatos)
+    datasets.forEach((ds, idx) => {
         ds._origBorderWidth = ds.borderWidth || 3;
         ds._origBackgroundColor = ds.backgroundColor;
         ds._origBorderColor = ds.borderColor;
         ds._origPointRadius = ds.pointRadius || 4;
 
-        if (!ds.comparison && POLIGONAL_DEFAULT_COMPARISONS[ds.label]) {
+        if (idx > 0 && !ds.comparison && POLIGONAL_DEFAULT_COMPARISONS[ds.label]) {
             ds.comparison = POLIGONAL_DEFAULT_COMPARISONS[ds.label];
         }
     });
@@ -236,13 +225,22 @@ window.createPoligonalRadar = function(options) {
             }
             return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
         } else if (color.startsWith('rgb')) {
-            const rgb = color.match(/\\d+/g);
+            const rgb = color.match(/\d+/g);
             if (rgb && rgb.length >= 3) {
                 return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + alpha + ')';
             }
         }
         return color;
     }
+
+    // Identifica o wrapper do canvas para garantir que a legenda e o painel de comparação
+    // sejam inseridos FORA do container de altura restrita do Chart.js
+    const chartWrapper = canvas.parentNode;
+    const isDedicatedWrapper = chartWrapper && 
+        chartWrapper !== document.body && 
+        !['SECTION', 'MAIN', 'ARTICLE', 'BODY'].includes(chartWrapper.tagName.toUpperCase());
+
+    const insertTarget = isDedicatedWrapper ? chartWrapper : canvas;
 
     // 2. Custom Interactive HTML Legend
     let legendContainer = document.getElementById(canvasId + '-legend');
@@ -253,11 +251,18 @@ window.createPoligonalRadar = function(options) {
         legendContainer.style.flexWrap = 'wrap';
         legendContainer.style.justifyContent = 'center';
         legendContainer.style.gap = '0.75rem';
-        legendContainer.style.marginTop = '1rem';
+        legendContainer.style.marginTop = '1.25rem';
         legendContainer.style.fontSize = '0.75rem';
         legendContainer.style.fontWeight = '600';
         legendContainer.style.fontFamily = fontFamily;
-        canvas.parentNode.insertBefore(legendContainer, canvas.nextSibling);
+        legendContainer.style.maxWidth = '700px';
+        legendContainer.style.marginLeft = 'auto';
+        legendContainer.style.marginRight = 'auto';
+        legendContainer.style.width = '100%';
+        legendContainer.style.boxSizing = 'border-box';
+        legendContainer.style.position = 'relative';
+        legendContainer.style.zIndex = '5';
+        insertTarget.parentNode.insertBefore(legendContainer, insertTarget.nextSibling);
     }
 
     // 3. Comparison Panel
@@ -265,33 +270,57 @@ window.createPoligonalRadar = function(options) {
     if (!comparisonPanel) {
         comparisonPanel = document.createElement('div');
         comparisonPanel.id = canvasId + '-comparison';
-        comparisonPanel.style.marginTop = '1rem';
+        comparisonPanel.style.marginTop = '0px';
         comparisonPanel.style.overflow = 'hidden';
         comparisonPanel.style.maxHeight = '0px';
         comparisonPanel.style.opacity = '0';
-        comparisonPanel.style.transition = 'max-height 0.5s ease, opacity 0.5s ease';
-        comparisonPanel.style.fontFamily = fontFamily;
-        comparisonPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+        comparisonPanel.style.transition = 'max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, margin-top 0.3s ease';
+        comparisonPanel.style.fontFamily = bodyFontFamily;
+        comparisonPanel.style.backgroundColor = 'rgba(10, 10, 14, 0.95)';
         comparisonPanel.style.borderRadius = '8px';
+        comparisonPanel.style.border = '1px solid rgba(255, 255, 255, 0.12)';
         comparisonPanel.style.borderLeft = '4px solid transparent';
         comparisonPanel.style.position = 'relative';
+        comparisonPanel.style.zIndex = '5';
         comparisonPanel.style.color = pointLabelColor;
+        comparisonPanel.style.maxWidth = '700px';
+        comparisonPanel.style.marginLeft = 'auto';
+        comparisonPanel.style.marginRight = 'auto';
+        comparisonPanel.style.boxSizing = 'border-box';
+        comparisonPanel.style.width = '100%';
+        comparisonPanel.style.backdropFilter = 'blur(12px)';
+        comparisonPanel.style.webkitBackdropFilter = 'blur(12px)';
+        comparisonPanel.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.6)';
         
         const closeBtn = document.createElement('button');
         closeBtn.innerHTML = '✕';
+        closeBtn.setAttribute('type', 'button');
+        closeBtn.setAttribute('aria-label', 'Fechar análise de posicionamento');
         closeBtn.style.position = 'absolute';
-        closeBtn.style.top = '8px';
+        closeBtn.style.top = '10px';
         closeBtn.style.right = '12px';
-        closeBtn.style.background = 'transparent';
-        closeBtn.style.border = 'none';
+        closeBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+        closeBtn.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        closeBtn.style.borderRadius = '6px';
         closeBtn.style.color = pointLabelColor;
         closeBtn.style.cursor = 'pointer';
-        closeBtn.style.fontSize = '14px';
+        closeBtn.style.fontSize = '12px';
+        closeBtn.style.lineHeight = '1';
+        closeBtn.style.padding = '5px 9px';
+        closeBtn.style.transition = 'all 0.2s ease';
+        closeBtn.onmouseenter = () => {
+            closeBtn.style.background = 'rgba(255, 255, 255, 0.15)';
+            closeBtn.style.color = '#ffffff';
+        };
+        closeBtn.onmouseleave = () => {
+            closeBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+            closeBtn.style.color = pointLabelColor;
+        };
         closeBtn.onclick = resetState;
         
         const contentDiv = document.createElement('div');
         contentDiv.id = canvasId + '-comparison-content';
-        contentDiv.style.padding = '1rem 2rem 1rem 1rem';
+        contentDiv.style.padding = '1.25rem 1.5rem 1.25rem 1.25rem';
         
         comparisonPanel.appendChild(closeBtn);
         comparisonPanel.appendChild(contentDiv);
@@ -309,12 +338,15 @@ window.createPoligonalRadar = function(options) {
             ds.borderWidth = ds._origBorderWidth;
             ds.backgroundColor = ds._origBackgroundColor;
             ds.borderColor = ds._origBorderColor;
+            ds.pointRadius = ds._origPointRadius;
         });
         chartInstance.update();
         
         // Reseta o painel de comparação
         comparisonPanel.style.maxHeight = '0px';
         comparisonPanel.style.opacity = '0';
+        comparisonPanel.style.marginTop = '0px';
+        comparisonPanel.style.borderLeftColor = 'transparent';
         
         // Reseta a legenda
         updateLegendUI();
@@ -382,6 +414,8 @@ window.createPoligonalRadar = function(options) {
         const text = document.createElement('span');
         text.innerText = ds.label;
 
+        pill.title = index === 0 ? `${ds.label} (Jogo de referência)` : `Análise comparativa: ${ds.label}`;
+
         pill.appendChild(dot);
         pill.appendChild(text);
 
@@ -408,41 +442,55 @@ window.createPoligonalRadar = function(options) {
                 chartInstance.update();
                 updateLegendUI();
 
-                // Atualiza o painel de comparação
-                const comp = ds.comparison || POLIGONAL_DEFAULT_COMPARISONS[ds.label];
+                // O jogo base (índice 0) é a referência e não se compara consigo mesmo.
+                // O painel comparativo é exibido exclusivamente para os jogos correlatos (índice > 0).
+                const isReferenceGame = index === 0 || ds.isReferenceGame === true || ds.isMain === true || ds.comparison === false;
+                let comp = !isReferenceGame && (ds.comparison || POLIGONAL_DEFAULT_COMPARISONS[ds.label]);
                 if (comp) {
                     comparisonPanel.style.borderLeftColor = ds._origBorderColor;
                     const contentDiv = document.getElementById(canvasId + '-comparison-content');
                     
-                    const similarText = typeof comp === 'string' ? comp : (comp.similar || '');
-                    const differsText = typeof comp === 'object' ? (comp.differs || '') : '';
+                    let similarText = '';
+                    let differsText = '';
+                    if (typeof comp === 'string') {
+                        similarText = comp;
+                        const defaultEntry = POLIGONAL_DEFAULT_COMPARISONS[ds.label];
+                        if (defaultEntry && typeof defaultEntry === 'object' && defaultEntry.differs) {
+                            differsText = defaultEntry.differs;
+                        }
+                    } else if (typeof comp === 'object') {
+                        similarText = comp.similar || '';
+                        differsText = comp.differs || '';
+                    }
 
                     contentDiv.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; padding-right: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: ${ds._origBorderColor}; box-shadow: 0 0 10px ${ds._origBorderColor};"></span>
-                                <span style="font-weight: 900; font-size: 0.95rem; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em;">${ds.label}</span>
+                                <span style="font-family: ${fontFamily}; font-weight: 900; font-size: 0.95rem; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em;">${ds.label}</span>
                             </div>
                             <span style="font-size: 0.65rem; font-family: monospace; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Análise de Posicionamento</span>
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; font-size: 0.75rem; line-height: 1.55;">
-                            <div style="padding: 0.85rem; border-radius: 10px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.06);">
-                                <span style="font-weight: 800; color: #34d399; display: block; margin-bottom: 0.25rem; letter-spacing: 0.03em;">⚖️ Como se Compara:</span>
-                                <p style="margin: 0; color: #e2e8f0;">${similarText}</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; font-size: 0.875rem; line-height: 1.6;">
+                            <div style="padding: 0.85rem 1rem; border-radius: 8px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); font-family: ${bodyFontFamily};">
+                                <span style="font-family: ${bodyFontFamily}; font-weight: 700; font-size: 0.8rem; color: #34d399; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; letter-spacing: 0.02em;">⚖️ Como se Compara:</span>
+                                <p style="margin: 0; color: var(--text-light, #e2e8f0); font-family: ${bodyFontFamily}; font-size: 0.875rem; line-height: 1.6; opacity: 0.85;">${similarText}</p>
                             </div>
                             ${differsText ? `
-                            <div style="padding: 0.85rem; border-radius: 10px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.06);">
-                                <span style="font-weight: 800; color: #fb923c; display: block; margin-bottom: 0.25rem; letter-spacing: 0.03em;">⚡ Como se Difere:</span>
-                                <p style="margin: 0; color: #e2e8f0;">${differsText}</p>
+                            <div style="padding: 0.85rem 1rem; border-radius: 8px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); font-family: ${bodyFontFamily};">
+                                <span style="font-family: ${bodyFontFamily}; font-weight: 700; font-size: 0.8rem; color: #fb923c; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; letter-spacing: 0.02em;">⚡ Como se Difere:</span>
+                                <p style="margin: 0; color: var(--text-light, #e2e8f0); font-family: ${bodyFontFamily}; font-size: 0.875rem; line-height: 1.6; opacity: 0.85;">${differsText}</p>
                             </div>
                             ` : ''}
                         </div>
                     `;
+                    comparisonPanel.style.marginTop = '1.25rem';
                     comparisonPanel.style.opacity = '1';
-                    comparisonPanel.style.maxHeight = '600px';
+                    comparisonPanel.style.maxHeight = '800px';
                 } else {
                     comparisonPanel.style.maxHeight = '0px';
                     comparisonPanel.style.opacity = '0';
+                    comparisonPanel.style.marginTop = '0px';
                 }
             }
         };

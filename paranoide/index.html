@@ -326,6 +326,7 @@
             canvasId: 'competitorAnalysisChart',
             labels: ['Pressão Psicológica', 'Precisão Arcade', 'Complexidade Mecânica', 'Estética Distópica', 'Inovação de Regras'],
             fontFamily: "'Major Mono Display', monospace",
+            bodyFontFamily: "'Inter', sans-serif",
             gridColor: 'rgba(74, 74, 74, 0.5)',
             angleLineColor: 'rgba(74, 74, 74, 0.5)',
             pointLabelColor: '#D9D9D9',
@@ -338,29 +339,35 @@
                 {
                     label: 'PARANOIDE',
                     data: [10, 8, 9, 10, 9],
-                    backgroundColor: 'rgba(140, 3, 3, 0.3)',
-                    borderColor: '#8C0303',
-                    pointBackgroundColor: '#8C0303',
+                    backgroundColor: 'rgba(255, 42, 58, 0.25)',
+                    borderColor: '#FF2A3A',
+                    pointBackgroundColor: '#FF2A3A',
                     pointBorderColor: '#D9D9D9',
                     borderWidth: 3
                 },
                 {
                     label: 'Portal',
-                    comparison: 'Inspirado por Portal, PARANOIDE constrói uma atmosfera opressora de testes científicos guiados por uma IA sádica, mas foca na precisão mecânica arcade.',
+                    comparison: {
+                        similar: 'Presença opressiva e onipresente de uma inteligência artificial sarcástica que monitora, humilha e manipula o ambiente de testes laboratoriais.',
+                        differs: 'Ao invés de puzzles 3D em primeira pessoa com física de portais, o foco é na velocidade frenética e precisão de rebatimento arcade em circuitos elétricos reais.'
+                    },
                     data: [9, 6, 8, 9, 10],
-                    backgroundColor: 'rgba(74, 74, 74, 0.2)',
-                    borderColor: '#4A4A4A',
-                    pointBackgroundColor: '#4A4A4A',
+                    backgroundColor: 'rgba(0, 229, 255, 0.2)',
+                    borderColor: '#00E5FF',
+                    pointBackgroundColor: '#00E5FF',
                     pointBorderColor: '#D9D9D9',
                     borderWidth: 2
                 },
                 {
                     label: 'Arkanoid',
-                    comparison: 'Subvertemos a fundação clássica de Arkanoid, pegando um gênero fundamentalmente simples e transformando em um pesadelo de sobrevivência multitarefa.',
+                    comparison: {
+                        similar: 'A fundação clássica de física de rebatimento: controle de palheta, ângulo de ricochete do disco e eliminação de blocos em grade.',
+                        differs: 'Subverte o clássico com sabotagens ativas da IA (inversão de comandos, telas apagadas e física adulterada), transformando reflexos em duelo psicológico contínuo.'
+                    },
                     data: [2, 10, 6, 4, 3],
-                    backgroundColor: 'rgba(89, 2, 2, 0.2)',
-                    borderColor: '#590202',
-                    pointBackgroundColor: '#590202',
+                    backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                    borderColor: '#FBBF24',
+                    pointBackgroundColor: '#FBBF24',
                     pointBorderColor: '#D9D9D9',
                     borderWidth: 2
                 }
